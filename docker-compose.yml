@@ -1,0 +1,79 @@
+services:
+  # ---------- Next.js Apps ----------
+  public:
+    build:
+      context: .
+      dockerfile: apps/public/Dockerfile.dev
+    ports:
+      - "4000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/apps/public/.next
+    environment:
+      - DATABASE_HOST=mysql
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=devpassword
+      - DATABASE_NAME=mpga
+      - STRIPE_SECRET_KEY=sk_test_xxx
+      - STRIPE_WEBHOOK_SECRET=whsec_xxx
+      - MAIL_HOST=mailpit
+      - MAIL_PORT=1025
+    depends_on:
+      - mysql
+
+  admin:
+    build:
+      context: .
+      dockerfile: apps/admin/Dockerfile.dev
+    ports:
+      - "4001:3001"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/apps/admin/.next
+    environment:
+      - DATABASE_HOST=mysql
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=devpassword
+      - DATABASE_NAME=mpga
+      - STRIPE_SECRET_KEY=sk_test_xxx
+      - STRIPE_WEBHOOK_SECRET=whsec_xxx
+      - MAIL_HOST=mailpit
+      - MAIL_PORT=1025
+      - BETTER_AUTH_SECRET=dev-secret-change-in-prod
+      - BETTER_AUTH_URL=http://localhost:26101
+      - NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:26101
+    depends_on:
+      - mysql
+
+  # ---------- External Services ----------
+  mysql:
+    image: mysql:8.4.7
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "25061:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    restart: unless-stopped
+
+  stripe:
+    image: stripe/stripe-cli:v1.34.0
+    environment:
+      STRIPE_DEVICE_NAME: docker
+    command: listen --forward-to admin:4001/stripe/webhook/clover/
+    restart: unless-stopped
+    depends_on:
+      - admin
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "1035:1025"
+      - "8035:8025"
+
+volumes:
+  mysql-data:
+    external: true
+    name: mpga_dev-data

@@ -1,0 +1,32 @@
+{
+  "name": "@mpga/ui",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "@mpga/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@mpga/eslint-config": "workspace:*",
+    "@mpga/typescript-config": "workspace:*",
+    "@types/react": "^18.3.17",
+    "eslint": "^8.57.0",
+    "react": "^18.3.1",
+    "typescript": "^5.7.2"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1"
+  }
+}
