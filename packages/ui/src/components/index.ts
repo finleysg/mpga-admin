@@ -1,2 +1,2 @@
-export * from "./PostCard";
-export * from "./PostList";
+// UI components will be added as they are developed
+export {};
