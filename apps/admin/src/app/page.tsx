@@ -1,6 +1,7 @@
+import { db, posts } from "@mpga/database";
 import Link from "next/link";
 
-import { db, posts } from "@mpga/database";
+export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
   const allPosts = await db.select().from(posts).orderBy(posts.createdAt);

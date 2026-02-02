@@ -1,0 +1,17 @@
+# Dependencies
+node_modules
+
+# Hidden folders in root
+/.*
+
+# Build outputs
+dist
+
+# Lockfile
+pnpm-lock.yaml
+
+# Generated files
+packages/database/drizzle
+
+# Coverage
+coverage

@@ -1,6 +1,5 @@
-import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
-
 import type { accounts, sessions, users } from "@mpga/database";
+import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
 
 export type User = InferSelectModel<typeof users>;
 export type NewUser = InferInsertModel<typeof users>;

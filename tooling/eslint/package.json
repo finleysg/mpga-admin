@@ -2,19 +2,27 @@
   "name": "@mpga/eslint-config",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
+  "exports": {
+    "./base": "./base.mjs",
+    "./nextjs": "./nextjs.mjs",
+    "./library": "./library.mjs"
+  },
   "files": [
-    "base.js",
-    "nextjs.js",
-    "library.js"
+    "base.mjs",
+    "nextjs.mjs",
+    "library.mjs"
   ],
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "^8.18.0",
-    "@typescript-eslint/parser": "^8.18.0",
-    "eslint-config-next": "^15.1.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-import": "^2.31.0"
+    "@eslint/eslintrc": "^3.3.0",
+    "@eslint/js": "^9.17.0",
+    "eslint-config-next": "16.1.6",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-import": "^2.31.0",
+    "globals": "^15.14.0",
+    "typescript-eslint": "^8.19.0"
   },
   "peerDependencies": {
-    "eslint": "^8.57.0 || ^9.0.0"
+    "eslint": "^9.0.0"
   }
 }

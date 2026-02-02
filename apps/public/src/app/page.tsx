@@ -1,7 +1,8 @@
-import { eq } from "drizzle-orm";
-
 import { db, posts } from "@mpga/database";
 import { PostList } from "@mpga/ui";
+import { eq } from "drizzle-orm";
+
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const publishedPosts = await db

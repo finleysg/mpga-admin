@@ -13,7 +13,8 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src/"
+    "lint": "eslint src/",
+    "test": "vitest run --config ../../vitest.config.ts"
   },
   "dependencies": {
     "@mpga/types": "workspace:*"
@@ -21,12 +22,12 @@
   "devDependencies": {
     "@mpga/eslint-config": "workspace:*",
     "@mpga/typescript-config": "workspace:*",
-    "@types/react": "^18.3.17",
-    "eslint": "^8.57.0",
-    "react": "^18.3.1",
+    "@types/react": "^19.2.0",
+    "eslint": "^9.17.0",
+    "react": "19.2.3",
     "typescript": "^5.7.2"
   },
   "peerDependencies": {
-    "react": "^18.3.1"
+    "react": "^19.2.0"
   }
 }

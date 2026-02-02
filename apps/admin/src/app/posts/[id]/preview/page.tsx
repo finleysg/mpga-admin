@@ -1,8 +1,7 @@
-import { eq } from "drizzle-orm";
-import { notFound } from "next/navigation";
-
 import { db, posts } from "@mpga/database";
 import { PostCard } from "@mpga/ui";
+import { eq } from "drizzle-orm";
+import { notFound } from "next/navigation";
 
 interface PreviewPageProps {
   params: Promise<{ id: string }>;
