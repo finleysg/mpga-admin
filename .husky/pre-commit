@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+
+# Lint and format staged files
+pnpm exec lint-staged
+
+# Typecheck entire workspace
+pnpm typecheck
+
+# Run tests
+pnpm test

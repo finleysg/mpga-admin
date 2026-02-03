@@ -1,0 +1,513 @@
+{
+  "name": "MPGA Home Page Implementation",
+  "description": "Build the home page for Minnesota Public Golf Association's public site with a classic/traditional golf club aesthetic.",
+  "items": [
+    {
+      "id": "DS-001",
+      "category": "Design System",
+      "description": "Replace cyan primary color palette with MPGA green palette in Tailwind config",
+      "file": "tooling/tailwind/base.css",
+      "steps_to_verify": [
+        "Open tooling/tailwind/base.css",
+        "Confirm primary-500 is #00a261 (MPGA green)",
+        "Confirm primary-900 is #004d2d",
+        "Confirm all 10 primary color stops (50-950) use green hues",
+        "Run pnpm build to verify no CSS errors"
+      ],
+      "passes": false
+    },
+    {
+      "id": "DS-002",
+      "category": "Design System",
+      "description": "Add gold accent color palette to Tailwind config",
+      "file": "tooling/tailwind/base.css",
+      "steps_to_verify": [
+        "Open tooling/tailwind/base.css",
+        "Confirm gold-500 is #DBA507 or similar gold shade",
+        "Confirm gold color palette has at least 50, 100, 500, 600, 700 stops",
+        "Run pnpm build to verify no CSS errors"
+      ],
+      "passes": false
+    },
+    {
+      "id": "DS-003",
+      "category": "Design System",
+      "description": "Add secondary color palette (#07485B) to Tailwind config",
+      "file": "tooling/tailwind/base.css",
+      "steps_to_verify": [
+        "Open tooling/tailwind/base.css",
+        "Confirm secondary-500 is #07485B",
+        "Confirm secondary color palette has consistent shade range",
+        "Run pnpm build to verify no CSS errors"
+      ],
+      "passes": false
+    },
+    {
+      "id": "DS-004",
+      "category": "Design System",
+      "description": "Add Google Fonts (Playfair Display for headings, Inter for body) to layout.tsx",
+      "file": "apps/public/src/app/layout.tsx",
+      "steps_to_verify": [
+        "Open apps/public/src/app/layout.tsx",
+        "Confirm next/font/google imports Playfair_Display and Inter",
+        "Confirm font variables are applied to html or body element",
+        "Run pnpm dev and inspect font-family in browser DevTools",
+        "Verify headings use Playfair Display, body uses Inter"
+      ],
+      "passes": false
+    },
+    {
+      "id": "DS-005",
+      "category": "Design System",
+      "description": "Add typography CSS variables for font families to Tailwind config",
+      "file": "tooling/tailwind/base.css",
+      "steps_to_verify": [
+        "Open tooling/tailwind/base.css",
+        "Confirm --font-heading variable exists for Playfair Display",
+        "Confirm --font-body variable exists for Inter",
+        "Classes like font-heading and font-body should be available"
+      ],
+      "passes": false
+    },
+    {
+      "id": "SH-001",
+      "category": "shadcn/ui Setup",
+      "description": "Initialize shadcn/ui in packages/ui with components.json config",
+      "file": "packages/ui/components.json",
+      "steps_to_verify": [
+        "Confirm packages/ui/components.json exists",
+        "Confirm style is set to 'new-york' or 'default'",
+        "Confirm tailwindCSS config points to correct path",
+        "Confirm aliases are configured for @mpga/ui imports"
+      ],
+      "passes": false
+    },
+    {
+      "id": "SH-002",
+      "category": "shadcn/ui Setup",
+      "description": "Add required dependencies for shadcn/ui (tailwind-merge, class-variance-authority, clsx, lucide-react)",
+      "file": "packages/ui/package.json",
+      "steps_to_verify": [
+        "Open packages/ui/package.json",
+        "Confirm dependencies include: tailwind-merge, class-variance-authority, clsx",
+        "Confirm dependencies include: lucide-react for icons",
+        "Run pnpm install from root - no errors"
+      ],
+      "passes": false
+    },
+    {
+      "id": "SH-003",
+      "category": "shadcn/ui Setup",
+      "description": "Create cn() utility function for className merging",
+      "file": "packages/ui/src/lib/utils.ts",
+      "steps_to_verify": [
+        "Confirm packages/ui/src/lib/utils.ts exists",
+        "Confirm cn() function uses clsx and tailwind-merge",
+        "Confirm function is exported from packages/ui/src/index.ts"
+      ],
+      "passes": false
+    },
+    {
+      "id": "SC-001",
+      "category": "shadcn Components",
+      "description": "Install shadcn/ui Button component",
+      "file": "packages/ui/src/components/ui/button.tsx",
+      "steps_to_verify": [
+        "Confirm packages/ui/src/components/ui/button.tsx exists",
+        "Confirm Button component is exported from packages/ui",
+        "Confirm buttonVariants includes primary, secondary, outline variants",
+        "Run pnpm typecheck - no errors"
+      ],
+      "passes": false
+    },
+    {
+      "id": "SC-002",
+      "category": "shadcn Components",
+      "description": "Install shadcn/ui Card component",
+      "file": "packages/ui/src/components/ui/card.tsx",
+      "steps_to_verify": [
+        "Confirm packages/ui/src/components/ui/card.tsx exists",
+        "Confirm Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter are exported",
+        "Run pnpm typecheck - no errors"
+      ],
+      "passes": false
+    },
+    {
+      "id": "SC-003",
+      "category": "shadcn Components",
+      "description": "Install shadcn/ui Navigation Menu component",
+      "file": "packages/ui/src/components/ui/navigation-menu.tsx",
+      "steps_to_verify": [
+        "Confirm packages/ui/src/components/ui/navigation-menu.tsx exists",
+        "Confirm NavigationMenu, NavigationMenuItem, NavigationMenuLink are exported",
+        "Run pnpm typecheck - no errors"
+      ],
+      "passes": false
+    },
+    {
+      "id": "SC-004",
+      "category": "shadcn Components",
+      "description": "Install shadcn/ui Carousel component",
+      "file": "packages/ui/src/components/ui/carousel.tsx",
+      "steps_to_verify": [
+        "Confirm packages/ui/src/components/ui/carousel.tsx exists",
+        "Confirm Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext are exported",
+        "Confirm embla-carousel-react dependency is installed",
+        "Run pnpm typecheck - no errors"
+      ],
+      "passes": false
+    },
+    {
+      "id": "SC-005",
+      "category": "shadcn Components",
+      "description": "Install shadcn/ui Sheet component (for mobile menu)",
+      "file": "packages/ui/src/components/ui/sheet.tsx",
+      "steps_to_verify": [
+        "Confirm packages/ui/src/components/ui/sheet.tsx exists",
+        "Confirm Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle are exported",
+        "Confirm @radix-ui/react-dialog dependency is installed",
+        "Run pnpm typecheck - no errors"
+      ],
+      "passes": false
+    },
+    {
+      "id": "UC-001",
+      "category": "UI Components",
+      "description": "Create Header component with desktop navigation using NavigationMenu",
+      "file": "packages/ui/src/components/Header.tsx",
+      "steps_to_verify": [
+        "Confirm packages/ui/src/components/Header.tsx exists",
+        "Confirm Header has sticky position with white background",
+        "Confirm navigation links: Home, Tournaments, Match Play, Members, News",
+        "Confirm MPGA logo links to home",
+        "Confirm desktop nav is visible on screens >= 768px",
+        "Run pnpm typecheck - no errors"
+      ],
+      "passes": false
+    },
+    {
+      "id": "UC-002",
+      "category": "UI Components",
+      "description": "Add mobile hamburger menu to Header using Sheet component",
+      "file": "packages/ui/src/components/Header.tsx",
+      "steps_to_verify": [
+        "Confirm hamburger icon visible on screens < 768px",
+        "Confirm clicking hamburger opens Sheet slide-out menu",
+        "Confirm Sheet contains all navigation links",
+        "Confirm Sheet closes when link is clicked",
+        "Test in browser at mobile viewport width"
+      ],
+      "passes": false
+    },
+    {
+      "id": "UC-003",
+      "category": "UI Components",
+      "description": "Create Footer component with 4-column layout",
+      "file": "packages/ui/src/components/Footer.tsx",
+      "steps_to_verify": [
+        "Confirm packages/ui/src/components/Footer.tsx exists",
+        "Confirm dark background (primary-900 or neutral-900)",
+        "Confirm 4 columns: Navigation, About, Contact, Social",
+        "Confirm copyright line at bottom with current year",
+        "Confirm responsive: stacks on mobile",
+        "Run pnpm typecheck - no errors"
+      ],
+      "passes": false
+    },
+    {
+      "id": "UC-004",
+      "category": "UI Components",
+      "description": "Create FeatureCard component using Card primitive",
+      "file": "packages/ui/src/components/FeatureCard.tsx",
+      "steps_to_verify": [
+        "Confirm packages/ui/src/components/FeatureCard.tsx exists",
+        "Confirm props: icon (emoji/ReactNode), title, description, href",
+        "Confirm hover effect: subtle lift shadow",
+        "Confirm entire card is clickable link",
+        "Run pnpm typecheck - no errors"
+      ],
+      "passes": false
+    },
+    {
+      "id": "UC-005",
+      "category": "UI Components",
+      "description": "Create HeroSlide component with 66/33 split layout",
+      "file": "packages/ui/src/components/HeroSlide.tsx",
+      "steps_to_verify": [
+        "Confirm packages/ui/src/components/HeroSlide.tsx exists",
+        "Confirm props: imageUrl, title, subtitle, venue, date, ctaHref",
+        "Confirm images added to assets: systemName matches image name",
+        "Confirm 66% image / 33% content split",
+        "Confirm content side has primary-900 green background",
+        "Confirm responsive: stacks on mobile",
+        "Run pnpm typecheck - no errors"
+      ],
+      "passes": false
+    },
+    {
+      "id": "UC-006",
+      "category": "UI Components",
+      "description": "Create HeroCarousel component using Carousel primitive",
+      "file": "packages/ui/src/components/HeroCarousel.tsx",
+      "steps_to_verify": [
+        "Confirm packages/ui/src/components/HeroCarousel.tsx exists",
+        "Confirm props: slides array of HeroSlide data",
+        "Confirm manual navigation only (arrows + dots)",
+        "Confirm full width, ~60vh height",
+        "Confirm navigation dots show current slide",
+        "Run pnpm typecheck - no errors"
+      ],
+      "passes": false
+    },
+    {
+      "id": "UC-007",
+      "category": "UI Components",
+      "description": "Create NewsCard component using Card primitive",
+      "file": "packages/ui/src/components/NewsCard.tsx",
+      "steps_to_verify": [
+        "Confirm packages/ui/src/components/NewsCard.tsx exists",
+        "Confirm props: title, date, excerpt, href",
+        "Confirm date is formatted nicely",
+        "Confirm excerpt is truncated to 2-3 lines",
+        "Confirm hover effect matches FeatureCard",
+        "Run pnpm typecheck - no errors"
+      ],
+      "passes": false
+    },
+    {
+      "id": "UC-008",
+      "category": "UI Components",
+      "description": "Export all custom components from packages/ui index",
+      "file": "packages/ui/src/index.ts",
+      "steps_to_verify": [
+        "Open packages/ui/src/index.ts",
+        "Confirm exports: Header, Footer, FeatureCard, HeroSlide, HeroCarousel, NewsCard",
+        "Confirm exports: Button, Card, NavigationMenu, Carousel, Sheet components",
+        "Confirm exports: cn utility function",
+        "Run pnpm build in packages/ui - no errors"
+      ],
+      "passes": false
+    },
+    {
+      "id": "LI-001",
+      "category": "Layout Integration",
+      "description": "Add Header and Footer to public app layout",
+      "file": "apps/public/src/app/layout.tsx",
+      "steps_to_verify": [
+        "Open apps/public/src/app/layout.tsx",
+        "Confirm Header is rendered before {children}",
+        "Confirm Footer is rendered after {children}",
+        "Confirm main content is wrapped in flex-grow container",
+        "Run pnpm dev and verify header/footer appear on all pages"
+      ],
+      "passes": false
+    },
+    {
+      "id": "DL-001",
+      "category": "Data Layer",
+      "description": "Create getUpcomingTournaments() query function",
+      "file": "apps/public/src/lib/queries.ts",
+      "steps_to_verify": [
+        "Confirm apps/public/src/lib/queries.ts exists",
+        "Confirm getUpcomingTournaments() joins tournamentInstance, tournament, golfCourse",
+        "Confirm returns: id, name, startDate, tournamentName, venueName",
+        "Confirm filters by startDate >= CURDATE()",
+        "Confirm orders by startDate ASC, limits to 5",
+        "Run pnpm typecheck - no errors"
+      ],
+      "passes": false
+    },
+    {
+      "id": "DL-002",
+      "category": "Data Layer",
+      "description": "Create getAboutContent() query function",
+      "file": "apps/public/src/lib/queries.ts",
+      "steps_to_verify": [
+        "Confirm getAboutContent() queries content table",
+        "Confirm filters by contentType = 'H'",
+        "Confirm returns: title, contentText",
+        "Confirm limits to 1 result",
+        "Run pnpm typecheck - no errors"
+      ],
+      "passes": false
+    },
+    {
+      "id": "DL-003",
+      "category": "Data Layer",
+      "description": "Create getFeatureCards() query function",
+      "file": "apps/public/src/lib/queries.ts",
+      "steps_to_verify": [
+        "Confirm getFeatureCards() queries content table",
+        "Confirm filters by contentType IN ('T1', 'M1', 'C1')",
+        "Confirm returns: title, contentText, contentType",
+        "Confirm maps contentType to route: T1->/tournaments, M1->/match-play, C1->/members",
+        "Run pnpm typecheck - no errors"
+      ],
+      "passes": false
+    },
+    {
+      "id": "DL-004",
+      "category": "Data Layer",
+      "description": "Create getLatestAnnouncements() query function",
+      "file": "apps/public/src/lib/queries.ts",
+      "steps_to_verify": [
+        "Confirm getLatestAnnouncements() queries announcement table",
+        "Confirm orders by createDate DESC",
+        "Confirm limits to 3 results",
+        "Confirm returns: id, title, text, createDate",
+        "Run pnpm typecheck - no errors"
+      ],
+      "passes": false
+    },
+    {
+      "id": "DL-005",
+      "category": "Data Layer",
+      "description": "Create isOffseason() utility function",
+      "file": "apps/public/src/lib/queries.ts",
+      "steps_to_verify": [
+        "Confirm isOffseason() checks if current date has no upcoming tournaments",
+        "Confirm returns boolean",
+        "Used to determine if hero shows tournaments or logo slide"
+      ],
+      "passes": false
+    },
+    {
+      "id": "API-001",
+      "category": "API",
+      "description": "Create revalidation API endpoint for ISR",
+      "file": "apps/public/src/app/api/revalidate/route.ts",
+      "steps_to_verify": [
+        "Confirm apps/public/src/app/api/revalidate/route.ts exists",
+        "Confirm POST handler accepts secret and path query params",
+        "Confirm validates secret against REVALIDATE_SECRET env var",
+        "Confirm returns 401 if secret is invalid",
+        "Confirm calls revalidatePath(path) on success",
+        "Test with curl: curl -X POST 'http://localhost:3000/api/revalidate?secret=test&path=/'"
+      ],
+      "passes": false
+    },
+    {
+      "id": "API-002",
+      "category": "API",
+      "description": "Add REVALIDATE_SECRET to environment configuration",
+      "file": ".env.example",
+      "steps_to_verify": [
+        "Confirm .env.example has REVALIDATE_SECRET entry",
+        "Confirm .env has actual REVALIDATE_SECRET value set",
+        "Document purpose in comments"
+      ],
+      "passes": false
+    },
+    {
+      "id": "HP-001",
+      "category": "Home Page",
+      "description": "Build Hero section on home page with carousel",
+      "file": "apps/public/src/app/page.tsx",
+      "steps_to_verify": [
+        "Confirm page.tsx fetches upcoming tournaments",
+        "Confirm HeroCarousel renders with tournament data",
+        "Confirm offseason fallback shows logo slide",
+        "Visually verify carousel works in browser"
+      ],
+      "passes": false
+    },
+    {
+      "id": "HP-002",
+      "category": "Home Page",
+      "description": "Build Feature Cards section on home page (3-column grid)",
+      "file": "apps/public/src/app/page.tsx",
+      "steps_to_verify": [
+        "Confirm page.tsx fetches feature cards content",
+        "Confirm 3 FeatureCards render in grid layout",
+        "Confirm cards have correct icons and links",
+        "Confirm responsive: stacks on mobile",
+        "Visually verify in browser"
+      ],
+      "passes": false
+    },
+    {
+      "id": "HP-003",
+      "category": "Home Page",
+      "description": "Build About MPGA section on home page",
+      "file": "apps/public/src/app/page.tsx",
+      "steps_to_verify": [
+        "Confirm page.tsx fetches about content",
+        "Confirm section has 'About MPGA' heading with serif font",
+        "Confirm content renders as paragraphs",
+        "Confirm max-width container, centered",
+        "Visually verify in browser"
+      ],
+      "passes": false
+    },
+    {
+      "id": "HP-004",
+      "category": "Home Page",
+      "description": "Build Latest News section on home page",
+      "file": "apps/public/src/app/page.tsx",
+      "steps_to_verify": [
+        "Confirm page.tsx fetches latest announcements",
+        "Confirm section has 'Latest News' heading",
+        "Confirm 3 NewsCards render in grid layout",
+        "Confirm 'View All News' link points to /news",
+        "Visually verify in browser"
+      ],
+      "passes": false
+    },
+    {
+      "id": "HP-005",
+      "category": "Home Page",
+      "description": "Add proper page metadata and styling to home page",
+      "file": "apps/public/src/app/page.tsx",
+      "steps_to_verify": [
+        "Confirm page title is 'MPGA - Minnesota Public Golf Association'",
+        "Confirm page description is set appropriately",
+        "Confirm sections have proper vertical spacing",
+        "Confirm background colors match design system"
+      ],
+      "passes": false
+    },
+    {
+      "id": "VE-001",
+      "category": "Verification",
+      "description": "Run TypeScript type checking across workspace",
+      "file": null,
+      "steps_to_verify": [
+        "Run pnpm typecheck from root",
+        "Confirm no TypeScript errors",
+        "All components properly typed"
+      ],
+      "passes": false
+    },
+    {
+      "id": "VE-002",
+      "category": "Verification",
+      "description": "Run ESLint across workspace",
+      "file": null,
+      "steps_to_verify": [
+        "Run pnpm lint from root",
+        "Confirm no linting errors",
+        "Confirm no warnings in new code"
+      ],
+      "passes": false
+    },
+    {
+      "id": "VE-003",
+      "category": "Verification",
+      "description": "Visual verification of complete home page",
+      "file": null,
+      "steps_to_verify": [
+        "Run pnpm dev",
+        "Visit http://localhost:3000",
+        "Verify header displays logo and nav links",
+        "Verify hero carousel shows tournament data",
+        "Verify carousel arrows/dots work",
+        "Verify feature cards display with correct links",
+        "Verify about section renders database content",
+        "Verify news section shows 3 latest articles",
+        "Verify footer displays all links",
+        "Resize to mobile (<768px), verify hamburger menu works"
+      ],
+      "passes": false
+    }
+  ]
+}

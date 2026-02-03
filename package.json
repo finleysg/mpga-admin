@@ -13,13 +13,30 @@
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "db:generate": "turbo run db:generate",
     "db:push": "turbo run db:push",
-    "db:studio": "turbo run db:studio"
+    "db:studio": "turbo run db:studio",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{js,mjs,cjs}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.3",
+    "eslint": "^9.17.0",
     "@testing-library/react": "^16.1.0",
     "@vitejs/plugin-react": "^4.3.4",
+    "husky": "^9.1.7",
     "jsdom": "^25.0.1",
+    "lint-staged": "^16.2.7",
     "prettier": "^3.5.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
