@@ -47,13 +47,13 @@ export default async function HomePage() {
       <section className="py-8">
         <HeroCarousel slides={slides} />
       </section>
-      <FeatureCardsSection cards={featureCards} />
       {aboutContent && (
         <AboutSection
           title={aboutContent.title}
           content={aboutContent.content}
         />
       )}
+      <FeatureCardsSection cards={featureCards} />
       <LatestNewsSection announcements={announcements} />
     </main>
   );

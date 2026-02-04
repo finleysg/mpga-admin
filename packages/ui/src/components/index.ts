@@ -17,6 +17,7 @@ export {
   AnnouncementCard,
   type AnnouncementCardProps,
 } from "./AnnouncementCard";
+export { TournamentCard, type TournamentCardProps } from "./TournamentCard";
 export {
   LatestNewsSection,
   type LatestNewsSectionProps,
