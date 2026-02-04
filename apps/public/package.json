@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3000",
+    "dev": "next dev -p 4000",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
@@ -22,10 +22,10 @@
     "@mpga/eslint-config": "workspace:*",
     "@mpga/tailwind-config": "workspace:*",
     "@mpga/typescript-config": "workspace:*",
+    "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^22.10.2",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
-    "@tailwindcss/postcss": "^4.0.0",
     "eslint": "^9.17.0",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.7.2"

@@ -3,14 +3,27 @@ import mysql from "mysql2/promise";
 
 import * as schema from "./schema";
 
-const pool = mysql.createPool({
-  host: process.env.DATABASE_HOST ?? "localhost",
-  user: process.env.DATABASE_USER ?? "root",
-  password: process.env.DATABASE_PASSWORD ?? "",
-  database: process.env.DATABASE_NAME ?? "mpga",
-  connectionLimit: 10,
-  waitForConnections: true,
-  queueLimit: 0,
-});
+export interface DatabaseConfig {
+  host: string;
+  port: number;
+  user: string;
+  password: string;
+  database: string;
+}
 
-export const db = drizzle(pool, { schema, mode: "default" });
+export function createDb(config: DatabaseConfig) {
+  const pool = mysql.createPool({
+    host: config.host,
+    port: config.port,
+    user: config.user,
+    password: config.password,
+    database: config.database,
+    connectionLimit: 10,
+    waitForConnections: true,
+    queueLimit: 0,
+  });
+
+  return drizzle(pool, { schema, mode: "default" });
+}
+
+export type Database = ReturnType<typeof createDb>;

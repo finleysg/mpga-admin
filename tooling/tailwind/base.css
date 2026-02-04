@@ -1,19 +1,47 @@
 @import "tailwindcss";
 
 @theme {
-  /* Custom primary color palette */
-  --color-primary-50: #f0f9ff;
-  --color-primary-100: #e0f2fe;
-  --color-primary-200: #bae6fd;
-  --color-primary-300: #7dd3fc;
-  --color-primary-400: #38bdf8;
-  --color-primary-500: #0ea5e9;
-  --color-primary-600: #0284c7;
-  --color-primary-700: #0369a1;
-  --color-primary-800: #075985;
-  --color-primary-900: #0c4a6e;
-  --color-primary-950: #082f49;
+  /* DS-001: MPGA Green primary color palette */
+  --color-primary-50: #e6f7ef;
+  --color-primary-100: #b3e6d1;
+  --color-primary-200: #80d4b3;
+  --color-primary-300: #4dc295;
+  --color-primary-400: #26b07b;
+  --color-primary-500: #00a261;
+  --color-primary-600: #008c54;
+  --color-primary-700: #007a48;
+  --color-primary-800: #00683c;
+  --color-primary-900: #004d2d;
+  --color-primary-950: #003d23;
 
-  /* Custom font stack */
-  --font-sans: var(--font-sans, ui-sans-serif), system-ui, sans-serif;
+  /* DS-002: Gold accent color palette */
+  --color-gold-50: #fdf9e6;
+  --color-gold-100: #faf0c2;
+  --color-gold-200: #f5e085;
+  --color-gold-300: #f0d048;
+  --color-gold-400: #e8c01a;
+  --color-gold-500: #dba507;
+  --color-gold-600: #b88a06;
+  --color-gold-700: #956f05;
+  --color-gold-800: #725504;
+  --color-gold-900: #4f3a03;
+  --color-gold-950: #2c2002;
+
+  /* DS-003: Secondary color palette */
+  --color-secondary-50: #e6f1f4;
+  --color-secondary-100: #c0dce3;
+  --color-secondary-200: #96c4d0;
+  --color-secondary-300: #6cacbd;
+  --color-secondary-400: #4d99ad;
+  --color-secondary-500: #07485b;
+  --color-secondary-600: #063e4f;
+  --color-secondary-700: #053443;
+  --color-secondary-800: #042a37;
+  --color-secondary-900: #031f29;
+  --color-secondary-950: #02141b;
+
+  /* DS-005: Typography font families */
+  --font-heading: "Playfair Display", Georgia, serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-sans: var(--font-body);
 }
