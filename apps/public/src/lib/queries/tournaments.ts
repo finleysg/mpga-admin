@@ -1,6 +1,7 @@
-import { db } from "../db";
 import { tournament, tournamentInstance, golfCourse } from "@mpga/database";
 import { eq, and, gte, lt, asc } from "drizzle-orm";
+
+import { db } from "../db";
 
 export interface Tournament2026 {
   tournamentId: number;
@@ -50,7 +51,8 @@ export function formatTournamentDates(
   startDate: string,
   rounds: number,
 ): string {
-  const start = new Date(startDate);
+  const parts = startDate.split("-").map(Number);
+  const start = new Date(parts[0]!, parts[1]! - 1, parts[2]!);
   const options: Intl.DateTimeFormatOptions = {
     month: "long",
     day: "numeric",

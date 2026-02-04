@@ -22,7 +22,7 @@ pnpm db:studio        # Open Drizzle Studio UI
 
 **Monorepo Structure**: pnpm workspaces + Turborepo
 
-- `apps/public` - Public-facing Next.js site (port 3000, Docker: 4000)
+- `apps/public` - Public-facing Next.js site (dev port 4000, Docker maps 4000→3000)
 - `apps/admin` - Admin dashboard Next.js app (port 3001, Docker: 4001)
 - `packages/database` - Drizzle ORM schema and MySQL client
 - `packages/types` - Shared TypeScript type definitions

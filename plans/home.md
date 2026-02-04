@@ -11,7 +11,7 @@ Build the home page for Minnesota Public Golf Association's public site with a c
 ### Color Palette
 
 **Primary**: `#00a261` - MPGA Green
-**Secondary**: `##07485B`
+**Secondary**: `#07485B`
 **Accent**: `#DBA507`
 
 | Token         | Hex       | Usage                       |

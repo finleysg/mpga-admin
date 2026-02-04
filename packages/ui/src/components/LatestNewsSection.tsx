@@ -27,11 +27,9 @@ export function LatestNewsSection({ announcements }: LatestNewsSectionProps) {
           ))}
         </div>
         <div className="text-center">
-          <Link href="/news">
-            <Button className="bg-secondary-600 hover:bg-secondary-700">
-              View All News
-            </Button>
-          </Link>
+          <Button asChild className="bg-secondary-600 hover:bg-secondary-700">
+            <Link href="/news">View All News</Link>
+          </Button>
         </div>
       </div>
     </section>

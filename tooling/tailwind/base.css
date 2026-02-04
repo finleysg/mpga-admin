@@ -41,7 +41,7 @@
   --color-secondary-950: #02141b;
 
   /* DS-005: Typography font families */
-  --font-heading: var(--font-heading, "Playfair Display"), Georgia, serif;
-  --font-body: var(--font-body, "Inter"), system-ui, sans-serif;
-  --font-sans: var(--font-body, "Inter"), system-ui, sans-serif;
+  --font-heading: "Playfair Display", Georgia, serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-sans: var(--font-body);
 }

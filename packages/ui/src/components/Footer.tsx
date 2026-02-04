@@ -77,7 +77,7 @@ export function Footer() {
 
         {/* Copyright */}
         <div className="mt-8 border-t border-primary-700 pt-8 text-center text-sm text-primary-200">
-          &copy; 2025 Zoomdoggy Design
+          &copy; {new Date().getFullYear()} Zoomdoggy Design
         </div>
       </div>
     </footer>
