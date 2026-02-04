@@ -66,7 +66,7 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
           ))}
         </CarouselContent>
 
-        {/* Arrow Navigation */}
+        {/* Arrow Navigation - left arrow same position all sizes */}
         <button
           onClick={scrollPrev}
           className="absolute left-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 text-gray-800 shadow-md transition-colors hover:bg-white"
@@ -75,17 +75,17 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
           <ChevronLeft className="h-6 w-6" />
         </button>
 
-        {/* Position next arrow at right edge of image area (66% width) */}
+        {/* Right arrow - edge on mobile, 33% offset on desktop */}
         <button
           onClick={scrollNext}
-          className="absolute right-[calc(33.333%+1rem)] top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 text-gray-800 shadow-md transition-colors hover:bg-white"
+          className="absolute right-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 text-gray-800 shadow-md transition-colors hover:bg-white md:right-[calc(33.333%+1rem)]"
           aria-label="Next slide"
         >
           <ChevronRight className="h-6 w-6" />
         </button>
 
-        {/* Dot Indicators - positioned at bottom center of image area */}
-        <div className="absolute bottom-4 left-0 z-10 flex w-2/3 justify-center gap-2">
+        {/* Dot Indicators - full width on mobile, 2/3 on desktop */}
+        <div className="absolute bottom-4 left-0 z-10 flex w-full justify-center gap-2 md:w-2/3">
           {Array.from({ length: count }).map((_, index) => (
             <button
               key={index}
