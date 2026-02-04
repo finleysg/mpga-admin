@@ -21,6 +21,9 @@ export function FeatureCardsSection({ cards }: FeatureCardsSectionProps) {
   return (
     <section className="py-12">
       <div className="mx-auto max-w-6xl px-4">
+        <h2 className="font-heading mb-10 text-center text-3xl font-bold text-primary-900">
+          What We Do
+        </h2>
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
           {sortedCards.map((card) => (
             <FeatureCard key={card.contentType} {...card} />

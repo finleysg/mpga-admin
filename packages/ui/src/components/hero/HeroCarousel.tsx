@@ -75,17 +75,17 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
           <ChevronLeft className="h-6 w-6" />
         </button>
 
-        {/* Right arrow - edge on mobile, 33% offset on desktop */}
+        {/* Right arrow - at right edge on all screen sizes */}
         <button
           onClick={scrollNext}
-          className="absolute right-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 text-gray-800 shadow-md transition-colors hover:bg-white md:right-[calc(33.333%+1rem)]"
+          className="absolute right-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 text-gray-800 shadow-md transition-colors hover:bg-white"
           aria-label="Next slide"
         >
           <ChevronRight className="h-6 w-6" />
         </button>
 
-        {/* Dot Indicators - full width on mobile, 2/3 on desktop */}
-        <div className="absolute bottom-4 left-0 z-10 flex w-full justify-center gap-2 md:w-2/3">
+        {/* Dot Indicators - centered across full width on all screen sizes */}
+        <div className="absolute bottom-4 left-0 z-10 flex w-full justify-center gap-2">
           {Array.from({ length: count }).map((_, index) => (
             <button
               key={index}
