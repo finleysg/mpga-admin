@@ -1,0 +1,19 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "default",
+  "rsc": true,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "../../tooling/tailwind/base.css",
+    "baseColor": "neutral",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "aliases": {
+    "components": "@mpga/ui/components",
+    "utils": "@mpga/ui/lib/utils",
+    "ui": "@mpga/ui/components/ui",
+    "lib": "@mpga/ui/lib"
+  }
+}

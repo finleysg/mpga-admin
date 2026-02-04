@@ -1,2 +1,2 @@
-@import "tailwindcss";
-@import "@mpga/tailwind-config/base.css" source("../../packages/ui/src");
+@import "@mpga/tailwind-config/base.css";
+@source "../../../../packages/ui/src";
