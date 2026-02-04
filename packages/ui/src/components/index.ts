@@ -6,6 +6,22 @@ export { Footer } from "./Footer";
 export { HeroSlide, type HeroSlideProps } from "./hero/HeroSlide";
 export { HeroCarousel, type HeroCarouselProps } from "./hero/HeroCarousel";
 
+// Feature components
+export { FeatureCard, type FeatureCardProps } from "./FeatureCard";
+export {
+  FeatureCardsSection,
+  type FeatureCardsSectionProps,
+} from "./FeatureCardsSection";
+export { AboutSection, type AboutSectionProps } from "./AboutSection";
+export {
+  AnnouncementCard,
+  type AnnouncementCardProps,
+} from "./AnnouncementCard";
+export {
+  LatestNewsSection,
+  type LatestNewsSectionProps,
+} from "./LatestNewsSection";
+
 // UI primitives
 export { Button, buttonVariants } from "./ui/button";
 export {

@@ -1,14 +1,28 @@
 export const dynamic = "force-dynamic";
 
-import { HeroCarousel, type HeroSlideProps } from "@mpga/ui";
+import {
+  HeroCarousel,
+  FeatureCardsSection,
+  AboutSection,
+  LatestNewsSection,
+  type HeroSlideProps,
+} from "@mpga/ui";
 
+import { getLatestAnnouncements } from "@/lib/queries/announcements";
+import { getFeatureCards, getAboutContent } from "@/lib/queries/content";
 import {
   get2026Tournaments,
   formatTournamentDates,
 } from "@/lib/queries/tournaments";
 
 export default async function HomePage() {
-  const tournaments = await get2026Tournaments();
+  const [tournaments, featureCards, aboutContent, announcements] =
+    await Promise.all([
+      get2026Tournaments(),
+      getFeatureCards(),
+      getAboutContent(),
+      getLatestAnnouncements(),
+    ]);
 
   // Build slides array: logo slide first, then tournament slides
   const slides: HeroSlideProps[] = [
@@ -35,6 +49,14 @@ export default async function HomePage() {
       <section className="py-8">
         <HeroCarousel slides={slides} />
       </section>
+      <FeatureCardsSection cards={featureCards} />
+      {aboutContent && (
+        <AboutSection
+          title={aboutContent.title}
+          content={aboutContent.content}
+        />
+      )}
+      <LatestNewsSection announcements={announcements} />
     </main>
   );
 }
