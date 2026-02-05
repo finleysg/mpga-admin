@@ -1,5 +1,13 @@
-import { tournament, tournamentInstance, golfCourse } from "@mpga/database";
-import { eq, and, gte, lt, asc } from "drizzle-orm";
+import {
+  tournament,
+  tournamentInstance,
+  tournamentLink,
+  tournamentHistory,
+  document,
+  photo,
+  golfCourse,
+} from "@mpga/database";
+import { eq, and, gte, lt, asc, desc } from "drizzle-orm";
 
 import { db } from "../db";
 
@@ -110,4 +118,279 @@ export function formatTournamentDates(
   }
 
   return `${start.toLocaleDateString("en-US", options)} - ${end.toLocaleDateString("en-US", options)}`;
+}
+
+export interface TournamentInstanceDetail {
+  instanceId: number;
+  instanceName: string;
+  instanceDescription: string;
+  instanceNotes: string | null;
+  startDate: string;
+  rounds: number;
+  registrationStart: string | null;
+  registrationEnd: string | null;
+  tournamentId: number;
+  tournamentName: string;
+  tournamentDescription: string;
+  systemName: string | null;
+  venueName: string;
+  venueAddress: string;
+  venueCity: string;
+  venueState: string;
+  venueZip: string;
+  venueWebsiteUrl: string;
+  venueEmail: string;
+  venuePhone: string;
+  venueNotes: string | null;
+  venueLogo: string;
+}
+
+export async function getTournamentInstance(
+  systemName: string,
+  year: number,
+): Promise<TournamentInstanceDetail | null> {
+  try {
+    const results = await db
+      .select({
+        instanceId: tournamentInstance.id,
+        instanceName: tournamentInstance.name,
+        instanceDescription: tournamentInstance.description,
+        instanceNotes: tournamentInstance.notes,
+        startDate: tournamentInstance.startDate,
+        rounds: tournamentInstance.rounds,
+        registrationStart: tournamentInstance.registrationStart,
+        registrationEnd: tournamentInstance.registrationEnd,
+        tournamentId: tournament.id,
+        tournamentName: tournament.name,
+        tournamentDescription: tournament.description,
+        systemName: tournament.systemName,
+        venueName: golfCourse.name,
+        venueAddress: golfCourse.addressText,
+        venueCity: golfCourse.city,
+        venueState: golfCourse.state,
+        venueZip: golfCourse.zip,
+        venueWebsiteUrl: golfCourse.websiteUrl,
+        venueEmail: golfCourse.email,
+        venuePhone: golfCourse.phone,
+        venueNotes: golfCourse.notes,
+        venueLogo: golfCourse.logo,
+      })
+      .from(tournamentInstance)
+      .innerJoin(tournament, eq(tournamentInstance.tournamentId, tournament.id))
+      .innerJoin(golfCourse, eq(tournamentInstance.locationId, golfCourse.id))
+      .where(
+        and(
+          eq(tournament.systemName, systemName),
+          gte(tournamentInstance.startDate, `${year}-01-01`),
+          lt(tournamentInstance.startDate, `${year + 1}-01-01`),
+        ),
+      )
+      .limit(1);
+
+    return results[0] ?? null;
+  } catch (error) {
+    console.error(
+      `Failed to fetch tournament instance ${systemName}/${year}:`,
+      error,
+    );
+    return null;
+  }
+}
+
+export interface TournamentLinkData {
+  id: number;
+  linkType: string;
+  url: string;
+  title: string;
+}
+
+export async function getTournamentLinks(
+  instanceId: number,
+): Promise<TournamentLinkData[]> {
+  try {
+    const results = await db
+      .select({
+        id: tournamentLink.id,
+        linkType: tournamentLink.linkType,
+        url: tournamentLink.url,
+        title: tournamentLink.title,
+      })
+      .from(tournamentLink)
+      .where(eq(tournamentLink.tournamentInstanceId, instanceId));
+
+    return results;
+  } catch (error) {
+    console.error(`Failed to fetch tournament links for ${instanceId}:`, error);
+    return [];
+  }
+}
+
+export interface TournamentDocumentData {
+  id: number;
+  documentType: string;
+  title: string;
+  file: string | null;
+}
+
+export async function getTournamentDocuments(
+  tournamentId: number,
+  year: number,
+): Promise<TournamentDocumentData[]> {
+  try {
+    const results = await db
+      .select({
+        id: document.id,
+        documentType: document.documentType,
+        title: document.title,
+        file: document.file,
+      })
+      .from(document)
+      .where(
+        and(eq(document.tournamentId, tournamentId), eq(document.year, year)),
+      );
+
+    return results;
+  } catch (error) {
+    console.error(
+      `Failed to fetch tournament documents for ${tournamentId}/${year}:`,
+      error,
+    );
+    return [];
+  }
+}
+
+export interface TournamentBaseInfo {
+  id: number;
+  name: string;
+  description: string;
+}
+
+export async function getTournamentBySystemName(
+  systemName: string,
+): Promise<TournamentBaseInfo | null> {
+  try {
+    const results = await db
+      .select({
+        id: tournament.id,
+        name: tournament.name,
+        description: tournament.description,
+      })
+      .from(tournament)
+      .where(eq(tournament.systemName, systemName))
+      .limit(1);
+
+    return results[0] ?? null;
+  } catch (error) {
+    console.error(`Failed to fetch tournament ${systemName}:`, error);
+    return null;
+  }
+}
+
+export interface TournamentHistoryRecord {
+  id: number;
+  year: number;
+  location: string;
+  winner: string;
+  winnerClub: string;
+  coWinner: string | null;
+  coWinnerClub: string | null;
+  division: string;
+  score: string;
+  isMatch: boolean;
+  isNet: boolean;
+}
+
+export async function getTournamentHistory(
+  tournamentId: number,
+): Promise<TournamentHistoryRecord[]> {
+  try {
+    const results = await db
+      .select({
+        id: tournamentHistory.id,
+        year: tournamentHistory.year,
+        location: tournamentHistory.location,
+        winner: tournamentHistory.winner,
+        winnerClub: tournamentHistory.winnerClub,
+        coWinner: tournamentHistory.coWinner,
+        coWinnerClub: tournamentHistory.coWinnerClub,
+        division: tournamentHistory.division,
+        score: tournamentHistory.score,
+        isMatch: tournamentHistory.isMatch,
+        isNet: tournamentHistory.isNet,
+      })
+      .from(tournamentHistory)
+      .where(eq(tournamentHistory.tournamentId, tournamentId))
+      .orderBy(desc(tournamentHistory.year));
+
+    return results.map((r) => ({
+      ...r,
+      coWinner: r.coWinner || null,
+      coWinnerClub: r.coWinnerClub || null,
+      isMatch: r.isMatch === 1,
+      isNet: r.isNet === 1,
+    }));
+  } catch (error) {
+    console.error(
+      `Failed to fetch tournament history for ${tournamentId}:`,
+      error,
+    );
+    return [];
+  }
+}
+
+export interface TournamentPhotoRecord {
+  id: number;
+  rawImage: string;
+  caption: string;
+  year: number;
+}
+
+export async function getTournamentPhotos(
+  tournamentId: number,
+): Promise<TournamentPhotoRecord[]> {
+  try {
+    const results = await db
+      .select({
+        id: photo.id,
+        rawImage: photo.rawImage,
+        caption: photo.caption,
+        year: photo.year,
+      })
+      .from(photo)
+      .where(eq(photo.tournamentId, tournamentId))
+      .orderBy(desc(photo.year));
+
+    return results;
+  } catch (error) {
+    console.error(
+      `Failed to fetch tournament photos for ${tournamentId}:`,
+      error,
+    );
+    return [];
+  }
+}
+
+export async function getTournamentHistoryDocuments(
+  tournamentId: number,
+): Promise<TournamentDocumentData[]> {
+  try {
+    const results = await db
+      .select({
+        id: document.id,
+        documentType: document.documentType,
+        title: document.title,
+        file: document.file,
+      })
+      .from(document)
+      .where(eq(document.tournamentId, tournamentId))
+      .orderBy(desc(document.id));
+
+    return results;
+  } catch (error) {
+    console.error(
+      `Failed to fetch tournament history documents for ${tournamentId}:`,
+      error,
+    );
+    return [];
+  }
 }

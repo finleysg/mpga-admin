@@ -30,6 +30,7 @@ export default async function TournamentsPage() {
               location={`${t.venueName}, ${t.venueCity}`}
               logoUrl={getMediaUrl(t.venueLogo)}
               href={`/tournaments/${t.systemName}/${currentYear}`}
+              historyHref={`/tournaments/${t.systemName}/history`}
             />
           ))}
         </div>

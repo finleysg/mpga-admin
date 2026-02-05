@@ -1,3 +1,19 @@
+import { getMediaUrl } from "@mpga/types";
+import {
+  Markdown,
+  RegistrationCard,
+  DocumentsCard,
+  GolfCourseCard,
+} from "@mpga/ui";
+import { notFound } from "next/navigation";
+
+import { getTournamentPolicies } from "@/lib/queries/content";
+import {
+  getTournamentInstance,
+  getTournamentLinks,
+  getTournamentDocuments,
+} from "@/lib/queries/tournaments";
+
 type Params = Promise<{ name: string; year: string }>;
 
 export default async function TournamentYearPage({
@@ -6,15 +22,89 @@ export default async function TournamentYearPage({
   params: Params;
 }) {
   const { name, year } = await params;
+  const yearNum = parseInt(year, 10);
+
+  if (isNaN(yearNum)) {
+    notFound();
+  }
+
+  const instance = await getTournamentInstance(name, yearNum);
+
+  if (!instance) {
+    notFound();
+  }
+
+  const [links, documents, policies] = await Promise.all([
+    getTournamentLinks(instance.instanceId),
+    getTournamentDocuments(instance.tournamentId, yearNum),
+    getTournamentPolicies(),
+  ]);
+
+  const tournamentLinks = links.map((link) => ({
+    id: link.id,
+    linkType: link.linkType,
+    url: link.url,
+    title: link.title,
+  }));
+
+  const documentItems = documents
+    .filter((doc) => doc.file)
+    .map((doc) => ({
+      id: doc.id,
+      title: doc.title,
+      fileUrl: getMediaUrl(doc.file) ?? "",
+    }));
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="mb-8 text-3xl font-bold text-gray-900">
-        {decodeURIComponent(name)} - {year}
+    <main className="mx-auto max-w-6xl px-4 py-8">
+      <h1 className="mb-2 text-3xl font-bold font-heading text-primary-900">
+        {instance.instanceName}
       </h1>
-      <p className="text-sm text-gray-400">
-        Tournament detail placeholder for {decodeURIComponent(name)} ({year})
-      </p>
+
+      <div className="flex flex-col gap-8 lg:flex-row">
+        <div className="lg:w-[70%]">
+          <div className="rounded-lg bg-white p-6 shadow-sm">
+            <Markdown content={instance.instanceDescription} />
+            {instance.instanceNotes && (
+              <div className="mt-6 border-t border-gray-100 pt-6">
+                <Markdown content={instance.instanceNotes} />
+              </div>
+            )}
+          </div>
+
+          {policies && (
+            <div className="mt-6 rounded-lg bg-white p-6 shadow-sm">
+              <h2 className="mb-4 text-xl font-bold font-heading text-primary-900">
+                {policies.title}
+              </h2>
+              <Markdown content={policies.content} />
+            </div>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-6 lg:w-[30%]">
+          <RegistrationCard
+            registrationStart={instance.registrationStart}
+            registrationEnd={instance.registrationEnd}
+            links={tournamentLinks}
+          />
+
+          <DocumentsCard documents={documentItems} />
+
+          <GolfCourseCard
+            name={instance.venueName}
+            address={instance.venueAddress}
+            city={instance.venueCity}
+            state={instance.venueState}
+            zip={instance.venueZip}
+            websiteUrl={instance.venueWebsiteUrl || null}
+            email={instance.venueEmail || null}
+            phone={instance.venuePhone || null}
+            logoUrl={getMediaUrl(instance.venueLogo)}
+            notes={instance.venueNotes}
+          />
+        </div>
+      </div>
     </main>
   );
 }

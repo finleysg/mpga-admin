@@ -49,3 +49,21 @@ export async function getAboutContent(): Promise<AboutContent | null> {
     return null;
   }
 }
+
+export async function getTournamentPolicies(): Promise<AboutContent | null> {
+  try {
+    const results = await db
+      .select({
+        title: content.title,
+        content: content.contentText,
+      })
+      .from(content)
+      .where(eq(content.contentType, "TP"))
+      .limit(1);
+
+    return results[0] || null;
+  } catch (error) {
+    console.error("Failed to fetch tournament policies:", error);
+    return null;
+  }
+}
