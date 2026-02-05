@@ -45,6 +45,13 @@ export {
   type LatestNewsSectionProps,
 } from "./LatestNewsSection";
 export { CollapsibleList, type CollapsibleListProps } from "./CollapsibleList";
+export { ClubsTable, type ClubsTableProps, type ClubRow } from "./ClubsTable";
+export { ClubDetailCard, type ClubDetailCardProps } from "./ClubDetailCard";
+export {
+  OfficersCard,
+  type OfficersCardProps,
+  type Officer,
+} from "./OfficersCard";
 
 // UI primitives
 export { Button, buttonVariants } from "./ui/button";

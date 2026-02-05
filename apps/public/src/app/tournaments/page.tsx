@@ -21,18 +21,20 @@ export default async function TournamentsPage() {
         </p>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {tournaments.map((t) => (
-            <TournamentCard
-              key={t.instanceId}
-              name={t.tournamentName}
-              description={t.tournamentDescription}
-              dates={formatTournamentDates(t.startDate, t.rounds)}
-              location={`${t.venueName}, ${t.venueCity}`}
-              logoUrl={getMediaUrl(t.venueLogo)}
-              href={`/tournaments/${t.systemName}/${currentYear}`}
-              historyHref={`/tournaments/${t.systemName}/history`}
-            />
-          ))}
+          {tournaments
+            .filter((t) => t.systemName !== null)
+            .map((t) => (
+              <TournamentCard
+                key={t.instanceId}
+                name={t.tournamentName}
+                description={t.tournamentDescription}
+                dates={formatTournamentDates(t.startDate, t.rounds)}
+                location={`${t.venueName}, ${t.venueCity}`}
+                logoUrl={getMediaUrl(t.venueLogo)}
+                href={`/tournaments/${t.systemName}/${currentYear}`}
+                historyHref={`/tournaments/${t.systemName}/history`}
+              />
+            ))}
         </div>
       )}
     </main>

@@ -18,7 +18,7 @@ const navItems = [
   { label: "Home", href: "/" },
   { label: "Tournaments", href: "/tournaments" },
   { label: "Match Play", href: "/match-play" },
-  { label: "Members", href: "/member-clubs" },
+  { label: "Members", href: "/members" },
   { label: "News", href: "/news" },
 ];
 

@@ -3,7 +3,7 @@ import Link from "next/link";
 const navigationLinks = [
   { label: "Tournaments", href: "/tournaments" },
   { label: "Match Play", href: "/match-play" },
-  { label: "Members", href: "/member-clubs" },
+  { label: "Members", href: "/members" },
   { label: "News", href: "/news" },
 ];
 

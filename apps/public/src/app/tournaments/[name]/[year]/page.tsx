@@ -22,11 +22,11 @@ export default async function TournamentYearPage({
   params: Params;
 }) {
   const { name, year } = await params;
-  const yearNum = parseInt(year, 10);
 
-  if (isNaN(yearNum)) {
+  if (!/^\d{4}$/.test(year)) {
     notFound();
   }
+  const yearNum = parseInt(year, 10);
 
   const instance = await getTournamentInstance(name, yearNum);
 

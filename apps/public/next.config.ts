@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "**",
+        hostname: "mpgagolf.s3.us-west-2.amazonaws.com",
       },
     ],
   },
