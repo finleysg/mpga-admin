@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+const bucketName = process.env.S3_BUCKET_NAME ?? "mpgagolf";
+
 const nextConfig: NextConfig = {
   output: "standalone",
   transpilePackages: ["@mpga/database", "@mpga/types", "@mpga/ui"],
@@ -7,7 +9,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "mpgagolf.s3.us-west-2.amazonaws.com",
+        hostname: `${bucketName}.s3.amazonaws.com`,
       },
     ],
   },
