@@ -53,12 +53,21 @@ export {
   type Officer,
 } from "./OfficersCard";
 export { MatchPlaySignUp, type MatchPlaySignUpProps } from "./MatchPlaySignUp";
+export {
+  MatchPlayRulesTabs,
+  type MatchPlayRulesTabsProps,
+} from "./MatchPlayRulesTabs";
 export { NewsList, type NewsListProps } from "./NewsList";
 export {
-  MatchPlayTeamsTable,
-  type MatchPlayTeamsTableProps,
+  MatchPlayGroupCards,
+  type MatchPlayGroupCardsProps,
   type MatchPlayTeamRow,
-} from "./MatchPlayTeamsTable";
+} from "./MatchPlayGroupCards";
+export {
+  MatchPlayResultsTable,
+  type MatchPlayResultsTableProps,
+  type MatchPlayResultRow,
+} from "./MatchPlayResultsTable";
 
 // UI primitives
 export { Button, buttonVariants } from "./ui/button";

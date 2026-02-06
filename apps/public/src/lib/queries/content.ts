@@ -68,6 +68,42 @@ export async function getMatchPlayContent(): Promise<AboutContent | null> {
   }
 }
 
+export async function getMatchPlayRules(): Promise<AboutContent | null> {
+  try {
+    const results = await db
+      .select({
+        title: content.title,
+        content: content.contentText,
+      })
+      .from(content)
+      .where(eq(content.contentType, "MP"))
+      .limit(1);
+
+    return results[0] || null;
+  } catch (error) {
+    console.error("Failed to fetch match play rules:", error);
+    return null;
+  }
+}
+
+export async function getSeniorMatchPlayRules(): Promise<AboutContent | null> {
+  try {
+    const results = await db
+      .select({
+        title: content.title,
+        content: content.contentText,
+      })
+      .from(content)
+      .where(eq(content.contentType, "SP"))
+      .limit(1);
+
+    return results[0] || null;
+  } catch (error) {
+    console.error("Failed to fetch senior match play rules:", error);
+    return null;
+  }
+}
+
 export async function getTournamentPolicies(): Promise<AboutContent | null> {
   try {
     const results = await db

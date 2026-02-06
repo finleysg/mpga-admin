@@ -19,6 +19,7 @@ services:
       - STRIPE_WEBHOOK_SECRET=whsec_xxx
       - MAIL_HOST=mailpit
       - MAIL_PORT=1025
+      - SEASON_YEAR=2025
     depends_on:
       - mysql
 
