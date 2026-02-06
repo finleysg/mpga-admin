@@ -52,6 +52,13 @@ export {
   type OfficersCardProps,
   type Officer,
 } from "./OfficersCard";
+export { MatchPlaySignUp, type MatchPlaySignUpProps } from "./MatchPlaySignUp";
+export { NewsList, type NewsListProps } from "./NewsList";
+export {
+  MatchPlayTeamsTable,
+  type MatchPlayTeamsTableProps,
+  type MatchPlayTeamRow,
+} from "./MatchPlayTeamsTable";
 
 // UI primitives
 export { Button, buttonVariants } from "./ui/button";
