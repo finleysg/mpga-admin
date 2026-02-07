@@ -207,7 +207,7 @@
         "Token is hashed before storage and compared using constant-time comparison",
         "pnpm typecheck passes"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "auth-13",
@@ -225,7 +225,7 @@
         "On successful account creation via credentials, calls acceptInvitation(token) and redirects to /",
         "pnpm typecheck passes"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "auth-14",
