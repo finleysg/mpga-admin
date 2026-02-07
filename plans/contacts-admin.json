@@ -36,7 +36,7 @@
         "Both actions import db from @/lib/db and contact from @mpga/database",
         "pnpm typecheck passes"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "contacts-03",
@@ -51,7 +51,7 @@
         "deleteContactAction catches MySQL FK constraint errors and returns a user-friendly message like 'Cannot delete: this contact is linked to a club or committee'",
         "pnpm typecheck passes"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "contacts-04",
