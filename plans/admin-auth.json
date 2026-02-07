@@ -117,7 +117,7 @@
         "All new components are exported from packages/ui/src/components/index.ts",
         "pnpm typecheck passes"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "auth-07",
@@ -129,7 +129,7 @@
         "socialProviders object includes apple with clientId and clientSecret from env vars",
         "pnpm typecheck passes"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "auth-08",
@@ -143,7 +143,7 @@
         ".env.example contains APPLE_CLIENT_SECRET=",
         ".env.example contains NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:4100"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "auth-09",
@@ -162,7 +162,7 @@
         "If user is already authenticated (useSession), redirect to /",
         "pnpm typecheck passes"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "auth-10",
