@@ -179,7 +179,7 @@
         "pnpm typecheck passes",
         "Running `pnpm db:push` creates the invitation table in the database"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "auth-11",
@@ -193,7 +193,7 @@
         "Email body contains the accept link: {NEXT_PUBLIC_APP_URL}/accept-invitation/{token}",
         "pnpm typecheck passes"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "auth-12",
