@@ -58,7 +58,7 @@
         "Database has `account` table with OAuth provider columns",
         "Database has `verification` table with token columns"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "auth-04",
