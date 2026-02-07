@@ -6,7 +6,8 @@ export async function proxy(request: NextRequest) {
   const isPublicRoute =
     request.nextUrl.pathname.startsWith("/login") ||
     request.nextUrl.pathname.startsWith("/api/auth") ||
-    request.nextUrl.pathname.startsWith("/api/invitations") ||
+    request.nextUrl.pathname.startsWith("/api/invitations/validate") ||
+    request.nextUrl.pathname.startsWith("/api/invitations/accept") ||
     request.nextUrl.pathname.startsWith("/accept-invitation");
 
   if (isPublicRoute) {

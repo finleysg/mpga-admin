@@ -10,7 +10,9 @@ export const auth = betterAuth({
     level: "info",
   },
   baseURL: process.env.BETTER_AUTH_URL,
-  trustedOrigins: ["http://localhost:4100"],
+  trustedOrigins: process.env.BETTER_AUTH_TRUSTED_ORIGINS?.split(",") ?? [
+    "http://localhost:4100",
+  ],
   database: drizzleAdapter(db, {
     provider: "mysql",
   }),

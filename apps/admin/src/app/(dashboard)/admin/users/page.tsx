@@ -26,7 +26,14 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { authClient, useSession } from "@/lib/auth-client";
+import { useSession } from "@/lib/auth-client";
+
+import {
+  banUserAction,
+  listUsersAction,
+  removeUserAction,
+  setRoleAction,
+} from "./actions";
 
 interface User {
   id: string;
@@ -55,13 +62,9 @@ export default function UsersPage() {
   useEffect(() => {
     async function fetchUsers() {
       try {
-        const response = await authClient.admin.listUsers({
-          query: {
-            limit: 100,
-          },
-        });
-        if (response.data?.users) {
-          setUsers(response.data.users as User[]);
+        const result = await listUsersAction();
+        if (result.success && result.data) {
+          setUsers(result.data);
         }
       } catch (error) {
         console.error("Failed to fetch users:", error);
@@ -78,16 +81,14 @@ export default function UsersPage() {
   const handleBanUser = async (userId: string, ban: boolean) => {
     setActionLoading(userId);
     try {
-      if (ban) {
-        await authClient.admin.banUser({ userId });
-      } else {
-        await authClient.admin.unbanUser({ userId });
+      const result = await banUserAction(userId, ban);
+      if (result.success) {
+        setUsers((prev) =>
+          prev.map((user) =>
+            user.id === userId ? { ...user, banned: ban } : user,
+          ),
+        );
       }
-      setUsers((prev) =>
-        prev.map((user) =>
-          user.id === userId ? { ...user, banned: ban } : user,
-        ),
-      );
     } catch (error) {
       console.error("Failed to update ban status:", error);
     } finally {
@@ -101,8 +102,10 @@ export default function UsersPage() {
     }
     setActionLoading(userId);
     try {
-      await authClient.admin.removeUser({ userId });
-      setUsers((prev) => prev.filter((user) => user.id !== userId));
+      const result = await removeUserAction(userId);
+      if (result.success) {
+        setUsers((prev) => prev.filter((user) => user.id !== userId));
+      }
     } catch (error) {
       console.error("Failed to remove user:", error);
     } finally {
@@ -116,10 +119,12 @@ export default function UsersPage() {
   ) => {
     setActionLoading(userId);
     try {
-      await authClient.admin.setRole({ userId, role });
-      setUsers((prev) =>
-        prev.map((user) => (user.id === userId ? { ...user, role } : user)),
-      );
+      const result = await setRoleAction(userId, role);
+      if (result.success) {
+        setUsers((prev) =>
+          prev.map((user) => (user.id === userId ? { ...user, role } : user)),
+        );
+      }
     } catch (error) {
       console.error("Failed to set role:", error);
     } finally {
