@@ -34,7 +34,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 
 import { type ContactData, listContactsAction } from "./actions";
 
@@ -188,22 +188,43 @@ export default function ContactsPage() {
     table.setPageIndex(0);
   };
 
-  const exportToExcel = () => {
-    const rows = table.getFilteredRowModel().rows.map((row) => ({
-      Name: `${row.original.lastName}, ${row.original.firstName}`,
-      Email: row.original.email ?? "",
-      Phone: row.original.primaryPhone ?? "",
-      "Alternate Phone": row.original.alternatePhone ?? "",
-      Address: row.original.addressText ?? "",
-      City: row.original.city ?? "",
-      State: row.original.state ?? "",
-      Zip: row.original.zip ?? "",
-      "Send Email": row.original.sendEmail ? "Yes" : "No",
-    }));
-    const ws = XLSX.utils.json_to_sheet(rows);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Contacts");
-    XLSX.writeFile(wb, "contacts.xlsx");
+  const exportToExcel = async () => {
+    const wb = new ExcelJS.Workbook();
+    const ws = wb.addWorksheet("Contacts");
+    ws.columns = [
+      { header: "Name", key: "name" },
+      { header: "Email", key: "email" },
+      { header: "Phone", key: "phone" },
+      { header: "Alternate Phone", key: "alternatePhone" },
+      { header: "Address", key: "address" },
+      { header: "City", key: "city" },
+      { header: "State", key: "state" },
+      { header: "Zip", key: "zip" },
+      { header: "Send Email", key: "sendEmail" },
+    ];
+    for (const row of table.getFilteredRowModel().rows) {
+      ws.addRow({
+        name: `${row.original.lastName}, ${row.original.firstName}`,
+        email: row.original.email ?? "",
+        phone: row.original.primaryPhone ?? "",
+        alternatePhone: row.original.alternatePhone ?? "",
+        address: row.original.addressText ?? "",
+        city: row.original.city ?? "",
+        state: row.original.state ?? "",
+        zip: row.original.zip ?? "",
+        sendEmail: row.original.sendEmail ? "Yes" : "No",
+      });
+    }
+    const buffer = await wb.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "contacts.xlsx";
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const filteredCount = table.getFilteredRowModel().rows.length;

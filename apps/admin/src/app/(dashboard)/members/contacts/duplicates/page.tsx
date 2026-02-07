@@ -61,11 +61,14 @@ export default function DuplicatesPage() {
 
   const handleMerged = (groupId: string) => {
     setSelectedGroup(null);
-    setGroups((prev) => {
-      const next = prev.filter((g) => g.id !== groupId);
-      const maxPage = Math.max(0, Math.ceil(next.length / PAGE_SIZE) - 1);
-      if (currentPage > maxPage) setCurrentPage(maxPage);
-      return next;
+    setGroups((prev) => prev.filter((g) => g.id !== groupId));
+    setCurrentPage((prev) => {
+      const remainingGroups = groups.filter((g) => g.id !== groupId);
+      const maxPage = Math.max(
+        0,
+        Math.ceil(remainingGroups.length / PAGE_SIZE) - 1,
+      );
+      return prev > maxPage ? maxPage : prev;
     });
   };
 

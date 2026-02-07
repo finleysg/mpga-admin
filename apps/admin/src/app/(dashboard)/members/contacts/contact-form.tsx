@@ -130,7 +130,7 @@ export function ContactForm({ contact }: ContactFormProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Contact Information</CardTitle>
+        <CardTitle className="font-heading">Contact Information</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSave} className="space-y-4">
@@ -282,7 +282,10 @@ export function ContactForm({ contact }: ContactFormProps) {
                       Cancel
                     </AlertDialogCancel>
                     <AlertDialogAction
-                      onClick={handleDelete}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleDelete();
+                      }}
                       disabled={deleting}
                       className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
                     >
