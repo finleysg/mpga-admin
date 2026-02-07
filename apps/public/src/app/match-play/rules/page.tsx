@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
 import { MatchPlayRulesTabs } from "@mpga/ui";
+import type { Metadata } from "next";
 
 import {
   getMatchPlayRules,

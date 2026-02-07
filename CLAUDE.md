@@ -42,9 +42,6 @@ pnpm db:studio        # Open Drizzle Studio UI
 
 Located in `packages/database/src/schema/`:
 
-- `users.ts` - User, session, account tables (Better Auth)
-- `posts.ts` - Posts table with status enum (draft/published)
-
 ## Authentication (Admin Only)
 
 - Config: `apps/admin/src/lib/auth.ts`
