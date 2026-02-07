@@ -154,7 +154,7 @@
         "Save button shows 'Saving...' and is disabled while saving",
         "pnpm typecheck passes"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "contacts-09",
