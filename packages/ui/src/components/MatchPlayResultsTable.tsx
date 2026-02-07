@@ -10,7 +10,7 @@ export interface MatchPlayResultRow {
   homeTeamScore: string;
   awayClubName: string;
   awayTeamScore: string;
-  forfeit: number;
+  forfeit: boolean;
   notes: string | null;
 }
 
@@ -130,7 +130,7 @@ export function MatchPlayResultsTable({ results }: MatchPlayResultsTableProps) {
                         {result.awayTeamScore}
                       </td>
                       <td className="whitespace-nowrap px-4 py-3 text-center text-sm">
-                        {result.forfeit === 1 && (
+                        {result.forfeit && (
                           <span className="inline-flex rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800">
                             Forfeit
                           </span>

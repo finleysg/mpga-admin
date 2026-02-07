@@ -311,7 +311,7 @@
       "steps_to_verify": [
         ".env.example contains NEXT_PUBLIC_APP_URL=http://localhost:4100"
       ],
-      "passes": false
+      "passes": true
     }
   ]
 }

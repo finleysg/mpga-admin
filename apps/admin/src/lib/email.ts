@@ -43,10 +43,10 @@ export async function sendInvitationEmail(
     from: process.env.MAIL_FROM ?? "noreply@mpga.golf",
     to: email,
     subject: "You've been invited to MPGA Admin",
-    text: `You've been invited to join the MPGA Admin dashboard.\n\nClick the link below to create your account:\n${acceptLink}\n\nThis invitation expires in 7 days.`,
+    text: `You've been invited to join the MPGA Administration site.\n\nClick the link below to create your account:\n${acceptLink}\n\nThis invitation expires in 7 days.`,
     html: `
-      <h1>You've been invited to MPGA Admin</h1>
-      <p>You've been invited to join the MPGA Admin dashboard.</p>
+      <h1>You've been invited to MPGA Administration</h1>
+      <p>You've been invited to join the MPGA Administration site.</p>
       <p><a href="${acceptLink}">Click here to create your account</a></p>
       <p>Or copy this link: ${acceptLink}</p>
       <p><em>This invitation expires in 7 days.</em></p>

@@ -6,7 +6,11 @@ import { db } from "./db";
 import { ac, adminRole, superAdminRole } from "./permissions";
 
 export const auth = betterAuth({
+  logger: {
+    level: "info",
+  },
   baseURL: process.env.BETTER_AUTH_URL,
+  trustedOrigins: ["http://localhost:4100"],
   database: drizzleAdapter(db, {
     provider: "mysql",
   }),
@@ -17,10 +21,6 @@ export const auth = betterAuth({
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    },
-    apple: {
-      clientId: process.env.APPLE_CLIENT_ID!,
-      clientSecret: process.env.APPLE_CLIENT_SECRET!,
     },
   },
   session: {

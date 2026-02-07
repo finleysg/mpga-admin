@@ -2,15 +2,16 @@
  * Seed script to bootstrap the first super_admin account.
  *
  * Usage:
- *   ADMIN_EMAIL=admin@example.com ADMIN_PASSWORD=secret123 npx tsx scripts/seed-admin.ts
+ *   pnpm --filter @mpga/admin seed-admin
  *
  * Required env vars:
  *   - ADMIN_EMAIL: The email for the super_admin account
  *   - ADMIN_PASSWORD: The password for the super_admin account
  *   - DATABASE_HOST, DATABASE_PORT, DATABASE_USER, DATABASE_PASSWORD, DATABASE_NAME
+ *   - BETTER_AUTH_URL, BETTER_AUTH_SECRET
  */
 
-import { auth } from "../apps/admin/src/lib/auth";
+import { auth } from "../src/lib/auth";
 
 async function main() {
   const email = process.env.ADMIN_EMAIL;
@@ -40,7 +41,7 @@ async function main() {
       process.exit(1);
     }
 
-    console.log(`Success! Created super_admin user with ID: ${result.id}`);
+    console.log(`Success! Created super_admin user with ID: ${result.user.id}`);
     console.log(`Email: ${email}`);
     console.log(`Role: super_admin`);
     console.log("");
