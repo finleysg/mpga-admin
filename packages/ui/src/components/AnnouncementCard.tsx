@@ -1,4 +1,4 @@
-import { Calendar, ArrowRight } from "lucide-react";
+import { Calendar, ArrowRight, ExternalLink } from "lucide-react";
 import Link from "next/link";
 
 export interface AnnouncementCardProps {
@@ -6,6 +6,9 @@ export interface AnnouncementCardProps {
   title: string;
   text: string;
   createDate: string;
+  externalUrl?: string;
+  externalName?: string;
+  truncate?: boolean;
 }
 
 function formatDate(dateString: string): string {
@@ -22,6 +25,9 @@ export function AnnouncementCard({
   title,
   text,
   createDate,
+  externalUrl,
+  externalName,
+  truncate = true,
 }: AnnouncementCardProps) {
   return (
     <div className="flex flex-col rounded-lg bg-white p-6 shadow-sm">
@@ -32,14 +38,31 @@ export function AnnouncementCard({
       <h3 className="font-heading mb-3 text-xl font-bold text-gray-900">
         {title}
       </h3>
-      <p className="mb-4 flex-1 line-clamp-3 text-gray-600">{text}</p>
-      <Link
-        href={`/news/${id}`}
-        className="inline-flex items-center gap-1 text-secondary-600 hover:text-secondary-700"
+      <p
+        className={`mb-4 flex-1 text-gray-600${truncate ? " line-clamp-3" : ""}`}
       >
-        Read More
-        <ArrowRight className="h-4 w-4" />
-      </Link>
+        {text}
+      </p>
+      {externalUrl && (
+        <a
+          href={externalUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mb-4 inline-flex items-center gap-1 text-secondary-400 hover:text-secondary-500"
+        >
+          {externalName || externalUrl}
+          <ExternalLink className="h-4 w-4" />
+        </a>
+      )}
+      {truncate && (
+        <Link
+          href={`/news/${id}`}
+          className="inline-flex items-center gap-1 text-secondary-400 hover:text-secondary-500"
+        >
+          Read More
+          <ArrowRight className="h-4 w-4" />
+        </Link>
+      )}
     </div>
   );
 }

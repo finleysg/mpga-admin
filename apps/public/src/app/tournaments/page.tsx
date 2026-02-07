@@ -5,9 +5,10 @@ import {
   getTournamentsForYear,
   formatTournamentDates,
 } from "@/lib/queries/tournaments";
+import { getCurrentSeason } from "@/lib/season";
 
 export default async function TournamentsPage() {
-  const currentYear = new Date().getFullYear();
+  const currentYear = getCurrentSeason();
   const tournaments = await getTournamentsForYear(currentYear);
 
   return (

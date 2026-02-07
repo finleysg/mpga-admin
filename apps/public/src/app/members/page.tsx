@@ -4,6 +4,7 @@ import {
   getMembersContent,
   getClubsWithMembershipStatus,
 } from "@/lib/queries/clubs";
+import { getCurrentSeason } from "@/lib/season";
 
 export const metadata = {
   title: "Member Clubs | MPGA",
@@ -11,7 +12,7 @@ export const metadata = {
 };
 
 export default async function MembersPage() {
-  const currentYear = new Date().getFullYear();
+  const currentYear = getCurrentSeason();
   const [content, clubs] = await Promise.all([
     getMembersContent(),
     getClubsWithMembershipStatus(currentYear),

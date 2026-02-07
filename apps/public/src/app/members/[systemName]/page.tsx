@@ -7,6 +7,7 @@ import {
   getClubMembershipInfo,
   getClubOfficers,
 } from "@/lib/queries/clubs";
+import { getCurrentSeason } from "@/lib/season";
 
 type Params = Promise<{ systemName: string }>;
 
@@ -34,7 +35,7 @@ export default async function ClubDetailPage({ params }: { params: Params }) {
     notFound();
   }
 
-  const currentYear = new Date().getFullYear();
+  const currentYear = getCurrentSeason();
   const [officers, membershipInfo] = await Promise.all([
     getClubOfficers(club.id),
     getClubMembershipInfo(club.id, currentYear),
