@@ -78,6 +78,14 @@ const navGroups = [
   },
 ];
 
+const adminNavGroup = {
+  title: "Administration",
+  items: [
+    { title: "Users", url: "/admin/users" },
+    { title: "Invitations", url: "/admin/invitations" },
+  ],
+};
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
   const { data: session } = useSession();
@@ -124,6 +132,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarMenu>
           </SidebarGroup>
         ))}
+        {session?.user?.role === "super_admin" && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="text-primary-300 font-medium text-sm">
+              {adminNavGroup.title}
+            </SidebarGroupLabel>
+            <SidebarMenu className="ml-3">
+              {adminNavGroup.items.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild isActive={pathname === item.url}>
+                    <Link href={item.url}>{item.title}</Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
+        )}
       </SidebarContent>
       <SidebarFooter>
         <div className="flex items-center justify-between gap-2 px-2 py-2">
