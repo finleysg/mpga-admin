@@ -1,19 +1,19 @@
 import { type NextRequest, NextResponse } from "next/server";
 
-export async function proxy(request: NextRequest) {
-  const sessionCookie = request.cookies.get("better-auth.session_token");
+export async function proxy(_request: NextRequest) {
+  // const sessionCookie = request.cookies.get("better-auth.session_token");
 
-  const isAuthPage =
-    request.nextUrl.pathname.startsWith("/login") ||
-    request.nextUrl.pathname.startsWith("/api/auth");
+  // const isAuthPage =
+  //   request.nextUrl.pathname.startsWith("/login") ||
+  //   request.nextUrl.pathname.startsWith("/api/auth");
 
-  if (isAuthPage) {
-    return NextResponse.next();
-  }
+  // if (isAuthPage) {
+  //   return NextResponse.next();
+  // }
 
-  if (!sessionCookie) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
+  // if (!sessionCookie) {
+  //   return NextResponse.redirect(new URL("/login", request.url));
+  // }
 
   return NextResponse.next();
 }

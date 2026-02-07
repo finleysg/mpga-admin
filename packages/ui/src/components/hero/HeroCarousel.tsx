@@ -57,7 +57,7 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
   }, [api]);
 
   return (
-    <div className="relative mx-auto max-w-7xl overflow-hidden px-6">
+    <div className="relative mx-auto max-w-7xl overflow-hidden px-3">
       <Carousel
         setApi={setApi}
         opts={{
@@ -76,7 +76,7 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
         {/* Arrow Navigation - left arrow same position all sizes */}
         <button
           onClick={scrollPrev}
-          className="absolute left-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 text-gray-800 shadow-md transition-colors hover:bg-white"
+          className="absolute left-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/50 text-gray-800 shadow-md transition-colors hover:bg-white"
           aria-label="Previous slide"
         >
           <ChevronLeft className="h-6 w-6" />
@@ -85,7 +85,7 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
         {/* Right arrow - at right edge on all screen sizes */}
         <button
           onClick={scrollNext}
-          className="absolute right-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 text-gray-800 shadow-md transition-colors hover:bg-white"
+          className="absolute right-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/50 text-gray-800 shadow-md transition-colors hover:bg-white"
           aria-label="Next slide"
         >
           <ChevronRight className="h-6 w-6" />

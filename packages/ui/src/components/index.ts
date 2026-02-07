@@ -72,6 +72,15 @@ export {
 // UI primitives
 export { Button, buttonVariants } from "./ui/button";
 export {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+  BreadcrumbEllipsis,
+} from "./ui/breadcrumb";
+export {
   Carousel,
   CarouselContent,
   CarouselItem,
@@ -79,6 +88,12 @@ export {
   CarouselNext,
   type CarouselApi,
 } from "./ui/carousel";
+export {
+  Collapsible,
+  CollapsibleTrigger,
+  CollapsibleContent,
+} from "./ui/collapsible";
+export { Input } from "./ui/input";
 export {
   NavigationMenu,
   NavigationMenuList,
@@ -90,6 +105,7 @@ export {
   NavigationMenuViewport,
   navigationMenuTriggerStyle,
 } from "./ui/navigation-menu";
+export { Separator } from "./ui/separator";
 export {
   Sheet,
   SheetPortal,
@@ -102,3 +118,36 @@ export {
   SheetTitle,
   SheetDescription,
 } from "./ui/sheet";
+export {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupAction,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarInput,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuAction,
+  SidebarMenuBadge,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSkeleton,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+  SidebarProvider,
+  SidebarRail,
+  SidebarSeparator,
+  SidebarTrigger,
+  useSidebar,
+} from "./ui/sidebar";
+export { Skeleton } from "./ui/skeleton";
+export {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider,
+} from "./ui/tooltip";

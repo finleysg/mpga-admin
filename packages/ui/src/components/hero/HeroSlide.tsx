@@ -30,7 +30,7 @@ export function HeroSlide({
     return (
       <>
         {/* Mobile: centered logo on brand background */}
-        <div className="relative flex h-[350px] w-full flex-col bg-secondary-500 md:hidden">
+        <div className="relative flex h-[360px] w-full flex-col bg-secondary-500 md:hidden">
           <div className="relative flex-1">
             <Image
               src={imageUrl}
@@ -40,7 +40,7 @@ export function HeroSlide({
               priority
             />
           </div>
-          <div className="pb-6 text-center">
+          <div className="pb-8 text-center">
             <h1 className="text-xl font-bold text-white">
               Minnesota Public Golf Association
             </h1>
@@ -57,11 +57,11 @@ export function HeroSlide({
               src={imageUrl}
               alt="MPGA"
               fill
-              className="object-contain"
+              className="object-contain p-8"
               priority
             />
           </div>
-          <div className="flex w-1/3 flex-col justify-center bg-secondary-500 p-6 text-white">
+          <div className="flex w-1/3 flex-col justify-center bg-primary-700 p-6 text-white">
             <h1 className="mb-4 text-2xl font-bold leading-tight md:text-3xl">
               Minnesota Public Golf Association
             </h1>
@@ -103,7 +103,7 @@ export function HeroSlide({
               <Button
                 size="sm"
                 variant="outline"
-                className="mt-3 border-white bg-transparent text-white hover:bg-white hover:text-secondary-500"
+                className="mt-3 border-white bg-transparent text-white hover:bg-white hover:text-primary-700"
               >
                 {ctaText}
               </Button>
@@ -123,24 +123,24 @@ export function HeroSlide({
             priority
           />
         </div>
-        <div className="flex w-1/3 flex-col justify-center bg-secondary-500 p-6 text-white">
+        <div className="flex w-1/3 flex-col justify-center bg-primary-700 p-6 text-white">
           <h2 className="mb-2 text-xl font-bold leading-tight md:text-2xl">
             {title}
           </h2>
           {subtitle && (
-            <p className="mb-4 text-sm text-secondary-200">{subtitle}</p>
+            <p className="mb-4 text-sm text-primary-200">{subtitle}</p>
           )}
           {dates && (
-            <p className="mb-1 text-base font-medium text-secondary-100">
+            <p className="mb-1 text-base font-medium text-primary-100">
               {dates}
             </p>
           )}
-          {venue && <p className="mb-6 text-sm text-secondary-200">{venue}</p>}
+          {venue && <p className="mb-6 text-sm text-primary-200">{venue}</p>}
           {ctaUrl && (
             <Link href={ctaUrl}>
               <Button
                 variant="outline"
-                className="border-white bg-transparent text-white hover:bg-white hover:text-secondary-500"
+                className="border-white bg-transparent text-white hover:bg-white hover:text-primary-700"
               >
                 {ctaText}
               </Button>

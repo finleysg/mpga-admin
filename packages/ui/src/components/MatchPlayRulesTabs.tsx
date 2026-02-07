@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import { Printer } from "lucide-react";
+import { useState } from "react";
 
-import { Button } from "./ui/button";
 import { Markdown } from "./Markdown";
+import { Button } from "./ui/button";
 
 export interface MatchPlayRulesTabsProps {
   matchPlayRules: { title: string; content: string } | null;
