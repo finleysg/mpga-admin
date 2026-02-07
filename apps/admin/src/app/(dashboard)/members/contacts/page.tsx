@@ -12,6 +12,8 @@ import {
 } from "@mpga/ui";
 import {
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   ChevronUp,
   ChevronsUpDown,
   Plus,
@@ -24,6 +26,7 @@ import { type ContactData, listContactsAction } from "./actions";
 
 type SortField = "name" | "email" | "cityState";
 type SortDirection = "asc" | "desc";
+type PageSize = 10 | 25 | 50 | "all";
 
 export default function ContactsPage() {
   const router = useRouter();
@@ -32,6 +35,8 @@ export default function ContactsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<SortField>("name");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+  const [pageSize, setPageSize] = useState<PageSize>(25);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     async function fetchContacts() {
@@ -112,7 +117,29 @@ export default function ContactsPage() {
       setSortField(field);
       setSortDirection("asc");
     }
+    setCurrentPage(1);
   };
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+  };
+
+  const handlePageSizeChange = (value: string) => {
+    setPageSize(value === "all" ? "all" : (Number(value) as 10 | 25 | 50));
+    setCurrentPage(1);
+  };
+
+  const totalPages = useMemo(() => {
+    if (pageSize === "all") return 1;
+    return Math.max(1, Math.ceil(sortedContacts.length / pageSize));
+  }, [sortedContacts.length, pageSize]);
+
+  const paginatedContacts = useMemo(() => {
+    if (pageSize === "all") return sortedContacts;
+    const startIndex = (currentPage - 1) * pageSize;
+    return sortedContacts.slice(startIndex, startIndex + pageSize);
+  }, [sortedContacts, currentPage, pageSize]);
 
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field) {
@@ -162,7 +189,7 @@ export default function ContactsPage() {
                   type="text"
                   placeholder="Search contacts..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={(e) => handleSearchChange(e.target.value)}
                   className="pl-10"
                 />
               </div>
@@ -175,54 +202,95 @@ export default function ContactsPage() {
                 No contacts match your search
               </div>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead
-                      className="cursor-pointer select-none"
-                      onClick={() => handleSort("name")}
-                    >
-                      Name
-                      <SortIcon field="name" />
-                    </TableHead>
-                    <TableHead
-                      className="cursor-pointer select-none"
-                      onClick={() => handleSort("email")}
-                    >
-                      Email
-                      <SortIcon field="email" />
-                    </TableHead>
-                    <TableHead>Phone</TableHead>
-                    <TableHead
-                      className="cursor-pointer select-none"
-                      onClick={() => handleSort("cityState")}
-                    >
-                      City/State
-                      <SortIcon field="cityState" />
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {sortedContacts.map((contact) => (
-                    <TableRow
-                      key={contact.id}
-                      className="cursor-pointer hover:bg-gray-50"
-                      onClick={() =>
-                        router.push(`/members/contacts/${contact.id}`)
-                      }
-                    >
-                      <TableCell className="font-medium">
-                        {contact.lastName}, {contact.firstName}
-                      </TableCell>
-                      <TableCell>{contact.email ?? "-"}</TableCell>
-                      <TableCell>{contact.primaryPhone ?? "-"}</TableCell>
-                      <TableCell>
-                        {formatCityState(contact.city, contact.state)}
-                      </TableCell>
+              <>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead
+                        className="cursor-pointer select-none"
+                        onClick={() => handleSort("name")}
+                      >
+                        Name
+                        <SortIcon field="name" />
+                      </TableHead>
+                      <TableHead
+                        className="cursor-pointer select-none"
+                        onClick={() => handleSort("email")}
+                      >
+                        Email
+                        <SortIcon field="email" />
+                      </TableHead>
+                      <TableHead>Phone</TableHead>
+                      <TableHead
+                        className="cursor-pointer select-none"
+                        onClick={() => handleSort("cityState")}
+                      >
+                        City/State
+                        <SortIcon field="cityState" />
+                      </TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {paginatedContacts.map((contact) => (
+                      <TableRow
+                        key={contact.id}
+                        className="cursor-pointer hover:bg-gray-50"
+                        onClick={() =>
+                          router.push(`/members/contacts/${contact.id}`)
+                        }
+                      >
+                        <TableCell className="font-medium">
+                          {contact.lastName}, {contact.firstName}
+                        </TableCell>
+                        <TableCell>{contact.email ?? "-"}</TableCell>
+                        <TableCell>{contact.primaryPhone ?? "-"}</TableCell>
+                        <TableCell>
+                          {formatCityState(contact.city, contact.state)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                <div className="mt-4 flex items-center justify-between border-t pt-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-500">Show</span>
+                    <select
+                      value={String(pageSize)}
+                      onChange={(e) => handlePageSizeChange(e.target.value)}
+                      className="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm focus:border-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-400"
+                    >
+                      <option value="10">10</option>
+                      <option value="25">25</option>
+                      <option value="50">50</option>
+                      <option value="all">All</option>
+                    </select>
+                    <span className="text-sm text-gray-500">per page</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-500">
+                      Page {currentPage} of {totalPages}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage((prev) => prev - 1)}
+                      disabled={currentPage === 1}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                      Previous
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage((prev) => prev + 1)}
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </>
             )}
           </>
         )}

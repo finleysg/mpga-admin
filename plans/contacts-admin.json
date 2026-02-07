@@ -125,7 +125,7 @@
         "Changing the sort resets to page 1",
         "pnpm typecheck passes"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "contacts-08",
