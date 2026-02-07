@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm/relations";
 
+import { user, session, account } from "./auth";
 import {
   document,
   announcement,
@@ -203,5 +204,25 @@ export const tournamentLinkRelations = relations(tournamentLink, ({ one }) => ({
   tournamentInstance: one(tournamentInstance, {
     fields: [tournamentLink.tournamentInstanceId],
     references: [tournamentInstance.id],
+  }),
+}));
+
+// Better Auth relations
+export const userRelations = relations(user, ({ many }) => ({
+  sessions: many(session),
+  accounts: many(account),
+}));
+
+export const sessionRelations = relations(session, ({ one }) => ({
+  user: one(user, {
+    fields: [session.userId],
+    references: [user.id],
+  }),
+}));
+
+export const accountRelations = relations(account, ({ one }) => ({
+  user: one(user, {
+    fields: [account.userId],
+    references: [user.id],
   }),
 }));

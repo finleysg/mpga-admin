@@ -43,8 +43,10 @@ services:
       - MAIL_HOST=mailpit
       - MAIL_PORT=1025
       - BETTER_AUTH_SECRET=dev-secret-change-in-prod
-      - BETTER_AUTH_URL=http://localhost:26101
-      - NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:26101
+      - BETTER_AUTH_URL=http://localhost:4001
+      - NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:4001
+      - NEXT_PUBLIC_APP_URL=http://localhost:4001
+      - MAIL_FROM=noreply@mpga.golf
     depends_on:
       - mysql
 

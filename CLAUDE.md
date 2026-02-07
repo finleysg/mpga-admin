@@ -38,6 +38,15 @@ pnpm db:studio        # Open Drizzle Studio UI
 - **Better Auth** for admin authentication (email/password, 7-day sessions)
 - **Tailwind CSS** with shared base config in `tooling/tailwind`
 
+## Database Migrations
+
+- **Development**: Use `pnpm db:push` for fast iteration (applies schema directly, no migration files)
+- **Production**: Use `pnpm db:generate` to create migration files, then `drizzle-kit migrate` to apply them in order
+- Migration files live in `packages/database/drizzle/`
+- The `__drizzle_migrations` table tracks which migrations have been applied
+- Schema is the source of truth: `packages/database/src/schema/`
+- Before deploying, always run `pnpm db:generate` to capture schema changes as a migration, review the SQL, and commit it
+
 ## Database Schema
 
 Located in `packages/database/src/schema/`:
@@ -48,6 +57,15 @@ Located in `packages/database/src/schema/`:
 - Client: `apps/admin/src/lib/auth-client.ts`
 - Middleware protects all admin routes except `/login` and `/api/auth`
 - Session cookie: `better-auth.session_token`
+
+## Styles
+
+- Use shadcn blocks and components
+- The public site is based on the primary pallette
+- Users of the public site will be on their phone most often (80-90%)
+- The admin site is based on the secondary pallette
+- The admin site should be responsive, but users will primarily be on a laptop
+- Always use the font-heading class for h tags
 
 ## Docker Development
 

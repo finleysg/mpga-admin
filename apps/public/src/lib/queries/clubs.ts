@@ -61,7 +61,7 @@ export async function getClubsWithMembershipStatus(
         membership,
         and(eq(club.id, membership.clubId), eq(membership.year, year)),
       )
-      .where(eq(club.archived, 0))
+      .where(eq(club.archived, false))
       .orderBy(club.name);
 
     return results.map((r) => ({
@@ -199,7 +199,7 @@ export async function getClubOfficers(clubId: number): Promise<ClubOfficer[]> {
           firstName: r.firstName,
           lastName: r.lastName,
           email: r.email,
-          isPrimary: r.isPrimary === 1,
+          isPrimary: r.isPrimary,
           roles: r.role ? [r.role] : [],
         });
       }

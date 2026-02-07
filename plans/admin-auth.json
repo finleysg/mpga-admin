@@ -1,0 +1,317 @@
+{
+  "title": "Admin Authentication & Authorization",
+  "description": "Implement authentication, role-based authorization, social SSO, and invitation flow for the admin dashboard.",
+  "plan": ".claude/plans/cozy-nibbling-riddle.md",
+  "items": [
+    {
+      "id": "auth-01",
+      "category": "roles",
+      "description": "Create access control permissions file with super_admin and admin role definitions using Better Auth's createAccessControl",
+      "files": ["apps/admin/src/lib/permissions.ts"],
+      "steps_to_verify": [
+        "File exists at apps/admin/src/lib/permissions.ts",
+        "Exports `ac` (access control instance), `superAdminRole`, and `adminRole`",
+        "super_admin role has permissions: user create/list/set-role/ban/delete, session list/revoke, invitation create/list/revoke",
+        "admin role has minimal permissions: user get only",
+        "pnpm typecheck passes"
+      ],
+      "passes": true
+    },
+    {
+      "id": "auth-02",
+      "category": "roles",
+      "description": "Add Better Auth admin plugin to server auth config with role definitions and access control",
+      "files": ["apps/admin/src/lib/auth.ts"],
+      "steps_to_verify": [
+        "auth.ts imports admin plugin from better-auth/plugins",
+        "auth.ts imports ac, superAdminRole, adminRole from ./permissions",
+        "plugins array includes admin({ defaultRole: 'admin', adminRoles: ['super_admin', 'admin'], ac, roles: { super_admin: superAdminRole, admin: adminRole } })",
+        "baseURL is set from process.env.BETTER_AUTH_URL",
+        "pnpm typecheck passes"
+      ],
+      "passes": true
+    },
+    {
+      "id": "auth-03",
+      "category": "roles",
+      "description": "Add adminClient plugin to auth client config with matching role definitions",
+      "files": ["apps/admin/src/lib/auth-client.ts"],
+      "steps_to_verify": [
+        "auth-client.ts imports adminClient from better-auth/client/plugins",
+        "auth-client.ts imports ac, superAdminRole, adminRole from ./permissions",
+        "plugins array includes adminClient with matching ac and roles config",
+        "signIn, signOut, signUp, useSession still exported",
+        "pnpm typecheck passes"
+      ],
+      "passes": true
+    },
+    {
+      "id": "auth-03b",
+      "category": "database",
+      "description": "Generate and apply Better Auth database tables. Run `npx @better-auth/cli generate` from apps/admin to generate Drizzle migration for auth tables (user, session, account, verification) with admin plugin columns (role, banned, banReason, banExpires on user; impersonatedBy on session). Then run `pnpm db:push` to apply.",
+      "files": [],
+      "steps_to_verify": [
+        "Running `npx @better-auth/cli generate` from apps/admin produces migration output",
+        "Running `pnpm db:push` applies the schema to the database",
+        "Database has `user` table with columns: id, name, email, emailVerified, image, createdAt, updatedAt, role, banned, banReason, banExpires",
+        "Database has `session` table with columns: id, expiresAt, token, createdAt, updatedAt, ipAddress, userAgent, userId, impersonatedBy",
+        "Database has `account` table with OAuth provider columns",
+        "Database has `verification` table with token columns"
+      ],
+      "passes": true
+    },
+    {
+      "id": "auth-04",
+      "category": "route-protection",
+      "description": "Enable route protection in proxy.ts — uncomment session cookie check, define public routes (/login, /api/auth, /accept-invitation), redirect unauthenticated users to /login",
+      "files": ["apps/admin/src/proxy.ts"],
+      "steps_to_verify": [
+        "proxy function checks for better-auth.session_token cookie",
+        "Requests to /login, /api/auth/*, /accept-invitation/* pass through without auth check",
+        "Unauthenticated requests to all other routes redirect to /login",
+        "config.matcher excludes _next/static, _next/image, favicon.ico, and images",
+        "pnpm typecheck passes"
+      ],
+      "passes": true
+    },
+    {
+      "id": "auth-05",
+      "category": "route-protection",
+      "description": "Add server-side session validation to dashboard layout as a secondary guard behind the proxy",
+      "files": ["apps/admin/src/app/(dashboard)/layout.tsx"],
+      "steps_to_verify": [
+        "Layout imports auth from @/lib/auth and calls auth.api.getSession with request headers",
+        "If session is null/invalid, redirects to /login using next/navigation redirect",
+        "Existing sidebar layout and breadcrumb rendering are preserved",
+        "pnpm typecheck passes"
+      ],
+      "passes": true
+    },
+    {
+      "id": "auth-06",
+      "category": "route-protection",
+      "description": "Add SidebarFooter to app-sidebar showing current user info and sign-out button",
+      "files": ["apps/admin/src/components/app-sidebar.tsx"],
+      "steps_to_verify": [
+        "SidebarFooter is imported from @mpga/ui",
+        "useSession hook is used to get current user",
+        "Footer displays user name or email",
+        "Sign-out button calls signOut() from auth-client",
+        "Footer renders at the bottom of the sidebar",
+        "pnpm typecheck passes"
+      ],
+      "passes": true
+    },
+    {
+      "id": "auth-06b",
+      "category": "ui-components",
+      "description": "Add missing shadcn components to @mpga/ui required by login-03 block: Card (CardHeader, CardTitle, CardDescription, CardContent), Field (FieldGroup, FieldLabel, FieldDescription, FieldSeparator)",
+      "files": [
+        "packages/ui/src/components/ui/card.tsx",
+        "packages/ui/src/components/ui/field.tsx",
+        "packages/ui/src/components/index.ts"
+      ],
+      "steps_to_verify": [
+        "card.tsx exists with Card, CardHeader, CardTitle, CardDescription, CardContent exports",
+        "field.tsx exists with Field, FieldGroup, FieldLabel, FieldDescription, FieldSeparator exports",
+        "All new components are exported from packages/ui/src/components/index.ts",
+        "pnpm typecheck passes"
+      ],
+      "passes": true
+    },
+    {
+      "id": "auth-07",
+      "category": "social-sso",
+      "description": "Add Google and Apple social providers to Better Auth server config",
+      "files": ["apps/admin/src/lib/auth.ts"],
+      "steps_to_verify": [
+        "socialProviders object includes google with clientId and clientSecret from env vars",
+        "socialProviders object includes apple with clientId and clientSecret from env vars",
+        "pnpm typecheck passes"
+      ],
+      "passes": true
+    },
+    {
+      "id": "auth-08",
+      "category": "social-sso",
+      "description": "Add Google and Apple SSO env vars to .env.example",
+      "files": [".env.example"],
+      "steps_to_verify": [
+        ".env.example contains GOOGLE_CLIENT_ID=",
+        ".env.example contains GOOGLE_CLIENT_SECRET=",
+        ".env.example contains APPLE_CLIENT_ID=",
+        ".env.example contains APPLE_CLIENT_SECRET=",
+        ".env.example contains NEXT_PUBLIC_BETTER_AUTH_URL=http://localhost:4100"
+      ],
+      "passes": true
+    },
+    {
+      "id": "auth-09",
+      "category": "social-sso",
+      "description": "Rebuild login page using shadcn login-03 block layout (https://ui.shadcn.com/blocks/login#login-03). Centered Card on muted background with MPGA logo, Apple and Google SSO buttons at top, 'Or continue with' FieldSeparator, then email/password fields below.",
+      "files": ["apps/admin/src/app/login/page.tsx"],
+      "steps_to_verify": [
+        "Page layout matches login-03: centered card on bg-muted with logo/brand header above card",
+        "Card uses CardHeader with title 'Welcome back' and CardContent wrapping the form",
+        "Apple sign-in button appears first, then Google sign-in button (both variant='outline')",
+        "FieldSeparator with 'Or continue with' text divides SSO buttons from credential fields",
+        "Email and password Input fields with FieldLabel components below the separator",
+        "Login Button at bottom of form",
+        "Google button calls signIn.social({ provider: 'google', callbackURL: '/' })",
+        "Apple button calls signIn.social({ provider: 'apple', callbackURL: '/' })",
+        "If user is already authenticated (useSession), redirect to /",
+        "pnpm typecheck passes"
+      ],
+      "passes": true
+    },
+    {
+      "id": "auth-10",
+      "category": "invitation",
+      "description": "Create invitation table schema in the database package",
+      "files": [
+        "packages/database/src/schema/invitation.ts",
+        "packages/database/src/schema/index.ts"
+      ],
+      "steps_to_verify": [
+        "invitation.ts defines a mysqlTable named 'invitation'",
+        "Table has columns: id (varchar PK), email (varchar), token (varchar), invitedBy (varchar), role (varchar default 'admin'), status (varchar default 'pending'), expiresAt (datetime), createdAt (datetime), acceptedAt (datetime nullable)",
+        "schema/index.ts exports from ./invitation",
+        "pnpm typecheck passes",
+        "Running `pnpm db:push` creates the invitation table in the database"
+      ],
+      "passes": true
+    },
+    {
+      "id": "auth-11",
+      "category": "invitation",
+      "description": "Create email utility for sending invitation emails using Mailgun/Mailpit",
+      "files": ["apps/admin/src/lib/email.ts"],
+      "steps_to_verify": [
+        "Exports sendInvitationEmail(email: string, token: string) function",
+        "Uses MAIL_HOST and MAIL_PORT env vars for SMTP transport (Mailpit locally)",
+        "Uses MAILGUN_API_KEY and MAILGUN_DOMAIN env vars for production",
+        "Email body contains the accept link: {NEXT_PUBLIC_APP_URL}/accept-invitation/{token}",
+        "pnpm typecheck passes"
+      ],
+      "passes": true
+    },
+    {
+      "id": "auth-12",
+      "category": "invitation",
+      "description": "Create server-side invitation logic: create, validate, and accept invitation functions",
+      "files": ["apps/admin/src/lib/invitation.ts"],
+      "steps_to_verify": [
+        "Exports createInvitation(email, invitedByUserId) — generates crypto-random token, inserts invitation record with 7-day expiry, calls sendInvitationEmail, returns void",
+        "Exports validateInvitation(token) — looks up invitation by hashed token, checks status is 'pending' and not expired, returns invitation record or null",
+        "Exports acceptInvitation(token) — updates invitation status to 'accepted' and sets acceptedAt timestamp",
+        "Token is hashed before storage and compared using constant-time comparison",
+        "pnpm typecheck passes"
+      ],
+      "passes": true
+    },
+    {
+      "id": "auth-13",
+      "category": "invitation",
+      "description": "Create invitation acceptance page at /accept-invitation/[token] using login-03 block layout adapted for sign-up. Centered Card on muted background, MPGA logo, Apple/Google SSO buttons, separator, then name/email(read-only)/password fields.",
+      "files": ["apps/admin/src/app/accept-invitation/[token]/page.tsx"],
+      "steps_to_verify": [
+        "Page layout matches login-03 block: centered card on bg-muted with MPGA logo header",
+        "Page validates the token server-side on load (calls validateInvitation)",
+        "If token is invalid/expired, shows an error message (not a form)",
+        "If valid, shows account creation form with email pre-filled and read-only",
+        "Form has name and password fields for credential sign-up using signUp.email()",
+        "Apple and Google sign-up buttons available above the separator",
+        "Social SSO buttons store invitation token in a cookie before redirecting",
+        "On successful account creation via credentials, calls acceptInvitation(token) and redirects to /",
+        "pnpm typecheck passes"
+      ],
+      "passes": true
+    },
+    {
+      "id": "auth-14",
+      "category": "invitation",
+      "description": "Create invitation OAuth callback page to handle social sign-up during invitation acceptance",
+      "files": ["apps/admin/src/app/accept-invitation/callback/page.tsx"],
+      "steps_to_verify": [
+        "Page reads invitation token from cookie",
+        "Validates the invitation is still pending",
+        "Calls acceptInvitation(token) to mark it accepted",
+        "Clears the invitation cookie",
+        "Redirects to /",
+        "pnpm typecheck passes"
+      ],
+      "passes": true
+    },
+    {
+      "id": "auth-15",
+      "category": "admin-ui",
+      "description": "Create user management page at /(dashboard)/admin/users — list users with role/status management actions",
+      "files": ["apps/admin/src/app/(dashboard)/admin/users/page.tsx"],
+      "steps_to_verify": [
+        "Page calls authClient.admin.listUsers() to fetch all users",
+        "Displays table with columns: Name, Email, Role, Status (active/banned), Created",
+        "Ban/unban action per user row",
+        "Remove user action per user row",
+        "Role change dropdown (admin/super_admin) per user row",
+        "Server-side check verifies requesting user has super_admin role; redirects if not",
+        "pnpm typecheck passes"
+      ],
+      "passes": true
+    },
+    {
+      "id": "auth-16",
+      "category": "admin-ui",
+      "description": "Create invitation management page at /(dashboard)/admin/invitations — send invitations and list pending/accepted/revoked",
+      "files": ["apps/admin/src/app/(dashboard)/admin/invitations/page.tsx"],
+      "steps_to_verify": [
+        "Page has a form to enter an email address and send an invitation",
+        "Form calls createInvitation server action",
+        "Lists all invitations with columns: Email, Status, Created, Expires",
+        "Pending invitations have a Revoke action",
+        "Server-side check verifies requesting user has super_admin role; redirects if not",
+        "pnpm typecheck passes"
+      ],
+      "passes": true
+    },
+    {
+      "id": "auth-17",
+      "category": "admin-ui",
+      "description": "Add Administration nav group to sidebar, visible only to super_admin users",
+      "files": ["apps/admin/src/components/app-sidebar.tsx"],
+      "steps_to_verify": [
+        "New 'Administration' SidebarGroup appears below Season Settings",
+        "Contains links to /admin/users and /admin/invitations",
+        "Group is only rendered when session.user.role === 'super_admin'",
+        "Uses useSession() to check role",
+        "pnpm typecheck passes"
+      ],
+      "passes": true
+    },
+    {
+      "id": "auth-18",
+      "category": "seed",
+      "description": "Create a seed script to bootstrap the first super_admin account. Uses Better Auth's server-side createUser API to insert a user with role 'super_admin'. Email and password are provided via ADMIN_EMAIL and ADMIN_PASSWORD env vars (or CLI args). This account uses credentials only (no social SSO) and is the only way to create the initial super admin.",
+      "files": ["scripts/seed-admin.ts"],
+      "steps_to_verify": [
+        "Script imports auth from apps/admin/src/lib/auth",
+        "Script calls auth.api.createUser with { email, password, name, role: 'super_admin' }",
+        "Email and password are read from ADMIN_EMAIL and ADMIN_PASSWORD env vars",
+        "Script logs success/failure message",
+        "Script can be run with: npx tsx scripts/seed-admin.ts",
+        "Running the script creates a user in the database with role 'super_admin'",
+        "The created user can log in at /login with the provided credentials"
+      ],
+      "passes": true
+    },
+    {
+      "id": "auth-19",
+      "category": "env",
+      "description": "Add NEXT_PUBLIC_APP_URL to .env.example for invitation link generation",
+      "files": [".env.example"],
+      "steps_to_verify": [
+        ".env.example contains NEXT_PUBLIC_APP_URL=http://localhost:4100"
+      ],
+      "passes": true
+    }
+  ]
+}

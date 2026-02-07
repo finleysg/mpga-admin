@@ -326,8 +326,8 @@ export async function getTournamentHistory(
       ...r,
       coWinner: r.coWinner || null,
       coWinnerClub: r.coWinnerClub || null,
-      isMatch: r.isMatch === 1,
-      isNet: r.isNet === 1,
+      isMatch: r.isMatch,
+      isNet: r.isNet,
     }));
   } catch (error) {
     console.error(

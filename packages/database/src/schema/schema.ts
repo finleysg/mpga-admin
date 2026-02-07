@@ -7,7 +7,7 @@ import {
   datetime,
   date,
   decimal,
-  tinyint,
+  boolean,
 } from "drizzle-orm/mysql-core";
 
 export const announcement = mysqlTable(
@@ -59,7 +59,7 @@ export const club = mysqlTable(
     golfCourseId: int().references(() => golfCourse.id),
     size: int(),
     systemName: varchar({ length: 50 }),
-    archived: tinyint().notNull(),
+    archived: boolean().notNull(),
   },
   (table) => [primaryKey({ columns: [table.id], name: "club_id" })],
 );
@@ -74,7 +74,7 @@ export const clubContact = mysqlTable(
     contactId: int()
       .notNull()
       .references(() => contact.id),
-    isPrimary: tinyint().notNull(),
+    isPrimary: boolean().notNull(),
     notes: varchar({ length: 150 }),
     userId: int(),
   },
@@ -122,7 +122,7 @@ export const contact = mysqlTable(
     state: varchar({ length: 2 }),
     zip: varchar({ length: 10 }),
     notes: longtext(),
-    sendEmail: tinyint().notNull(),
+    sendEmail: boolean().notNull(),
   },
   (table) => [primaryKey({ columns: [table.id], name: "contact_id" })],
 );
@@ -193,7 +193,7 @@ export const matchPlayResult = mysqlTable(
     homeTeamScore: decimal({ precision: 3, scale: 1 }).notNull(),
     awayTeamScore: decimal({ precision: 3, scale: 1 }).notNull(),
     enteredBy: varchar({ length: 60 }).notNull(),
-    forfeit: tinyint().notNull(),
+    forfeit: boolean().notNull(),
     homeTeamId: int()
       .notNull()
       .references(() => team.id),
@@ -270,7 +270,7 @@ export const team = mysqlTable(
     id: int().autoincrement().notNull(),
     year: int().notNull(),
     groupName: varchar({ length: 20 }).notNull(),
-    isSenior: tinyint().notNull(),
+    isSenior: boolean().notNull(),
     clubId: int()
       .notNull()
       .references(() => club.id),
@@ -302,8 +302,8 @@ export const tournamentHistory = mysqlTable(
     coWinnerClub: varchar({ length: 100 }).notNull(),
     division: varchar({ length: 20 }).notNull(),
     score: varchar({ length: 20 }).notNull(),
-    isMatch: tinyint().notNull(),
-    isNet: tinyint().notNull(),
+    isMatch: boolean().notNull(),
+    isNet: boolean().notNull(),
     notes: longtext(),
     tournamentId: int()
       .notNull()

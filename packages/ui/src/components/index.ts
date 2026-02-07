@@ -81,6 +81,15 @@ export {
   BreadcrumbEllipsis,
 } from "./ui/breadcrumb";
 export {
+  Card,
+  CardHeader,
+  CardFooter,
+  CardTitle,
+  CardAction,
+  CardDescription,
+  CardContent,
+} from "./ui/card";
+export {
   Carousel,
   CarouselContent,
   CarouselItem,
@@ -93,7 +102,20 @@ export {
   CollapsibleTrigger,
   CollapsibleContent,
 } from "./ui/collapsible";
+export {
+  Field,
+  FieldLabel,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLegend,
+  FieldSeparator,
+  FieldSet,
+  FieldContent,
+  FieldTitle,
+} from "./ui/field";
 export { Input } from "./ui/input";
+export { Label } from "./ui/label";
 export {
   NavigationMenu,
   NavigationMenuList,
@@ -146,8 +168,36 @@ export {
 } from "./ui/sidebar";
 export { Skeleton } from "./ui/skeleton";
 export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableFooter,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableCaption,
+} from "./ui/table";
+export {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
   TooltipProvider,
 } from "./ui/tooltip";
+export { Badge, badgeVariants, type BadgeProps } from "./ui/badge";
+export {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuCheckboxItem,
+  DropdownMenuRadioItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuGroup,
+  DropdownMenuPortal,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuRadioGroup,
+} from "./ui/dropdown-menu";

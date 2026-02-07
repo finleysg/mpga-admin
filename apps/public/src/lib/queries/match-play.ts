@@ -26,7 +26,7 @@ export async function getTeamsForYear(year: number): Promise<MatchPlayTeam[]> {
 
     return results.map((r) => ({
       ...r,
-      isSenior: r.isSenior === 1,
+      isSenior: r.isSenior,
     }));
   } catch (error) {
     console.error("Failed to fetch match play teams:", error);
