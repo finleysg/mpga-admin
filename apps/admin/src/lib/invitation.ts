@@ -14,16 +14,6 @@ function hashToken(token: string): string {
 }
 
 /**
- * Compares two strings in constant time to prevent timing attacks.
- */
-function constantTimeCompare(a: string, b: string): boolean {
-  if (a.length !== b.length) {
-    return false;
-  }
-  return crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b));
-}
-
-/**
  * Creates an invitation for the given email address.
  * Generates a crypto-random token, stores the hashed version,
  * and sends an invitation email with the plain token.
@@ -65,30 +55,37 @@ export async function validateInvitation(token: string) {
     .select()
     .from(invitation)
     .where(
-      and(eq(invitation.status, "pending"), gt(invitation.expiresAt, now)),
+      and(
+        eq(invitation.token, hashedToken),
+        eq(invitation.status, "pending"),
+        gt(invitation.expiresAt, now),
+      ),
     );
 
-  // Find matching invitation using constant-time comparison
-  for (const inv of results) {
-    if (constantTimeCompare(inv.token, hashedToken)) {
-      return inv;
-    }
-  }
-
-  return null;
+  return results[0] ?? null;
 }
 
 /**
  * Accepts an invitation by updating its status and setting the acceptedAt timestamp.
+ * Returns true if a pending invitation was found and accepted, false otherwise.
  */
-export async function acceptInvitation(token: string): Promise<void> {
+export async function acceptInvitation(token: string): Promise<boolean> {
   const hashedToken = hashToken(token);
+  const now = new Date();
 
-  await db
+  const result = await db
     .update(invitation)
     .set({
       status: "accepted",
-      acceptedAt: new Date(),
+      acceptedAt: now,
     })
-    .where(eq(invitation.token, hashedToken));
+    .where(
+      and(
+        eq(invitation.token, hashedToken),
+        eq(invitation.status, "pending"),
+        gt(invitation.expiresAt, now),
+      ),
+    );
+
+  return result[0].affectedRows > 0;
 }

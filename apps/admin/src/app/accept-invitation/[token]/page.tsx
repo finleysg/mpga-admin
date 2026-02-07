@@ -86,11 +86,18 @@ export default function AcceptInvitationPage({
         setError(result.error.message ?? "Account creation failed");
       } else {
         // Accept the invitation
-        await fetch("/api/invitations/accept", {
+        const acceptResponse = await fetch("/api/invitations/accept", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ token }),
         });
+
+        if (!acceptResponse.ok) {
+          setError(
+            "Your account was created but the invitation could not be accepted. Please contact an administrator.",
+          );
+          return;
+        }
 
         router.push("/");
         router.refresh();

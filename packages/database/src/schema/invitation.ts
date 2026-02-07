@@ -7,7 +7,7 @@ export const invitation = mysqlTable(
   {
     id: varchar("id", { length: 36 }).primaryKey(),
     email: varchar("email", { length: 255 }).notNull(),
-    token: varchar("token", { length: 255 }).notNull(),
+    token: varchar("token", { length: 255 }).notNull().unique(),
     invitedBy: varchar("invited_by", { length: 36 })
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
@@ -17,8 +17,5 @@ export const invitation = mysqlTable(
     createdAt: datetime("created_at", { fsp: 3 }).notNull(),
     acceptedAt: datetime("accepted_at", { fsp: 3 }),
   },
-  (table) => [
-    index("invitation_email_idx").on(table.email),
-    index("invitation_token_idx").on(table.token),
-  ],
+  (table) => [index("invitation_email_idx").on(table.email)],
 );
