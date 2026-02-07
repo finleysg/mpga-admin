@@ -63,7 +63,7 @@ Located in `packages/database/src/schema/`:
 - Use shadcn blocks and components
 - The public site is based on the primary pallette
 - Users of the public site will be on their phone most often (80-90%)
-- The admin site is based on the secondary pallette
+- The admin site is based on the secondary pallette - use secondary-500 for headings
 - The admin site should be responsive, but users will primarily be on a laptop
 - Always use the font-heading class for h tags
 

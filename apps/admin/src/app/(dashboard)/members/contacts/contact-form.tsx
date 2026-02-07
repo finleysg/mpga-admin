@@ -15,8 +15,12 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  Checkbox,
+  Field,
+  FieldError,
+  FieldLabel,
   Input,
-  Label,
+  toast,
 } from "@mpga/ui";
 import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -81,6 +85,7 @@ export function ContactForm({ contact }: ContactFormProps) {
       });
 
       if (result.success) {
+        toast.success(contact ? "Contact updated" : "Contact created");
         router.push("/members/contacts");
       } else {
         setError(result.error ?? "Failed to save contact");
@@ -107,6 +112,7 @@ export function ContactForm({ contact }: ContactFormProps) {
       const result = await deleteContactAction(contact.id);
 
       if (result.success) {
+        toast.success("Contact deleted");
         router.push("/members/contacts");
       } else {
         setDeleteDialogOpen(false);
@@ -130,126 +136,124 @@ export function ContactForm({ contact }: ContactFormProps) {
         <form onSubmit={handleSave} className="space-y-4">
           {/* Row 1: First Name and Last Name */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="firstName">
-                First Name <span className="text-red-500">*</span>
-              </Label>
+            <Field>
+              <FieldLabel htmlFor="firstName">
+                First Name <span className="text-destructive">*</span>
+              </FieldLabel>
               <Input
                 id="firstName"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 required
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="lastName">
-                Last Name <span className="text-red-500">*</span>
-              </Label>
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="lastName">
+                Last Name <span className="text-destructive">*</span>
+              </FieldLabel>
               <Input
                 id="lastName"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 required
               />
-            </div>
+            </Field>
           </div>
 
           {/* Row 2: Email */}
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+          <Field>
+            <FieldLabel htmlFor="email">Email</FieldLabel>
             <Input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-          </div>
+          </Field>
 
           {/* Row 3: Primary Phone and Alternate Phone */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="primaryPhone">Primary Phone</Label>
+            <Field>
+              <FieldLabel htmlFor="primaryPhone">Primary Phone</FieldLabel>
               <Input
                 id="primaryPhone"
                 value={primaryPhone}
                 onChange={(e) => setPrimaryPhone(e.target.value)}
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="alternatePhone">Alternate Phone</Label>
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="alternatePhone">Alternate Phone</FieldLabel>
               <Input
                 id="alternatePhone"
                 value={alternatePhone}
                 onChange={(e) => setAlternatePhone(e.target.value)}
               />
-            </div>
+            </Field>
           </div>
 
           {/* Row 4: Address */}
-          <div className="space-y-2">
-            <Label htmlFor="addressText">Address</Label>
+          <Field>
+            <FieldLabel htmlFor="addressText">Address</FieldLabel>
             <Input
               id="addressText"
               value={addressText}
               onChange={(e) => setAddressText(e.target.value)}
             />
-          </div>
+          </Field>
 
           {/* Row 5: City, State, Zip */}
           <div className="grid grid-cols-4 gap-4">
-            <div className="col-span-2 space-y-2">
-              <Label htmlFor="city">City</Label>
+            <Field className="col-span-2">
+              <FieldLabel htmlFor="city">City</FieldLabel>
               <Input
                 id="city"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="state">State</Label>
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="state">State</FieldLabel>
               <Input
                 id="state"
                 value={state}
                 onChange={(e) => setState(e.target.value)}
                 maxLength={2}
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="zip">Zip</Label>
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="zip">Zip</FieldLabel>
               <Input
                 id="zip"
                 value={zip}
                 onChange={(e) => setZip(e.target.value)}
               />
-            </div>
+            </Field>
           </div>
 
           {/* Row 6: Send Email checkbox */}
-          <div className="flex items-center space-x-2">
-            <input
+          <Field orientation="horizontal">
+            <Checkbox
               id="sendEmail"
-              type="checkbox"
               checked={sendEmail}
-              onChange={(e) => setSendEmail(e.target.checked)}
-              className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+              onCheckedChange={(checked) => setSendEmail(checked === true)}
             />
-            <Label htmlFor="sendEmail">Send Email</Label>
-          </div>
+            <FieldLabel htmlFor="sendEmail">Send Email</FieldLabel>
+          </Field>
 
           {/* Row 7: Notes */}
-          <div className="space-y-2">
-            <Label htmlFor="notes">Notes</Label>
+          <Field>
+            <FieldLabel htmlFor="notes">Notes</FieldLabel>
             <textarea
               id="notes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={4}
-              className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+              className="flex w-full rounded-md border border-gray-300 bg-background px-3 py-2 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:shadow-[0_0_0_1px_#96c4d0,0_0_8px_rgba(150,196,208,0.4)] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
             />
-          </div>
+          </Field>
 
           {/* Error message */}
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <FieldError>{error}</FieldError>}
 
           {/* Action buttons */}
           <div className="flex justify-between pt-4">
@@ -294,10 +298,14 @@ export function ContactForm({ contact }: ContactFormProps) {
 
             {/* Save/Cancel buttons on the right */}
             <div className="flex gap-2">
-              <Button type="button" variant="outline" onClick={handleCancel}>
+              <Button
+                type="button"
+                variant="secondaryoutline"
+                onClick={handleCancel}
+              >
                 Cancel
               </Button>
-              <Button type="submit" disabled={saving}>
+              <Button type="submit" variant="secondary" disabled={saving}>
                 {saving ? "Saving..." : "Save"}
               </Button>
             </div>
