@@ -271,7 +271,7 @@
         "Server-side check verifies requesting user has super_admin role; redirects if not",
         "pnpm typecheck passes"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "auth-17",
@@ -285,7 +285,7 @@
         "Uses useSession() to check role",
         "pnpm typecheck passes"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "auth-18",
@@ -301,7 +301,7 @@
         "Running the script creates a user in the database with role 'super_admin'",
         "The created user can log in at /login with the provided credentials"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "auth-19",
