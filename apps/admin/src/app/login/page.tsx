@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
   Field,
+  FieldError,
   FieldLabel,
   FieldSeparator,
   Input,
@@ -110,11 +111,7 @@ export default function LoginPage() {
               <FieldSeparator>Or continue with</FieldSeparator>
               <form onSubmit={handleSubmit}>
                 <div className="grid gap-6">
-                  {error && (
-                    <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
-                      {error}
-                    </div>
-                  )}
+                  {error && <FieldError>{error}</FieldError>}
                   <Field>
                     <FieldLabel htmlFor="email">Email</FieldLabel>
                     <Input

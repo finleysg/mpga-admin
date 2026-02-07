@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 
 import { auth } from "@/lib/auth";
+import { requireSuperAdmin } from "@/lib/require-auth";
 
 interface ActionResult<T = void> {
   success: boolean;
@@ -17,17 +18,6 @@ interface UserData {
   role: string | null;
   banned: boolean | null;
   createdAt: Date;
-}
-
-async function requireSuperAdmin(): Promise<string | null> {
-  const headersList = await headers();
-  const session = await auth.api.getSession({ headers: headersList });
-
-  if (!session?.user || session.user.role !== "super_admin") {
-    return null;
-  }
-
-  return session.user.id;
 }
 
 export async function listUsersAction(): Promise<ActionResult<UserData[]>> {
