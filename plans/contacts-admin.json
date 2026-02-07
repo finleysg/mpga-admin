@@ -173,7 +173,7 @@
         "h1 heading says 'Edit Contact' with font-heading and text-secondary-500 classes",
         "pnpm typecheck passes"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "contacts-10",
