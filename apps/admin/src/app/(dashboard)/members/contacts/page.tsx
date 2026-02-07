@@ -2,6 +2,7 @@
 
 import {
   Button,
+  Input,
   Table,
   TableBody,
   TableCell,
@@ -9,9 +10,9 @@ import {
   TableHeader,
   TableRow,
 } from "@mpga/ui";
-import { Plus } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { type ContactData, listContactsAction } from "./actions";
 
@@ -19,6 +20,7 @@ export default function ContactsPage() {
   const router = useRouter();
   const [contacts, setContacts] = useState<ContactData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     async function fetchContacts() {
@@ -36,6 +38,31 @@ export default function ContactsPage() {
 
     fetchContacts();
   }, []);
+
+  const filteredContacts = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return contacts;
+    }
+
+    const term = searchTerm.toLowerCase();
+    return contacts.filter((contact) => {
+      const firstName = contact.firstName?.toLowerCase() ?? "";
+      const lastName = contact.lastName?.toLowerCase() ?? "";
+      const email = contact.email?.toLowerCase() ?? "";
+      const phone = contact.primaryPhone?.toLowerCase() ?? "";
+      const city = contact.city?.toLowerCase() ?? "";
+
+      return (
+        firstName.includes(term) ||
+        lastName.includes(term) ||
+        `${firstName} ${lastName}`.includes(term) ||
+        `${lastName}, ${firstName}`.includes(term) ||
+        email.includes(term) ||
+        phone.includes(term) ||
+        city.includes(term)
+      );
+    });
+  }, [contacts, searchTerm]);
 
   const formatCityState = (city: string | null, state: string | null) => {
     if (city && state) return `${city}, ${state}`;
@@ -66,34 +93,59 @@ export default function ContactsPage() {
             No contacts found
           </div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>City/State</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {contacts.map((contact) => (
-                <TableRow
-                  key={contact.id}
-                  className="cursor-pointer hover:bg-gray-50"
-                  onClick={() => router.push(`/members/contacts/${contact.id}`)}
-                >
-                  <TableCell className="font-medium">
-                    {contact.lastName}, {contact.firstName}
-                  </TableCell>
-                  <TableCell>{contact.email ?? "-"}</TableCell>
-                  <TableCell>{contact.primaryPhone ?? "-"}</TableCell>
-                  <TableCell>
-                    {formatCityState(contact.city, contact.state)}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <>
+            <div className="mb-4 flex items-center justify-between">
+              <div className="relative w-80">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <Input
+                  type="text"
+                  placeholder="Search contacts..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <div className="text-sm text-gray-500">
+                Showing {filteredContacts.length} of {contacts.length} contacts
+              </div>
+            </div>
+            {filteredContacts.length === 0 ? (
+              <div className="py-8 text-center text-gray-500">
+                No contacts match your search
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Phone</TableHead>
+                    <TableHead>City/State</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredContacts.map((contact) => (
+                    <TableRow
+                      key={contact.id}
+                      className="cursor-pointer hover:bg-gray-50"
+                      onClick={() =>
+                        router.push(`/members/contacts/${contact.id}`)
+                      }
+                    >
+                      <TableCell className="font-medium">
+                        {contact.lastName}, {contact.firstName}
+                      </TableCell>
+                      <TableCell>{contact.email ?? "-"}</TableCell>
+                      <TableCell>{contact.primaryPhone ?? "-"}</TableCell>
+                      <TableCell>
+                        {formatCityState(contact.city, contact.state)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </>
         )}
       </div>
     </div>
