@@ -10,17 +10,28 @@ import {
   TableHeader,
   TableRow,
 } from "@mpga/ui";
-import { Plus, Search } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  ChevronsUpDown,
+  Plus,
+  Search,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { type ContactData, listContactsAction } from "./actions";
+
+type SortField = "name" | "email" | "cityState";
+type SortDirection = "asc" | "desc";
 
 export default function ContactsPage() {
   const router = useRouter();
   const [contacts, setContacts] = useState<ContactData[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortField, setSortField] = useState<SortField>("name");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 
   useEffect(() => {
     async function fetchContacts() {
@@ -63,6 +74,56 @@ export default function ContactsPage() {
       );
     });
   }, [contacts, searchTerm]);
+
+  const sortedContacts = useMemo(() => {
+    const sorted = [...filteredContacts];
+    const multiplier = sortDirection === "asc" ? 1 : -1;
+
+    sorted.sort((a, b) => {
+      switch (sortField) {
+        case "name": {
+          const lastNameCompare = (a.lastName ?? "").localeCompare(
+            b.lastName ?? "",
+          );
+          if (lastNameCompare !== 0) return lastNameCompare * multiplier;
+          return (
+            (a.firstName ?? "").localeCompare(b.firstName ?? "") * multiplier
+          );
+        }
+        case "email":
+          return (a.email ?? "").localeCompare(b.email ?? "") * multiplier;
+        case "cityState": {
+          const cityCompare = (a.city ?? "").localeCompare(b.city ?? "");
+          if (cityCompare !== 0) return cityCompare * multiplier;
+          return (a.state ?? "").localeCompare(b.state ?? "") * multiplier;
+        }
+        default:
+          return 0;
+      }
+    });
+
+    return sorted;
+  }, [filteredContacts, sortField, sortDirection]);
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
+
+  const SortIcon = ({ field }: { field: SortField }) => {
+    if (sortField !== field) {
+      return <ChevronsUpDown className="ml-1 inline h-4 w-4 opacity-50" />;
+    }
+    return sortDirection === "asc" ? (
+      <ChevronUp className="ml-1 inline h-4 w-4" />
+    ) : (
+      <ChevronDown className="ml-1 inline h-4 w-4" />
+    );
+  };
 
   const formatCityState = (city: string | null, state: string | null) => {
     if (city && state) return `${city}, ${state}`;
@@ -117,14 +178,32 @@ export default function ContactsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Email</TableHead>
+                    <TableHead
+                      className="cursor-pointer select-none"
+                      onClick={() => handleSort("name")}
+                    >
+                      Name
+                      <SortIcon field="name" />
+                    </TableHead>
+                    <TableHead
+                      className="cursor-pointer select-none"
+                      onClick={() => handleSort("email")}
+                    >
+                      Email
+                      <SortIcon field="email" />
+                    </TableHead>
                     <TableHead>Phone</TableHead>
-                    <TableHead>City/State</TableHead>
+                    <TableHead
+                      className="cursor-pointer select-none"
+                      onClick={() => handleSort("cityState")}
+                    >
+                      City/State
+                      <SortIcon field="cityState" />
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredContacts.map((contact) => (
+                  {sortedContacts.map((contact) => (
                     <TableRow
                       key={contact.id}
                       className="cursor-pointer hover:bg-gray-50"

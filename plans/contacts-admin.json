@@ -88,7 +88,7 @@
         "Clearing the search input restores all rows",
         "pnpm typecheck passes"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "contacts-06",
@@ -106,7 +106,7 @@
         "Sorting is applied after search filtering and before pagination",
         "pnpm typecheck passes"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "contacts-07",
