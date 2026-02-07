@@ -29,10 +29,12 @@ import {
   ChevronRight,
   ChevronUp,
   ChevronsUpDown,
+  Download,
   Search,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import * as XLSX from "xlsx";
 
 import { type ContactData, listContactsAction } from "./actions";
 
@@ -186,6 +188,24 @@ export default function ContactsPage() {
     table.setPageIndex(0);
   };
 
+  const exportToExcel = () => {
+    const rows = table.getFilteredRowModel().rows.map((row) => ({
+      Name: `${row.original.lastName}, ${row.original.firstName}`,
+      Email: row.original.email ?? "",
+      Phone: row.original.primaryPhone ?? "",
+      "Alternate Phone": row.original.alternatePhone ?? "",
+      Address: row.original.addressText ?? "",
+      City: row.original.city ?? "",
+      State: row.original.state ?? "",
+      Zip: row.original.zip ?? "",
+      "Send Email": row.original.sendEmail ? "Yes" : "No",
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Contacts");
+    XLSX.writeFile(wb, "contacts.xlsx");
+  };
+
   const filteredCount = table.getFilteredRowModel().rows.length;
   const showPagination = pageSizeOption !== "all" && table.getPageCount() > 1;
 
@@ -195,12 +215,20 @@ export default function ContactsPage() {
         <h1 className="font-heading text-3xl font-bold text-secondary-500">
           Contacts
         </h1>
-        <Button
-          variant="secondary"
-          onClick={() => router.push("/members/contacts/new")}
-        >
-          Add Contact
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="secondaryoutline"
+            onClick={() => router.push("/members/contacts/duplicates")}
+          >
+            Dedupe
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => router.push("/members/contacts/new")}
+          >
+            Add Contact
+          </Button>
+        </div>
       </div>
 
       {loading ? (
@@ -237,6 +265,7 @@ export default function ContactsPage() {
                   <option value="10">10</option>
                   <option value="25">25</option>
                   <option value="50">50</option>
+                  <option value="100">100</option>
                   <option value="all">All</option>
                 </select>
               </div>
@@ -244,6 +273,10 @@ export default function ContactsPage() {
                 {filteredCount} {filteredCount === 1 ? "contact" : "contacts"}
                 {globalFilter && ` (filtered)`}
               </p>
+              <Button variant="ghost" size="sm" onClick={exportToExcel}>
+                <Download className="mr-1 h-4 w-4" />
+                Export
+              </Button>
             </div>
           </div>
 
