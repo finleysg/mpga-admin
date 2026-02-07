@@ -72,7 +72,7 @@
         "'Add Contact' Button appears top-right and navigates to /members/contacts/new",
         "pnpm typecheck passes"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "contacts-05",
