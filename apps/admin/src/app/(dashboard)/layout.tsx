@@ -1,6 +1,5 @@
 "use client";
 
-import { Fragment } from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -14,6 +13,7 @@ import {
   SidebarTrigger,
 } from "@mpga/ui";
 import { usePathname } from "next/navigation";
+import { Fragment } from "react";
 
 import { AppSidebar } from "@/components/app-sidebar";
 
