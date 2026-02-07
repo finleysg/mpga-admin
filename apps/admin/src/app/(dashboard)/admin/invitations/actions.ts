@@ -2,11 +2,10 @@
 
 import { invitation } from "@mpga/database";
 import { desc, eq } from "drizzle-orm";
-import { headers } from "next/headers";
 
-import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { createInvitation } from "@/lib/invitation";
+import { requireSuperAdmin } from "@/lib/require-auth";
 
 interface ActionResult<T = void> {
   success: boolean;
@@ -20,17 +19,6 @@ interface InvitationData {
   status: string;
   createdAt: Date;
   expiresAt: Date;
-}
-
-async function requireSuperAdmin(): Promise<string | null> {
-  const headersList = await headers();
-  const session = await auth.api.getSession({ headers: headersList });
-
-  if (!session?.user || session.user.role !== "super_admin") {
-    return null;
-  }
-
-  return session.user.id;
 }
 
 export async function createInvitationAction(

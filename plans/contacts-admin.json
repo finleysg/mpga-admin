@@ -1,0 +1,215 @@
+{
+  "title": "Contacts Admin CRUD",
+  "description": "Full CRUD interface for contacts management in the admin dashboard: listing with search, sort, and pagination; add and edit forms; delete with styled confirmation dialog.",
+  "plan": ".claude/plans/prancy-splashing-mist.md",
+  "items": [
+    {
+      "id": "contacts-01",
+      "category": "ui-components",
+      "description": "Add AlertDialog component to @mpga/ui. Install @radix-ui/react-alert-dialog dependency, create alert-dialog.tsx following the Sheet component's Radix wrapper pattern, and export all sub-components from index.ts.",
+      "files": [
+        "packages/ui/package.json",
+        "packages/ui/src/components/ui/alert-dialog.tsx",
+        "packages/ui/src/components/index.ts"
+      ],
+      "steps_to_verify": [
+        "@radix-ui/react-alert-dialog is listed in packages/ui/package.json dependencies",
+        "alert-dialog.tsx exists and exports: AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription, AlertDialogAction, AlertDialogCancel",
+        "AlertDialogContent renders a centered overlay modal (not a side sheet)",
+        "AlertDialogAction uses the Button component with destructive styling support",
+        "All AlertDialog exports are re-exported from packages/ui/src/components/index.ts",
+        "pnpm build --filter @mpga/ui passes"
+      ],
+      "passes": true
+    },
+    {
+      "id": "contacts-02",
+      "category": "server-actions",
+      "description": "Create contacts server actions file with read operations: listContactsAction (all contacts ordered by lastName, firstName) and getContactAction (single contact by id). Follow the ActionResult<T> pattern from invitations/actions.ts. No super_admin guard needed — all admins can access.",
+      "files": ["apps/admin/src/app/(dashboard)/members/contacts/actions.ts"],
+      "steps_to_verify": [
+        "File has 'use server' directive",
+        "Exports ActionResult<T> interface with success, error?, data? fields",
+        "listContactsAction() returns ActionResult<ContactData[]> with all contacts ordered by lastName asc, firstName asc",
+        "getContactAction(id: number) returns ActionResult<ContactData> for a single contact, or error if not found",
+        "ContactData type includes all contact table fields: id, firstName, lastName, primaryPhone, alternatePhone, email, addressText, city, state, zip, notes, sendEmail",
+        "Both actions import db from @/lib/db and contact from @mpga/database",
+        "pnpm typecheck passes"
+      ],
+      "passes": true
+    },
+    {
+      "id": "contacts-03",
+      "category": "server-actions",
+      "description": "Add write operations to contacts actions: saveContactAction (insert if no id, update if id present) and deleteContactAction (with FK constraint error handling for clubContact/committee references).",
+      "files": ["apps/admin/src/app/(dashboard)/members/contacts/actions.ts"],
+      "steps_to_verify": [
+        "saveContactAction(data) inserts a new contact when data.id is undefined, returning { id } of the new record",
+        "saveContactAction(data) updates the existing contact when data.id is a number",
+        "saveContactAction validates firstName and lastName are non-empty, returns error if not",
+        "deleteContactAction(id: number) deletes the contact by id",
+        "deleteContactAction catches MySQL FK constraint errors and returns a user-friendly message like 'Cannot delete: this contact is linked to a club or committee'",
+        "pnpm typecheck passes"
+      ],
+      "passes": true
+    },
+    {
+      "id": "contacts-04",
+      "category": "listing-page",
+      "description": "Replace the contacts placeholder page with a working table that fetches and displays all contacts. Client component with useEffect/useState pattern. Table columns: Name (lastName, firstName), Email, Phone, City/State. Includes loading and empty states. Clicking a row navigates to /members/contacts/{id}. Add Contact button navigates to /members/contacts/new.",
+      "files": ["apps/admin/src/app/(dashboard)/members/contacts/page.tsx"],
+      "steps_to_verify": [
+        "Page is a 'use client' component",
+        "Calls listContactsAction() on mount via useEffect",
+        "Shows a loading state (spinner or skeleton) while data loads",
+        "Shows an empty state message when no contacts exist",
+        "Renders a Table with columns: Name, Email, Phone, City/State",
+        "Name column displays as 'lastName, firstName'",
+        "Email and Phone show the value or a dash for null",
+        "City/State combines city and state with comma separator, or dash if both null",
+        "Clicking a table row navigates to /members/contacts/{id}",
+        "h1 heading says 'Contacts' with font-heading and text-secondary-500 classes",
+        "'Add Contact' Button appears top-right and navigates to /members/contacts/new",
+        "pnpm typecheck passes"
+      ],
+      "passes": true
+    },
+    {
+      "id": "contacts-05",
+      "category": "listing-page",
+      "description": "Add text search filtering to the contacts listing. Single search Input with a Search icon that filters the table across name, email, phone, and city fields. Filter applied client-side via useMemo. Display count of filtered results.",
+      "files": ["apps/admin/src/app/(dashboard)/members/contacts/page.tsx"],
+      "steps_to_verify": [
+        "Search Input appears above the table with a Search icon (lucide-react)",
+        "Typing in the search input filters the table in real-time (no submit needed)",
+        "Search is case-insensitive",
+        "Search matches against: firstName, lastName, combined 'firstName lastName', combined 'lastName, firstName', email, primaryPhone, city",
+        "A result count is displayed (e.g., 'Showing 12 of 45 contacts')",
+        "Clearing the search input restores all rows",
+        "pnpm typecheck passes"
+      ],
+      "passes": true
+    },
+    {
+      "id": "contacts-06",
+      "category": "listing-page",
+      "description": "Add sortable column headers to the contacts listing for Name, Email, and City/State columns. Clicking a header toggles sort direction (asc/desc). Inactive columns show a neutral ChevronsUpDown icon; the active column shows ChevronUp or ChevronDown. Default sort: Name ascending.",
+      "files": ["apps/admin/src/app/(dashboard)/members/contacts/page.tsx"],
+      "steps_to_verify": [
+        "Name, Email, and City/State column headers are clickable with cursor-pointer",
+        "Phone column header is NOT clickable (not sortable)",
+        "Clicking a non-active column sets it as the sort field with ascending order",
+        "Clicking the already-active column toggles between ascending and descending",
+        "Active sort column shows ChevronUp (asc) or ChevronDown (desc) icon",
+        "Inactive sortable columns show ChevronsUpDown icon at reduced opacity",
+        "Default sort on page load is Name ascending (by lastName, then firstName)",
+        "Sorting is applied after search filtering and before pagination",
+        "pnpm typecheck passes"
+      ],
+      "passes": true
+    },
+    {
+      "id": "contacts-07",
+      "category": "listing-page",
+      "description": "Add client-side pagination to the contacts listing. Page size selector (10, 25, 50, All) with default 25. Previous/Next buttons with current page indicator. Pagination applied after filtering and sorting.",
+      "files": ["apps/admin/src/app/(dashboard)/members/contacts/page.tsx"],
+      "steps_to_verify": [
+        "Page size selector appears with options: 10, 25, 50, All",
+        "Default page size is 25",
+        "Previous and Next buttons navigate between pages",
+        "Previous button is disabled on the first page",
+        "Next button is disabled on the last page",
+        "Page indicator shows current page and total pages (e.g., 'Page 1 of 3')",
+        "Changing the search term resets to page 1",
+        "Changing the page size resets to page 1",
+        "Changing the sort resets to page 1",
+        "pnpm typecheck passes"
+      ],
+      "passes": true
+    },
+    {
+      "id": "contacts-08",
+      "category": "contact-form",
+      "description": "Create the shared ContactForm component used by both add and edit pages. Controlled inputs for all contact fields, laid out in a Card. Save calls saveContactAction and navigates to listing on success. Cancel navigates to listing. Shows validation and server errors.",
+      "files": [
+        "apps/admin/src/app/(dashboard)/members/contacts/contact-form.tsx"
+      ],
+      "steps_to_verify": [
+        "File is a 'use client' component exporting ContactForm",
+        "Accepts optional contact prop (ContactData type) — undefined means new contact",
+        "All fields initialized from contact prop or empty defaults (sendEmail defaults to true for new)",
+        "Form layout uses Card, CardHeader, CardContent from @mpga/ui",
+        "Row 1: First Name and Last Name side by side (2-column grid), both marked required",
+        "Row 2: Email (full width, type='email')",
+        "Row 3: Primary Phone and Alternate Phone side by side",
+        "Row 4: Address (full width)",
+        "Row 5: City (spans 2 cols), State (maxLength 2), Zip in a grid",
+        "Row 6: Send Email checkbox with label",
+        "Row 7: Notes textarea (styled to match Input)",
+        "Save button calls saveContactAction with form data",
+        "Client-side validation: firstName and lastName must be non-empty before submit",
+        "Error message displayed when save fails or validation fails",
+        "On successful save, navigates to /members/contacts",
+        "Cancel button navigates to /members/contacts",
+        "Save button shows 'Saving...' and is disabled while saving",
+        "pnpm typecheck passes"
+      ],
+      "passes": true
+    },
+    {
+      "id": "contacts-09",
+      "category": "contact-form",
+      "description": "Create the edit contact page at /members/contacts/[id]. Fetches the contact by id on mount, renders ContactForm with the data. Shows loading state. Redirects to listing if contact not found.",
+      "files": [
+        "apps/admin/src/app/(dashboard)/members/contacts/[id]/page.tsx"
+      ],
+      "steps_to_verify": [
+        "File is a 'use client' component",
+        "Reads id from useParams()",
+        "Calls getContactAction(Number(id)) on mount via useEffect",
+        "Shows a loading state while fetching",
+        "If contact is found, renders ContactForm with contact={data}",
+        "If contact is not found (error result), redirects to /members/contacts",
+        "h1 heading says 'Edit Contact' with font-heading and text-secondary-500 classes",
+        "pnpm typecheck passes"
+      ],
+      "passes": true
+    },
+    {
+      "id": "contacts-10",
+      "category": "contact-form",
+      "description": "Create the new contact page at /members/contacts/new. Renders ContactForm with no initial data.",
+      "files": ["apps/admin/src/app/(dashboard)/members/contacts/new/page.tsx"],
+      "steps_to_verify": [
+        "File is a 'use client' component",
+        "Renders ContactForm with no contact prop",
+        "h1 heading says 'New Contact' with font-heading and text-secondary-500 classes",
+        "Page is wrapped in max-w-4xl container matching the edit page",
+        "pnpm typecheck passes"
+      ],
+      "passes": true
+    },
+    {
+      "id": "contacts-11",
+      "category": "contact-form",
+      "description": "Add delete functionality to ContactForm with styled AlertDialog confirmation. Delete button (destructive variant) appears only when editing an existing contact. Clicking it opens an AlertDialog confirming the action. On confirm, calls deleteContactAction and navigates to listing. Shows error if delete fails (e.g., FK constraint).",
+      "files": [
+        "apps/admin/src/app/(dashboard)/members/contacts/contact-form.tsx"
+      ],
+      "steps_to_verify": [
+        "Delete button only renders when contact prop is provided (editing, not creating)",
+        "Delete button uses variant='destructive' and shows a Trash2 icon",
+        "Delete button is positioned on the left side of the action bar, separate from Save/Cancel",
+        "Clicking Delete opens an AlertDialog (from @mpga/ui, not browser confirm())",
+        "AlertDialog title says 'Delete Contact'",
+        "AlertDialog description includes the contact's name and warns the action cannot be undone",
+        "AlertDialog has Cancel and Delete action buttons",
+        "Delete action button shows 'Deleting...' and is disabled while the action runs",
+        "On successful delete, navigates to /members/contacts",
+        "On failed delete (e.g., FK constraint), closes dialog and shows error message on the form",
+        "pnpm typecheck passes"
+      ],
+      "passes": true
+    }
+  ]
+}

@@ -14,13 +14,15 @@
     "@mpga/database": "workspace:*",
     "@mpga/types": "workspace:*",
     "@mpga/ui": "workspace:*",
+    "@tanstack/react-table": "^8.21.3",
     "better-auth": "^1.1.10",
     "drizzle-orm": "^0.45.0",
     "lucide-react": "^0.563.0",
     "next": "16.1.6",
     "nodemailer": "^8.0.1",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "exceljs": "^4.4.0"
   },
   "devDependencies": {
     "@mpga/eslint-config": "workspace:*",
@@ -34,6 +36,6 @@
     "eslint": "^9.17.0",
     "tailwindcss": "^4.0.0",
     "tsx": "^4.21.0",
-    "typescript": "^5.7.2"
+    "typescript": "^5.9.3"
   }
 }
