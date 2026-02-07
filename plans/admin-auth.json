@@ -240,7 +240,7 @@
         "Redirects to /",
         "pnpm typecheck passes"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "auth-15",
@@ -256,7 +256,7 @@
         "Server-side check verifies requesting user has super_admin role; redirects if not",
         "pnpm typecheck passes"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "auth-16",
