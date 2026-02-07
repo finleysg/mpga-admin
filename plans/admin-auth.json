@@ -72,7 +72,7 @@
         "config.matcher excludes _next/static, _next/image, favicon.ico, and images",
         "pnpm typecheck passes"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "auth-05",
@@ -85,7 +85,7 @@
         "Existing sidebar layout and breadcrumb rendering are preserved",
         "pnpm typecheck passes"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "auth-06",
@@ -100,7 +100,7 @@
         "Footer renders at the bottom of the sidebar",
         "pnpm typecheck passes"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "auth-06b",

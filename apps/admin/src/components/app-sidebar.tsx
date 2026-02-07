@@ -1,8 +1,10 @@
 "use client";
 
 import {
+  Button,
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupLabel,
   SidebarHeader,
@@ -10,9 +12,12 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@mpga/ui";
+import { LogOut } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
+import { signOut, useSession } from "@/lib/auth-client";
 
 const navGroups = [
   {
@@ -75,6 +80,11 @@ const navGroups = [
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
+  const { data: session } = useSession();
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
 
   return (
     <Sidebar variant="floating" {...props}>
@@ -88,7 +98,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     src="/images/mpga-logo.png"
                     alt="MPGA Administration"
                     fill={true}
-                    className="contain"
+                    className="object-contain"
                     priority
                   />
                 </div>
@@ -115,6 +125,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroup>
         ))}
       </SidebarContent>
+      <SidebarFooter>
+        <div className="flex items-center justify-between gap-2 px-2 py-2">
+          <span className="text-sm text-muted-foreground truncate">
+            {session?.user?.name ?? session?.user?.email ?? "User"}
+          </span>
+          <Button variant="ghost" size="icon" onClick={handleSignOut}>
+            <LogOut className="h-4 w-4" />
+            <span className="sr-only">Sign out</span>
+          </Button>
+        </div>
+      </SidebarFooter>
     </Sidebar>
   );
 }
