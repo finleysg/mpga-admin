@@ -4,6 +4,7 @@ import { contact } from "@mpga/database";
 import { asc, eq } from "drizzle-orm";
 
 import { db } from "@/lib/db";
+import { requireAuth } from "@/lib/require-auth";
 
 interface ContactInput {
   id?: number;
@@ -44,6 +45,11 @@ export interface ContactData {
 export async function listContactsAction(): Promise<
   ActionResult<ContactData[]>
 > {
+  const userId = await requireAuth();
+  if (!userId) {
+    return { success: false, error: "Unauthorized" };
+  }
+
   try {
     const results = await db
       .select({
@@ -73,6 +79,11 @@ export async function listContactsAction(): Promise<
 export async function getContactAction(
   id: number,
 ): Promise<ActionResult<ContactData>> {
+  const userId = await requireAuth();
+  if (!userId) {
+    return { success: false, error: "Unauthorized" };
+  }
+
   try {
     const results = await db
       .select({
@@ -106,6 +117,11 @@ export async function getContactAction(
 export async function saveContactAction(
   data: ContactInput,
 ): Promise<ActionResult<{ id: number }>> {
+  const userId = await requireAuth();
+  if (!userId) {
+    return { success: false, error: "Unauthorized" };
+  }
+
   const firstName = data.firstName?.trim();
   const lastName = data.lastName?.trim();
 
@@ -157,6 +173,11 @@ export async function saveContactAction(
 }
 
 export async function deleteContactAction(id: number): Promise<ActionResult> {
+  const userId = await requireAuth();
+  if (!userId) {
+    return { success: false, error: "Unauthorized" };
+  }
+
   try {
     await db.delete(contact).where(eq(contact.id, id));
     return { success: true };
