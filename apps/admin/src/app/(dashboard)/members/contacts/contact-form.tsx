@@ -1,6 +1,15 @@
 "use client";
 
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
   Button,
   Card,
   CardContent,
@@ -9,10 +18,15 @@ import {
   Input,
   Label,
 } from "@mpga/ui";
+import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { type ContactData, saveContactAction } from "./actions";
+import {
+  type ContactData,
+  deleteContactAction,
+  saveContactAction,
+} from "./actions";
 
 interface ContactFormProps {
   contact?: ContactData;
@@ -21,6 +35,8 @@ interface ContactFormProps {
 export function ContactForm({ contact }: ContactFormProps) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [firstName, setFirstName] = useState(contact?.firstName ?? "");
@@ -79,6 +95,30 @@ export function ContactForm({ contact }: ContactFormProps) {
 
   const handleCancel = () => {
     router.push("/members/contacts");
+  };
+
+  const handleDelete = async () => {
+    if (!contact?.id) return;
+
+    setDeleting(true);
+    setError(null);
+
+    try {
+      const result = await deleteContactAction(contact.id);
+
+      if (result.success) {
+        router.push("/members/contacts");
+      } else {
+        setDeleteDialogOpen(false);
+        setError(result.error ?? "Failed to delete contact");
+      }
+    } catch (err) {
+      console.error("Failed to delete contact:", err);
+      setDeleteDialogOpen(false);
+      setError("Failed to delete contact");
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
@@ -212,13 +252,55 @@ export function ContactForm({ contact }: ContactFormProps) {
           {error && <p className="text-sm text-red-600">{error}</p>}
 
           {/* Action buttons */}
-          <div className="flex justify-end gap-2 pt-4">
-            <Button type="button" variant="outline" onClick={handleCancel}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={saving}>
-              {saving ? "Saving..." : "Save"}
-            </Button>
+          <div className="flex justify-between pt-4">
+            {/* Delete button - only shown when editing */}
+            {contact && (
+              <AlertDialog
+                open={deleteDialogOpen}
+                onOpenChange={setDeleteDialogOpen}
+              >
+                <AlertDialogTrigger asChild>
+                  <Button type="button" variant="destructive">
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete Contact</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to delete {contact.firstName}{" "}
+                      {contact.lastName}? This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel disabled={deleting}>
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleDelete}
+                      disabled={deleting}
+                      className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+                    >
+                      {deleting ? "Deleting..." : "Delete"}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+
+            {/* Spacer when no delete button */}
+            {!contact && <div />}
+
+            {/* Save/Cancel buttons on the right */}
+            <div className="flex gap-2">
+              <Button type="button" variant="outline" onClick={handleCancel}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={saving}>
+                {saving ? "Saving..." : "Save"}
+              </Button>
+            </div>
           </div>
         </form>
       </CardContent>

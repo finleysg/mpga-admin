@@ -187,7 +187,7 @@
         "Page is wrapped in max-w-4xl container matching the edit page",
         "pnpm typecheck passes"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "contacts-11",
@@ -209,7 +209,7 @@
         "On failed delete (e.g., FK constraint), closes dialog and shows error message on the form",
         "pnpm typecheck passes"
       ],
-      "passes": false
+      "passes": true
     }
   ]
 }
