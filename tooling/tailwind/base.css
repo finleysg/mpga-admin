@@ -104,6 +104,13 @@
   --color-card: #ffffff;
   --color-card-foreground: #1a1a1a;
 
+  /* Popover surface */
+  --color-popover: var(--color-gold-50);
+  --color-popover-foreground: #1a1a1a;
+
+  /* Borders */
+  --color-border: #e5e7eb;
+
   /* DS-005: Typography font families */
   --font-heading: "Playfair Display", Georgia, serif;
   --font-body: "Inter", system-ui, sans-serif;

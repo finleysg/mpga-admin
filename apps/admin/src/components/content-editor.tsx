@@ -14,6 +14,10 @@ import {
 	Input,
 	Skeleton,
 	toast,
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
 } from "@mpga/ui"
 import Link from "@tiptap/extension-link"
 import { EditorContent, useEditor } from "@tiptap/react"
@@ -34,6 +38,7 @@ import {
 	ListOrdered,
 	Loader2,
 	Minus,
+	RemoveFormatting,
 	ShieldAlert,
 	TextQuote,
 } from "lucide-react"
@@ -190,88 +195,97 @@ export function ContentEditor({ contentType, backHref }: ContentEditorProps) {
 				</div>
 				{editor && (
 					<div className="px-6 pb-4">
-						<div className="flex flex-wrap gap-1 rounded-md border-2 border-secondary-500 bg-muted/50 p-1">
-							<ToolbarButton
-								onClick={() => editor.chain().focus().toggleBold().run()}
-								active={editor.isActive("bold")}
-								title="Bold"
-							>
-								<Bold className="h-4 w-4" />
-							</ToolbarButton>
-							<ToolbarButton
-								onClick={() => editor.chain().focus().toggleItalic().run()}
-								active={editor.isActive("italic")}
-								title="Italic"
-							>
-								<Italic className="h-4 w-4" />
-							</ToolbarButton>
-							<ToolbarButton
-								onClick={() => editor.chain().focus().toggleHighlight().run()}
-								active={editor.isActive("highlight")}
-								title="Highlight"
-							>
-								<Highlighter className="h-4 w-4" />
-							</ToolbarButton>
-							<ToolbarSeparator />
-							<ToolbarButton
-								onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-								active={editor.isActive("heading", { level: 2 })}
-								title="Heading 2"
-							>
-								<Heading2 className="h-4 w-4" />
-							</ToolbarButton>
-							<ToolbarButton
-								onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-								active={editor.isActive("heading", { level: 3 })}
-								title="Heading 3"
-							>
-								<Heading3 className="h-4 w-4" />
-							</ToolbarButton>
-							<ToolbarButton
-								onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()}
-								active={editor.isActive("heading", { level: 4 })}
-								title="Heading 4"
-							>
-								<Heading4 className="h-4 w-4" />
-							</ToolbarButton>
-							<ToolbarSeparator />
-							<ToolbarButton
-								onClick={() => editor.chain().focus().toggleBulletList().run()}
-								active={editor.isActive("bulletList")}
-								title="Bullet list"
-							>
-								<List className="h-4 w-4" />
-							</ToolbarButton>
-							<ToolbarButton
-								onClick={() => editor.chain().focus().toggleOrderedList().run()}
-								active={editor.isActive("orderedList")}
-								title="Ordered list"
-							>
-								<ListOrdered className="h-4 w-4" />
-							</ToolbarButton>
-							<ToolbarSeparator />
-							<ToolbarButton
-								onClick={() => editor.chain().focus().toggleBlockquote().run()}
-								active={editor.isActive("blockquote")}
-								title="Block quote"
-							>
-								<TextQuote className="h-4 w-4" />
-							</ToolbarButton>
-							<AdmonitionDropdown
-								onSelect={(type) => editor.chain().focus().toggleAdmonition({ type }).run()}
-								active={editor.isActive("admonition")}
-							/>
-							<ToolbarSeparator />
-							<ToolbarButton onClick={setLink} active={editor.isActive("link")} title="Link">
-								<LinkIcon className="h-4 w-4" />
-							</ToolbarButton>
-							<ToolbarButton
-								onClick={() => editor.chain().focus().setHorizontalRule().run()}
-								title="Horizontal rule"
-							>
-								<Minus className="h-4 w-4" />
-							</ToolbarButton>
-						</div>
+						<TooltipProvider delayDuration={2000}>
+							<div className="flex flex-wrap gap-1 rounded-md border-2 border-secondary-500 bg-muted/50 p-1">
+								<ToolbarButton
+									onClick={() => editor.chain().focus().toggleBold().run()}
+									active={editor.isActive("bold")}
+									title="Bold"
+								>
+									<Bold className="h-4 w-4" />
+								</ToolbarButton>
+								<ToolbarButton
+									onClick={() => editor.chain().focus().toggleItalic().run()}
+									active={editor.isActive("italic")}
+									title="Italic"
+								>
+									<Italic className="h-4 w-4" />
+								</ToolbarButton>
+								<ToolbarButton
+									onClick={() => editor.chain().focus().toggleHighlight().run()}
+									active={editor.isActive("highlight")}
+									title="Highlight"
+								>
+									<Highlighter className="h-4 w-4" />
+								</ToolbarButton>
+								<ToolbarSeparator />
+								<ToolbarButton
+									onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+									active={editor.isActive("heading", { level: 2 })}
+									title="Heading 2"
+								>
+									<Heading2 className="h-4 w-4" />
+								</ToolbarButton>
+								<ToolbarButton
+									onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+									active={editor.isActive("heading", { level: 3 })}
+									title="Heading 3"
+								>
+									<Heading3 className="h-4 w-4" />
+								</ToolbarButton>
+								<ToolbarButton
+									onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()}
+									active={editor.isActive("heading", { level: 4 })}
+									title="Heading 4"
+								>
+									<Heading4 className="h-4 w-4" />
+								</ToolbarButton>
+								<ToolbarSeparator />
+								<ToolbarButton
+									onClick={() => editor.chain().focus().toggleBulletList().run()}
+									active={editor.isActive("bulletList")}
+									title="Bullet list"
+								>
+									<List className="h-4 w-4" />
+								</ToolbarButton>
+								<ToolbarButton
+									onClick={() => editor.chain().focus().toggleOrderedList().run()}
+									active={editor.isActive("orderedList")}
+									title="Ordered list"
+								>
+									<ListOrdered className="h-4 w-4" />
+								</ToolbarButton>
+								<ToolbarSeparator />
+								<ToolbarButton
+									onClick={() => editor.chain().focus().toggleBlockquote().run()}
+									active={editor.isActive("blockquote")}
+									title="Block quote"
+								>
+									<TextQuote className="h-4 w-4" />
+								</ToolbarButton>
+								<AdmonitionDropdown
+									onSelect={(type) => editor.chain().focus().toggleAdmonition({ type }).run()}
+									active={editor.isActive("admonition")}
+								/>
+								<ToolbarSeparator />
+								<ToolbarButton onClick={setLink} active={editor.isActive("link")} title="Link">
+									<LinkIcon className="h-4 w-4" />
+								</ToolbarButton>
+								<ToolbarButton
+									onClick={() => editor.chain().focus().setHorizontalRule().run()}
+									title="Horizontal rule"
+								>
+									<Minus className="h-4 w-4" />
+								</ToolbarButton>
+								<ToolbarSeparator />
+								<ToolbarButton
+									onClick={() => editor.chain().focus().clearNodes().unsetAllMarks().run()}
+									title="Clear formatting"
+								>
+									<RemoveFormatting className="h-4 w-4" />
+								</ToolbarButton>
+							</div>
+						</TooltipProvider>
 					</div>
 				)}
 			</div>
@@ -296,16 +310,20 @@ function ToolbarButton({
 	children: React.ReactNode
 }) {
 	return (
-		<button
-			type="button"
-			onClick={onClick}
-			title={title}
-			className={`rounded p-2 hover:bg-muted ${
-				active ? "bg-muted text-primary" : "text-muted-foreground"
-			}`}
-		>
-			{children}
-		</button>
+		<Tooltip>
+			<TooltipTrigger asChild>
+				<button
+					type="button"
+					onClick={onClick}
+					className={`cursor-pointer rounded p-2 transition-all duration-150 hover:bg-secondary-100 hover:text-secondary-700 active:scale-90 active:bg-secondary-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring ${
+						active ? "bg-muted text-primary" : "text-muted-foreground"
+					}`}
+				>
+					{children}
+				</button>
+			</TooltipTrigger>
+			<TooltipContent>{title}</TooltipContent>
+		</Tooltip>
 	)
 }
 
@@ -329,18 +347,22 @@ function AdmonitionDropdown({
 }) {
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
-				<button
-					type="button"
-					title="Callout block"
-					className={`flex items-center gap-0.5 rounded p-2 hover:bg-muted ${
-						active ? "bg-muted text-primary" : "text-muted-foreground"
-					}`}
-				>
-					<Info className="h-4 w-4" />
-					<ChevronDown className="h-3 w-3" />
-				</button>
-			</DropdownMenuTrigger>
+			<Tooltip>
+				<TooltipTrigger asChild>
+					<DropdownMenuTrigger asChild>
+						<button
+							type="button"
+							className={`flex cursor-pointer items-center gap-0.5 rounded p-2 transition-all duration-150 hover:bg-secondary-100 hover:text-secondary-700 active:scale-90 active:bg-secondary-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring ${
+								active ? "bg-muted text-primary" : "text-muted-foreground"
+							}`}
+						>
+							<Info className="h-4 w-4" />
+							<ChevronDown className="h-3 w-3" />
+						</button>
+					</DropdownMenuTrigger>
+				</TooltipTrigger>
+				<TooltipContent>Callout block</TooltipContent>
+			</Tooltip>
 			<DropdownMenuContent align="start">
 				{admonitionItems.map((item) => (
 					<DropdownMenuItem key={item.type} onClick={() => onSelect(item.type)}>
