@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 
 import { Button } from "./ui/button";
+import { H2 } from "./ui/heading";
 
 export interface MatchPlaySignUpProps {
   year: number;
@@ -23,9 +24,7 @@ export function MatchPlaySignUp({ year, deadline }: MatchPlaySignUpProps) {
 
   return (
     <div className="rounded-lg border border-primary-200 bg-primary-50 p-6">
-      <h2 className="mb-3 text-xl font-bold text-gray-900">
-        {year} Match Play Sign Up
-      </h2>
+      <H2 className="mb-3 text-xl">{year} Match Play Sign Up</H2>
       <p className="mb-4 text-gray-700">
         Click the button below to request a team for your club in the {year}{" "}
         match play season.

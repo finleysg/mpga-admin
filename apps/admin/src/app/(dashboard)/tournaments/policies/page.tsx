@@ -4,6 +4,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  H1,
   Markdown,
 } from "@mpga/ui";
 import { Pencil, Plus } from "lucide-react";
@@ -21,9 +22,7 @@ export default async function PoliciesPage() {
   return (
     <div className="mx-auto max-w-6xl">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="font-heading text-3xl font-bold text-secondary-500">
-          Tournament Policies
-        </h1>
+        <H1 variant="secondary">Tournament Policies</H1>
         <Button asChild>
           <Link href="/tournaments/policies/edit">
             {content ? (

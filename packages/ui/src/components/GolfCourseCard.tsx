@@ -1,6 +1,8 @@
 import { MapPin, Globe, Mail, Phone } from "lucide-react";
 import Image from "next/image";
 
+import { H2 } from "./ui/heading";
+
 export interface GolfCourseCardProps {
   name: string;
   address: string;
@@ -31,9 +33,7 @@ export function GolfCourseCard({
 
   return (
     <div className="rounded-lg bg-white p-6 shadow-sm">
-      <h2 className="mb-4 text-lg text-heading font-bold font-heading text-primary-900">
-        {name}
-      </h2>
+      <H2 className="mb-4 text-lg">{name}</H2>
 
       {logoUrl && (
         <div className="mb-4 flex justify-center">

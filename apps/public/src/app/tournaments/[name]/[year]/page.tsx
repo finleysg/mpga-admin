@@ -1,9 +1,11 @@
 import { getMediaUrl } from "@mpga/types";
 import {
-  Markdown,
-  RegistrationCard,
   DocumentsCard,
   GolfCourseCard,
+  H1,
+  H2,
+  Markdown,
+  RegistrationCard,
 } from "@mpga/ui";
 import { notFound } from "next/navigation";
 
@@ -57,9 +59,7 @@ export default async function TournamentYearPage({
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="mb-2 text-3xl font-bold font-heading text-primary-900">
-        {instance.instanceName}
-      </h1>
+      <H1 className="mb-2">{instance.instanceName}</H1>
 
       <div className="flex flex-col gap-8 lg:flex-row">
         <div className="lg:w-[70%]">
@@ -69,9 +69,7 @@ export default async function TournamentYearPage({
 
           {policies && (
             <div className="mt-6 rounded-lg bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-2xl font-bold font-heading text-primary-900">
-                {policies.title}
-              </h2>
+              <H2 className="mb-4">{policies.title}</H2>
               <Markdown content={policies.content} />
             </div>
           )}

@@ -1,5 +1,5 @@
 import { getMediaUrl } from "@mpga/types";
-import { ClubDetailCard, GolfCourseCard, OfficersCard } from "@mpga/ui";
+import { ClubDetailCard, GolfCourseCard, H1, H2, OfficersCard } from "@mpga/ui";
 import { notFound } from "next/navigation";
 
 import {
@@ -43,9 +43,7 @@ export default async function ClubDetailPage({ params }: { params: Params }) {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="mb-8 text-3xl font-bold font-heading text-primary-900">
-        {club.name}
-      </h1>
+      <H1 className="mb-8">{club.name}</H1>
 
       <div className="grid items-start gap-6 lg:grid-cols-3">
         <ClubDetailCard
@@ -71,9 +69,7 @@ export default async function ClubDetailPage({ params }: { params: Params }) {
           />
         ) : (
           <div className="rounded-lg bg-white p-6 shadow-sm">
-            <h2 className="mb-4 text-lg font-bold font-heading text-primary-900">
-              Golf Course
-            </h2>
+            <H2 className="mb-4 text-lg">Golf Course</H2>
             <p className="text-sm text-gray-500">No golf course assigned.</p>
           </div>
         )}

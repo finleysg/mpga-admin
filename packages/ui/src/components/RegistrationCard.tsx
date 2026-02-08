@@ -1,5 +1,7 @@
 import { Calendar, ExternalLink } from "lucide-react";
 
+import { H2 } from "./ui/heading";
+
 export interface TournamentLinkItem {
   id: number;
   linkType: string;
@@ -40,9 +42,7 @@ export function RegistrationCard({
 
   return (
     <div className="rounded-lg bg-white p-6 shadow-sm">
-      <h2 className="mb-4 text-lg font-bold font-heading text-primary-900">
-        Registration
-      </h2>
+      <H2 className="mb-4 text-lg">Registration</H2>
 
       {hasRegistrationDates && (
         <div className="mb-4 space-y-3">

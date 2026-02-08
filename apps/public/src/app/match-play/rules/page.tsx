@@ -1,4 +1,4 @@
-import { MatchPlayRulesTabs } from "@mpga/ui";
+import { H1, MatchPlayRulesTabs } from "@mpga/ui";
 import type { Metadata } from "next";
 
 import {
@@ -19,9 +19,7 @@ export default async function MatchPlayRulesPage() {
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="mb-8 text-3xl font-bold font-heading text-primary-900">
-        Match Play Rules
-      </h1>
+      <H1 className="mb-8">Match Play Rules</H1>
       <MatchPlayRulesTabs
         matchPlayRules={matchPlayRules}
         seniorRules={seniorRules}

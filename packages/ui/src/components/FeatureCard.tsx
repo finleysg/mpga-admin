@@ -4,6 +4,7 @@ import { Trophy, Users, MapPin, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "./ui/button";
+import { H3 } from "./ui/heading";
 
 export interface FeatureCardProps {
   contentType: string;
@@ -32,9 +33,7 @@ export function FeatureCard({
       <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-50">
         <Icon className="h-8 w-8 text-primary-600" />
       </div>
-      <h3 className="font-heading mb-3 text-xl font-semibold text-gray-900">
-        {title}
-      </h3>
+      <H3 className="mb-3">{title}</H3>
       <p className="mb-6 flex-1 text-gray-600">{description}</p>
       <Link href={route}>
         <Button variant="outline">Learn More</Button>

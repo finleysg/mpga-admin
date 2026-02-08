@@ -1,7 +1,11 @@
+import { H1 } from "@mpga/ui";
+
 export default function SrPublicLinksPage() {
   return (
     <div className="mx-auto max-w-6xl">
-      <h1 className="mb-6 font-heading text-3xl font-bold">Sr. Public Links</h1>
+      <H1 variant="secondary" className="mb-6">
+        Sr. Public Links
+      </H1>
       <div className="rounded-lg border bg-white p-6">
         <p className="text-gray-500">
           Sr. Public Links management coming soon.

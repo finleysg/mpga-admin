@@ -1,6 +1,8 @@
 import { Calendar, ArrowRight, ExternalLink } from "lucide-react";
 import Link from "next/link";
 
+import { H3 } from "./ui/heading";
+
 export interface AnnouncementCardProps {
   id: number;
   title: string;
@@ -35,9 +37,7 @@ export function AnnouncementCard({
         <Calendar className="h-4 w-4" />
         <span>{formatDate(createDate)}</span>
       </div>
-      <h3 className="font-heading mb-3 text-xl font-bold text-gray-900">
-        {title}
-      </h3>
+      <H3 className="mb-3 font-bold">{title}</H3>
       <p
         className={`mb-4 flex-1 text-gray-600${truncate ? " line-clamp-3" : ""}`}
       >

@@ -71,6 +71,7 @@ export {
 
 // UI primitives
 export { Button, buttonVariants } from "./ui/button";
+export { H1, H2, H3, H4, type HeadingProps } from "./ui/heading";
 export { Checkbox } from "./ui/checkbox";
 export {
   Breadcrumb,

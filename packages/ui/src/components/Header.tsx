@@ -32,7 +32,7 @@ export function Header() {
         {/* Left: MPGA branding */}
         <Link
           href="/"
-          className="font-heading text-2xl text-white hover:text-primary-100 transition-colors"
+          className="font-heading text-3xl text-white hover:text-primary-100 transition-colors"
         >
           MPGA
         </Link>

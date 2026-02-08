@@ -1,3 +1,5 @@
+import { H2 } from "./ui/heading";
+
 export interface Officer {
   id: number;
   firstName: string;
@@ -15,9 +17,7 @@ export function OfficersCard({ officers }: OfficersCardProps) {
   if (officers.length === 0) {
     return (
       <div className="rounded-lg bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-lg font-bold font-heading text-primary-900">
-          Officers and Contacts
-        </h2>
+        <H2 className="mb-4 text-lg">Officers and Contacts</H2>
         <p className="text-sm text-gray-500">No officers listed.</p>
       </div>
     );
@@ -25,9 +25,7 @@ export function OfficersCard({ officers }: OfficersCardProps) {
 
   return (
     <div className="rounded-lg bg-white p-6 shadow-sm">
-      <h2 className="mb-4 text-lg font-bold font-heading text-primary-900">
-        Officers and Contacts
-      </h2>
+      <H2 className="mb-4 text-lg">Officers and Contacts</H2>
 
       <ul className="space-y-3">
         {officers.map((officer) => (

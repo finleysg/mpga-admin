@@ -1,6 +1,7 @@
 import { Calendar, Globe, Users } from "lucide-react";
 
 import { Markdown } from "./Markdown";
+import { H2 } from "./ui/heading";
 
 export interface ClubDetailCardProps {
   website?: string | null;
@@ -29,9 +30,7 @@ export function ClubDetailCard({
 }: ClubDetailCardProps) {
   return (
     <div className="rounded-lg bg-white p-6 shadow-sm">
-      <h2 className="mb-4 text-lg font-bold font-heading text-primary-900">
-        Club Overview
-      </h2>
+      <H2 className="mb-4 text-lg">Club Overview</H2>
 
       <div className="space-y-3">
         {size && (

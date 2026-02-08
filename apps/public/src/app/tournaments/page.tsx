@@ -1,5 +1,5 @@
 import { getMediaUrl } from "@mpga/types";
-import { TournamentCard } from "@mpga/ui";
+import { H1, TournamentCard } from "@mpga/ui";
 
 import {
   getTournamentsForYear,
@@ -13,9 +13,7 @@ export default async function TournamentsPage() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="mb-8 font-heading text-3xl font-bold text-gray-900">
-        {currentYear} Tournament Schedule
-      </h1>
+      <H1 className="mb-8">{currentYear} Tournament Schedule</H1>
       {tournaments.length === 0 ? (
         <p className="text-gray-600">
           No tournaments scheduled for {currentYear}.

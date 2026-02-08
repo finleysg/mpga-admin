@@ -1,4 +1,4 @@
-import { NewsList } from "@mpga/ui";
+import { H1, NewsList } from "@mpga/ui";
 import type { Metadata } from "next";
 
 import { getAllAnnouncements } from "@/lib/queries/announcements";
@@ -13,9 +13,7 @@ export default async function NewsPage() {
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="mb-8 text-3xl font-bold font-heading text-primary-900">
-        News and Announcements
-      </h1>
+      <H1 className="mb-8">News and Announcements</H1>
       <NewsList announcements={announcements} />
     </main>
   );

@@ -3,6 +3,8 @@
 import {
   Badge,
   Button,
+  H1,
+  H2,
   Input,
   Table,
   TableBody,
@@ -151,17 +153,13 @@ export default function InvitationsPage() {
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
       <div className="mb-8 flex items-center justify-between">
-        <h1 className="font-heading text-3xl font-bold text-gray-900">
-          Invitation Management
-        </h1>
+        <H1 variant="secondary">Invitation Management</H1>
       </div>
 
       {/* Send Invitation Form */}
       <div className="mb-8 rounded-lg bg-white shadow">
         <div className="border-b border-gray-200 px-6 py-4">
-          <h2 className="text-lg font-medium text-gray-900">
-            Send New Invitation
-          </h2>
+          <H2 variant="secondary">Send New Invitation</H2>
         </div>
         <div className="p-6">
           <form onSubmit={handleSendInvitation} className="flex gap-4">
@@ -189,7 +187,7 @@ export default function InvitationsPage() {
       {/* Invitations List */}
       <div className="rounded-lg bg-white shadow">
         <div className="border-b border-gray-200 px-6 py-4">
-          <h2 className="text-lg font-medium text-gray-900">All Invitations</h2>
+          <H2 variant="secondary">All Invitations</H2>
         </div>
         <div className="p-6">
           {loading ? (

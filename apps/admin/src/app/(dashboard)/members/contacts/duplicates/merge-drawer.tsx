@@ -2,6 +2,7 @@
 
 import {
   Button,
+  H4,
   SheetContent,
   SheetDescription,
   SheetFooter,
@@ -60,9 +61,9 @@ function ContactSubCard({
       onClick={onToggle}
     >
       <div className="flex items-center justify-between">
-        <h4 className="font-heading text-sm font-semibold">
+        <H4 variant="secondary">
           {contact.firstName} {contact.lastName}
-        </h4>
+        </H4>
         <button
           type="button"
           className={`rounded p-0.5 transition-colors hover:bg-secondary-100 ${

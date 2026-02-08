@@ -1,4 +1,4 @@
-import { ClubsTable, Markdown } from "@mpga/ui";
+import { ClubsTable, H1, Markdown } from "@mpga/ui";
 
 import {
   getMembersContent,
@@ -20,7 +20,7 @@ export default async function MembersPage() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="mb-8 text-3xl font-bold text-gray-900">Member Clubs</h1>
+      <H1 className="mb-8">Member Clubs</H1>
 
       {content && (
         <div className="mb-8">

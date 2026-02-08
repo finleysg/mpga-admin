@@ -1,9 +1,11 @@
+import { H1 } from "@mpga/ui";
+
 export default function MatchPlayResultsPage() {
   return (
     <div className="mx-auto max-w-6xl">
-      <h1 className="mb-6 font-heading text-3xl font-bold">
+      <H1 variant="secondary" className="mb-6">
         Match Play Results
-      </h1>
+      </H1>
       <div className="rounded-lg border bg-white p-6">
         <p className="text-gray-500">
           Match Play Results management coming soon.

@@ -2,6 +2,8 @@
 
 import * as React from "react";
 
+import { H3 } from "./ui/heading";
+
 export interface MatchPlayResultRow {
   id: number;
   groupName: string;
@@ -52,9 +54,7 @@ export function MatchPlayResultsTable({ results }: MatchPlayResultsTableProps) {
     <div className="space-y-8">
       {Array.from(grouped.entries()).map(([groupName, groupResults]) => (
         <div key={groupName}>
-          <h3 className="mb-3 text-lg font-semibold text-gray-900">
-            {groupName}
-          </h3>
+          <H3 className="mb-3 text-lg">{groupName}</H3>
           <div className="overflow-x-auto rounded-lg bg-white shadow-sm">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-primary-50">

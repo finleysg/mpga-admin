@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "./ui/button";
+import { H3 } from "./ui/heading";
 
 export interface MatchPlayTeamRow {
   id: number;
@@ -37,9 +38,9 @@ export function MatchPlayGroupCards({ teams, year }: MatchPlayGroupCardsProps) {
         return (
           <div key={groupName} className="rounded-lg bg-white p-6 shadow-sm">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="font-heading text-lg font-bold text-primary-900">
+              <H3 className="text-lg font-bold text-primary-900">
                 {groupName}
-              </h3>
+              </H3>
               {isSenior && (
                 <span className="rounded-full px-2.5 py-0.5 text-xs font-medium bg-amber-100 text-amber-800">
                   Senior

@@ -1,5 +1,6 @@
 "use client";
 
+import { H1 } from "@mpga/ui";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -52,9 +53,9 @@ export default function EditContactPage() {
 
   return (
     <div className="mx-auto max-w-4xl">
-      <h1 className="mb-6 font-heading text-3xl font-bold text-secondary-500">
+      <H1 variant="secondary" className="mb-6">
         Edit Contact
-      </h1>
+      </H1>
       <ContactForm contact={contact} />
     </div>
   );

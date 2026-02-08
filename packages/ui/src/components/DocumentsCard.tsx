@@ -1,6 +1,7 @@
 import { FileText, Download } from "lucide-react";
 
 import { CollapsibleList } from "./CollapsibleList";
+import { H2 } from "./ui/heading";
 
 export interface DocumentItem {
   id: number;
@@ -21,9 +22,7 @@ export function DocumentsCard({
 }: DocumentsCardProps) {
   return (
     <div className="rounded-lg bg-white p-6 shadow-sm">
-      <h2 className="mb-4 text-lg font-bold font-heading text-primary-900">
-        {title}
-      </h2>
+      <H2 className="mb-4 text-lg">{title}</H2>
 
       {documents.length === 0 ? (
         <p className="text-sm text-gray-500">No documents available.</p>

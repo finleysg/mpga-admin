@@ -1,5 +1,5 @@
 import { getMediaUrl } from "@mpga/types";
-import { DocumentsCard, MatchPlayResultsTable } from "@mpga/ui";
+import { DocumentsCard, H1, MatchPlayResultsTable } from "@mpga/ui";
 
 import {
   getMatchPlayDocuments,
@@ -22,9 +22,7 @@ export default async function MatchPlayResultsPage() {
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="mb-8 text-3xl font-bold font-heading text-primary-900">
-        Schedule and Results
-      </h1>
+      <H1 className="mb-8">Schedule and Results</H1>
 
       {documentItems.length > 0 && (
         <div className="mb-8">

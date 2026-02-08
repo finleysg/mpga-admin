@@ -1,9 +1,10 @@
 import { getMediaUrl } from "@mpga/types";
 import {
-  HistoryResultsTable,
-  PhotoCarousel,
   DocumentsCard,
+  H1,
+  HistoryResultsTable,
   Markdown,
+  PhotoCarousel,
 } from "@mpga/ui";
 import { notFound } from "next/navigation";
 
@@ -66,9 +67,7 @@ export default async function TournamentHistoryPage({
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="mb-6 text-3xl font-bold font-heading text-primary-900">
-        {tournament.name} History
-      </h1>
+      <H1 className="mb-6">{tournament.name} History</H1>
 
       <Markdown content={tournament.description} className="mb-8" />
 

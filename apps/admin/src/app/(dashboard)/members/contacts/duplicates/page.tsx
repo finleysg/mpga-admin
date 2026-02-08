@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Sheet, toast } from "@mpga/ui";
+import { Button, H1, Sheet, toast } from "@mpga/ui";
 import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -82,9 +82,7 @@ export default function DuplicatesPage() {
           <ChevronLeft className="mr-1 h-4 w-4" />
           Back to Contacts
         </Link>
-        <h1 className="font-heading text-3xl font-bold text-secondary-500">
-          Duplicate Contacts
-        </h1>
+        <H1 variant="secondary">Duplicate Contacts</H1>
       </div>
 
       {loading ? (

@@ -2,6 +2,8 @@ import { Calendar, MapPin, ArrowRight, Trophy, History } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
+import { H3 } from "./ui/heading";
+
 export interface TournamentCardProps {
   name: string;
   description: string;
@@ -37,7 +39,7 @@ export function TournamentCard({
             <Trophy className="h-8 w-8 text-gray-400" />
           )}
         </div>
-        <h3 className="font-heading text-xl font-bold text-gray-900">{name}</h3>
+        <H3 className="font-bold">{name}</H3>
       </div>
       <p className="mb-4 flex-1 line-clamp-3 text-gray-600">{description}</p>
       {historyHref && (
