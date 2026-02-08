@@ -10,7 +10,7 @@ export interface MarkdownProps {
 	className?: string
 }
 
-const ADMONITION_TYPES = new Set(["note", "warning", "tip", "danger"])
+export const ADMONITION_TYPES = new Set(["note", "warning", "tip", "danger"])
 
 /** Remark plugin that converts :::note / :::tip / etc. container directives into div elements. */
 function remarkAdmonitions() {
@@ -47,7 +47,7 @@ const sanitizeSchema = {
  * This handles the highlight markdown syntax since remark has no maintained == plugin.
  * rehype-raw will parse the resulting HTML tags.
  */
-function preprocessHighlights(markdown: string): string {
+export function preprocessHighlights(markdown: string): string {
 	return markdown.replace(/==((?:(?!==).)+)==/g, "<mark>$1</mark>")
 }
 
