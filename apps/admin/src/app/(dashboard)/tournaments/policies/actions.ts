@@ -108,13 +108,17 @@ async function revalidatePublicSite(path: string) {
   }
 
   try {
-    await fetch(
+    const res = await fetch(
       `${publicUrl}/api/revalidate?path=${encodeURIComponent(path)}`,
       {
         method: "POST",
+        signal: AbortSignal.timeout(5000),
         headers: { "x-revalidate-secret": secret },
       },
     );
+    if (!res.ok) {
+      console.error(`Revalidation failed: ${res.status} ${res.statusText}`);
+    }
   } catch (error) {
     console.error("Failed to revalidate public site:", error);
   }

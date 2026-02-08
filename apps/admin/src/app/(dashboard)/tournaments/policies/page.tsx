@@ -13,6 +13,9 @@ import { getContentAction } from "./actions";
 
 export default async function PoliciesPage() {
   const result = await getContentAction("TP");
+  if (!result.success) {
+    throw new Error(result.error ?? "Failed to load content");
+  }
   const content = result.data;
 
   return (

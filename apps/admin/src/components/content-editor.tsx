@@ -69,7 +69,9 @@ export function ContentEditor({ contentType, backHref }: ContentEditorProps) {
   useEffect(() => {
     async function loadContent() {
       const result = await getContentAction(contentType);
-      if (result.success && result.data) {
+      if (!result.success) {
+        toast.error(result.error ?? "Failed to load content");
+      } else if (result.data) {
         setTitle(result.data.title);
         setContentId(result.data.id);
         if (editor) {
