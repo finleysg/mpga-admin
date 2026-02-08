@@ -1,5 +1,14 @@
 import { getMediaUrl } from "@mpga/types"
-import { DocumentsCard, GolfCourseCard, H1, H2, Markdown, RegistrationCard } from "@mpga/ui"
+import {
+	Card,
+	CardContent,
+	ContentCard,
+	DocumentsCard,
+	GolfCourseCard,
+	H1,
+	Markdown,
+	RegistrationCard,
+} from "@mpga/ui"
 import { notFound } from "next/navigation"
 
 import { getTournamentPolicies } from "@/lib/queries/content"
@@ -52,15 +61,19 @@ export default async function TournamentYearPage({ params }: { params: Params })
 
 			<div className="flex flex-col gap-8 lg:flex-row">
 				<div className="lg:w-[70%]">
-					<div className="rounded-lg bg-white p-6 shadow-sm">
-						<Markdown content={instance.instanceDescription} />
-					</div>
+					<Card>
+						<CardContent>
+							<Markdown content={instance.instanceDescription} />
+						</CardContent>
+					</Card>
 
 					{policies && (
-						<div className="mt-6 rounded-lg bg-white p-6 shadow-sm">
-							<H2 className="mb-4">{policies.title}</H2>
-							<Markdown content={policies.content} />
-						</div>
+						<ContentCard
+							heading="h2"
+							title={policies.title}
+							content={policies.content}
+							className="mt-6"
+						/>
 					)}
 				</div>
 

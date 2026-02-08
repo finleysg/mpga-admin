@@ -1,4 +1,4 @@
-import { Button, Card, CardContent, CardHeader, CardTitle, H1, Markdown } from "@mpga/ui"
+import { Button, Card, CardContent, ContentCard, H1 } from "@mpga/ui"
 import { Pencil, Plus } from "lucide-react"
 import Link from "next/link"
 
@@ -32,14 +32,12 @@ export default async function PoliciesPage() {
 				</Button>
 			</div>
 			{content ? (
-				<Card>
-					<CardHeader>
-						<CardTitle className="font-heading text-xl">{content.title}</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<Markdown content={content.contentText} />
-					</CardContent>
-				</Card>
+				<ContentCard
+					heading="h3"
+					title={content.title}
+					content={content.contentText}
+					variant="secondary"
+				/>
 			) : (
 				<Card>
 					<CardContent>

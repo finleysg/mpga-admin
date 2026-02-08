@@ -1,4 +1,4 @@
-import { H1, H2, Markdown, MatchPlaySignUp, MatchPlayGroupCards } from "@mpga/ui"
+import { ContentCard, H2, MatchPlaySignUp, MatchPlayGroupCards } from "@mpga/ui"
 
 import { getMatchPlayContent } from "@/lib/queries/content"
 import { getTeamsForYear } from "@/lib/queries/match-play"
@@ -30,8 +30,14 @@ export default async function MatchPlayPage() {
 
 	return (
 		<main className="mx-auto max-w-6xl px-4 py-8">
-			<H1 className="mb-8">{content?.title}</H1>
-			{content && <Markdown content={content.content} className="mb-8" />}
+			{content && (
+				<ContentCard
+					heading="h1"
+					title={content.title}
+					content={content.content}
+					className="mb-8"
+				/>
+			)}
 			{showSignUp ? (
 				<MatchPlaySignUp year={currentYear} deadline={formattedDeadline} />
 			) : (

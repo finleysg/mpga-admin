@@ -13,6 +13,7 @@ export { AboutSection, type AboutSectionProps } from "./AboutSection"
 export { AnnouncementCard, type AnnouncementCardProps } from "./AnnouncementCard"
 export { TournamentCard, type TournamentCardProps } from "./TournamentCard"
 export { Markdown, type MarkdownProps } from "./Markdown"
+export { ContentCard, type ContentCardProps } from "./ContentCard"
 export {
 	RegistrationCard,
 	type RegistrationCardProps,

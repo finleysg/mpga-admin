@@ -1,4 +1,4 @@
-import { H1, H2 } from "@mpga/ui"
+import { Card, CardContent, CardHeader, CardTitle, H1, H2 } from "@mpga/ui"
 
 export const dynamic = "force-dynamic"
 
@@ -9,14 +9,16 @@ export default async function AdminDashboard() {
 				<H1 variant="secondary">Admin Dashboard</H1>
 			</div>
 
-			<div className="rounded-lg bg-white shadow">
-				<div className="border-b border-gray-200 px-6 py-4">
-					<H2 variant="secondary">MPGA Administration</H2>
-				</div>
-				<div className="px-6 py-8 text-center text-gray-500">
+			<Card>
+				<CardHeader className="border-b border-gray-200">
+					<CardTitle>
+						<H2 variant="secondary">MPGA Administration</H2>
+					</CardTitle>
+				</CardHeader>
+				<CardContent className="py-8 text-center text-gray-500">
 					Welcome to the MPGA admin dashboard.
-				</div>
-			</div>
+				</CardContent>
+			</Card>
 		</main>
 	)
 }

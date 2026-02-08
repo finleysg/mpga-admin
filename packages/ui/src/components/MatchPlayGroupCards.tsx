@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from "./ui/button"
+import { Card, CardContent, CardHeader } from "./ui/card"
 import { H3 } from "./ui/heading"
 
 export interface MatchPlayTeamRow {
@@ -32,35 +33,39 @@ export function MatchPlayGroupCards({ teams, year }: MatchPlayGroupCardsProps) {
 			{Array.from(groups.entries()).map(([groupName, groupTeams]) => {
 				const isSenior = groupTeams[0]?.isSenior
 				return (
-					<div key={groupName} className="rounded-lg bg-white p-6 shadow-sm">
-						<div className="mb-4 flex items-center justify-between">
-							<H3 className="text-lg font-bold text-primary-900">{groupName}</H3>
-							{isSenior && (
-								<span className="rounded-full px-2.5 py-0.5 text-xs font-medium bg-amber-100 text-amber-800">
-									Senior
-								</span>
-							)}
-						</div>
-						<ul className="mb-4 space-y-1.5">
-							{groupTeams.map((team) => (
-								<li
-									key={team.id}
-									className="text-sm text-gray-700 before:mr-2 before:text-primary-300 before:content-['•']"
-								>
-									{team.clubName}
-								</li>
-							))}
-						</ul>
-						<Button
-							variant="outline"
-							size="sm"
-							onClick={() => {
-								console.log(`Get captains for ${groupName}`)
-							}}
-						>
-							Captains
-						</Button>
-					</div>
+					<Card key={groupName}>
+						<CardHeader>
+							<div className="flex items-center justify-between">
+								<H3 className="text-lg font-bold text-primary-900">{groupName}</H3>
+								{isSenior && (
+									<span className="rounded-full px-2.5 py-0.5 text-xs font-medium bg-amber-100 text-amber-800">
+										Senior
+									</span>
+								)}
+							</div>
+						</CardHeader>
+						<CardContent>
+							<ul className="mb-4 space-y-1.5">
+								{groupTeams.map((team) => (
+									<li
+										key={team.id}
+										className="text-sm text-gray-700 before:mr-2 before:text-primary-300 before:content-['•']"
+									>
+										{team.clubName}
+									</li>
+								))}
+							</ul>
+							<Button
+								variant="outline"
+								size="sm"
+								onClick={() => {
+									console.log(`Get captains for ${groupName}`)
+								}}
+							>
+								Captains
+							</Button>
+						</CardContent>
+					</Card>
 				)
 			})}
 		</div>

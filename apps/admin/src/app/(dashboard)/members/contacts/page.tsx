@@ -1,6 +1,16 @@
 "use client"
 
-import { Button, H1, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@mpga/ui"
+import {
+	Button,
+	Card,
+	H1,
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@mpga/ui"
 import {
 	type Column,
 	type ColumnDef,
@@ -283,7 +293,7 @@ export default function ContactsPage() {
 					) : (
 						<>
 							{/* Table */}
-							<div className="overflow-x-auto rounded-lg bg-white shadow-sm">
+							<Card className="overflow-x-auto p-0">
 								<Table className="min-w-full divide-y divide-gray-200">
 									<TableHeader className="bg-secondary-50">
 										<TableRow className="hover:bg-secondary-50">
@@ -327,7 +337,7 @@ export default function ContactsPage() {
 										))}
 									</TableBody>
 								</Table>
-							</div>
+							</Card>
 
 							{/* Pagination */}
 							{showPagination && (

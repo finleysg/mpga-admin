@@ -4,6 +4,7 @@ import { Trophy, Users, MapPin, type LucideIcon } from "lucide-react"
 import Link from "next/link"
 
 import { Button } from "./ui/button"
+import { Card, CardContent } from "./ui/card"
 import { H3 } from "./ui/heading"
 
 export interface FeatureCardProps {
@@ -25,15 +26,17 @@ export function FeatureCard({ contentType, title, description }: FeatureCardProp
 	}
 
 	return (
-		<div className="flex flex-col items-center rounded-lg bg-white p-6 text-center shadow-sm transition-shadow hover:shadow-md">
-			<div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-50">
-				<Icon className="h-8 w-8 text-primary-600" />
-			</div>
-			<H3 className="mb-3">{title}</H3>
-			<p className="mb-6 flex-1 text-gray-600">{description}</p>
-			<Link href={route}>
-				<Button variant="outline">Learn More</Button>
-			</Link>
-		</div>
+		<Card className="items-center text-center transition-shadow hover:shadow-md">
+			<CardContent>
+				<div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-50">
+					<Icon className="h-8 w-8 text-primary-600" />
+				</div>
+				<H3 className="mb-3">{title}</H3>
+				<p className="mb-6 flex-1 text-gray-600">{description}</p>
+				<Link href={route}>
+					<Button variant="outline">Learn More</Button>
+				</Link>
+			</CardContent>
+		</Card>
 	)
 }

@@ -1,5 +1,15 @@
 import { getMediaUrl } from "@mpga/types"
-import { ClubDetailCard, GolfCourseCard, H1, H2, OfficersCard } from "@mpga/ui"
+import {
+	Card,
+	CardContent,
+	CardHeader,
+	CardTitle,
+	ClubDetailCard,
+	GolfCourseCard,
+	H1,
+	H2,
+	OfficersCard,
+} from "@mpga/ui"
 import { notFound } from "next/navigation"
 
 import { getClubBySystemName, getClubMembershipInfo, getClubOfficers } from "@/lib/queries/clubs"
@@ -64,10 +74,16 @@ export default async function ClubDetailPage({ params }: { params: Params }) {
 						logoUrl={getMediaUrl(club.golfCourse.logo)}
 					/>
 				) : (
-					<div className="rounded-lg bg-white p-6 shadow-sm">
-						<H2 className="mb-4 text-lg">Golf Course</H2>
-						<p className="text-sm text-gray-500">No golf course assigned.</p>
-					</div>
+					<Card>
+						<CardHeader>
+							<CardTitle>
+								<H2 className="text-lg">Golf Course</H2>
+							</CardTitle>
+						</CardHeader>
+						<CardContent>
+							<p className="text-sm text-gray-500">No golf course assigned.</p>
+						</CardContent>
+					</Card>
 				)}
 
 				<OfficersCard officers={officers} />

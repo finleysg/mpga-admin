@@ -1,4 +1,4 @@
-import { ClubsTable, H1, Markdown } from "@mpga/ui"
+import { ClubsTable, ContentCard } from "@mpga/ui"
 
 import { getMembersContent, getClubsWithMembershipStatus } from "@/lib/queries/clubs"
 import { getCurrentSeason } from "@/lib/season"
@@ -17,12 +17,13 @@ export default async function MembersPage() {
 
 	return (
 		<main className="mx-auto max-w-6xl px-4 py-8">
-			<H1 className="mb-8">Member Clubs</H1>
-
 			{content && (
-				<div className="mb-8">
-					<Markdown content={content.content} />
-				</div>
+				<ContentCard
+					heading="h1"
+					title={content.title}
+					content={content.content}
+					className="mb-8"
+				/>
 			)}
 
 			<ClubsTable clubs={clubs} />
