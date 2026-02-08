@@ -109,8 +109,11 @@ async function revalidatePublicSite(path: string) {
 
   try {
     await fetch(
-      `${publicUrl}/api/revalidate?secret=${encodeURIComponent(secret)}&path=${encodeURIComponent(path)}`,
-      { method: "POST" },
+      `${publicUrl}/api/revalidate?path=${encodeURIComponent(path)}`,
+      {
+        method: "POST",
+        headers: { "x-revalidate-secret": secret },
+      },
     );
   } catch (error) {
     console.error("Failed to revalidate public site:", error);
