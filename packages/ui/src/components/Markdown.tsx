@@ -1,12 +1,12 @@
 // import type { Components } from "react-markdown";
-import ReactMarkdown from "react-markdown";
-import rehypeRaw from "rehype-raw";
-import rehypeSanitize from "rehype-sanitize";
-import remarkGfm from "remark-gfm";
+import ReactMarkdown from "react-markdown"
+import rehypeRaw from "rehype-raw"
+import rehypeSanitize from "rehype-sanitize"
+import remarkGfm from "remark-gfm"
 
 export interface MarkdownProps {
-  content: string;
-  className?: string;
+	content: string
+	className?: string
 }
 
 // const components: Components = {
@@ -83,14 +83,11 @@ export interface MarkdownProps {
 // };
 
 export function Markdown({ content, className }: MarkdownProps) {
-  return (
-    <div className={className ?? "prose"}>
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeRaw, rehypeSanitize]}
-      >
-        {content}
-      </ReactMarkdown>
-    </div>
-  );
+	return (
+		<div className={className ?? "prose"}>
+			<ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw, rehypeSanitize]}>
+				{content}
+			</ReactMarkdown>
+		</div>
+	)
 }
