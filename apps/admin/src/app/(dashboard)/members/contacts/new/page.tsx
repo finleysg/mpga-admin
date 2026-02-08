@@ -1,14 +1,16 @@
-"use client";
+"use client"
 
-import { ContactForm } from "../contact-form";
+import { H1 } from "@mpga/ui"
+
+import { ContactForm } from "../contact-form"
 
 export default function NewContactPage() {
-  return (
-    <div className="mx-auto max-w-4xl">
-      <h1 className="mb-6 font-heading text-3xl font-bold text-secondary-500">
-        New Contact
-      </h1>
-      <ContactForm />
-    </div>
-  );
+	return (
+		<div className="mx-auto max-w-4xl">
+			<H1 variant="secondary" className="mb-6">
+				New Contact
+			</H1>
+			<ContactForm />
+		</div>
+	)
 }

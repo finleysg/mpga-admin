@@ -1,43 +1,41 @@
-import { betterAuth } from "better-auth";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { admin } from "better-auth/plugins";
+import { betterAuth } from "better-auth"
+import { drizzleAdapter } from "better-auth/adapters/drizzle"
+import { admin } from "better-auth/plugins"
 
-import { db } from "./db";
-import { ac, adminRole, superAdminRole } from "./permissions";
+import { db } from "./db"
+import { ac, adminRole, superAdminRole } from "./permissions"
 
 export const auth = betterAuth({
-  logger: {
-    level: "info",
-  },
-  baseURL: process.env.BETTER_AUTH_URL,
-  trustedOrigins: process.env.BETTER_AUTH_TRUSTED_ORIGINS?.split(",") ?? [
-    "http://localhost:4100",
-  ],
-  database: drizzleAdapter(db, {
-    provider: "mysql",
-  }),
-  emailAndPassword: {
-    enabled: true,
-  },
-  socialProviders: {
-    google: {
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    },
-  },
-  session: {
-    expiresIn: 60 * 60 * 24 * 7, // 7 days
-    updateAge: 60 * 60 * 24, // 1 day
-  },
-  plugins: [
-    admin({
-      defaultRole: "admin",
-      adminRoles: ["super_admin", "admin"],
-      ac,
-      roles: {
-        super_admin: superAdminRole,
-        admin: adminRole,
-      },
-    }),
-  ],
-});
+	logger: {
+		level: "info",
+	},
+	baseURL: process.env.BETTER_AUTH_URL,
+	trustedOrigins: process.env.BETTER_AUTH_TRUSTED_ORIGINS?.split(",") ?? ["http://localhost:4100"],
+	database: drizzleAdapter(db, {
+		provider: "mysql",
+	}),
+	emailAndPassword: {
+		enabled: true,
+	},
+	socialProviders: {
+		google: {
+			clientId: process.env.GOOGLE_CLIENT_ID!,
+			clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+		},
+	},
+	session: {
+		expiresIn: 60 * 60 * 24 * 7, // 7 days
+		updateAge: 60 * 60 * 24, // 1 day
+	},
+	plugins: [
+		admin({
+			defaultRole: "admin",
+			adminRoles: ["super_admin", "admin"],
+			ac,
+			roles: {
+				super_admin: superAdminRole,
+				admin: adminRole,
+			},
+		}),
+	],
+})

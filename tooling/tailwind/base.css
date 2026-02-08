@@ -5,6 +5,35 @@
 
 .prose {
   max-width: none;
+  line-height: 1.5;
+}
+
+.prose h1 {
+  font-family: var(--font-heading);
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  color: var(--color-primary-900);
+}
+
+.prose h2 {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--color-primary-900);
+}
+
+.prose h3 {
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--color-primary-700);
+}
+
+.prose h4 {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--color-primary-700);
 }
 
 @theme {
@@ -55,4 +84,17 @@
   --font-heading: "Playfair Display", Georgia, serif;
   --font-body: "Inter", system-ui, sans-serif;
   --font-sans: var(--font-body);
+}
+
+@media print {
+  header,
+  footer {
+    display: none !important;
+  }
+
+  [data-slot="card"] {
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+  }
 }
