@@ -20,6 +20,7 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from "@mpga/ui"
+import type { ActionResult } from "@mpga/types"
 import Link from "@tiptap/extension-link"
 import { EditorContent, useEditor } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
@@ -52,12 +53,6 @@ import { Markdown } from "tiptap-markdown"
 
 import { Admonition, type AdmonitionType } from "@/lib/tiptap/admonition"
 import { HighlightWithMarkdown } from "@/lib/tiptap/highlight"
-
-interface ActionResult<T = void> {
-	success: boolean
-	error?: string
-	data?: T
-}
 
 interface ContentEditorProps {
 	backHref: string

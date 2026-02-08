@@ -1,16 +1,11 @@
 "use server"
 
 import { tournament, tournamentInstance } from "@mpga/database"
+import type { ActionResult } from "@mpga/types"
 import { eq } from "drizzle-orm"
 
 import { db } from "@/lib/db"
 import { requireAuth } from "@/lib/require-auth"
-
-interface ActionResult<T = void> {
-	success: boolean
-	error?: string
-	data?: T
-}
 
 export async function getInstanceDescriptionAction(
 	systemName: string,

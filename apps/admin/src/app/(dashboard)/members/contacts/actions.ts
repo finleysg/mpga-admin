@@ -1,6 +1,7 @@
 "use server"
 
 import { clubContact, clubContactRole, committee, contact } from "@mpga/database"
+import type { ActionResult } from "@mpga/types"
 import { asc, eq, inArray } from "drizzle-orm"
 
 import { db } from "@/lib/db"
@@ -19,12 +20,6 @@ interface ContactInput {
 	zip?: string | null
 	notes?: string | null
 	sendEmail?: boolean
-}
-
-export interface ActionResult<T = void> {
-	success: boolean
-	error?: string
-	data?: T
 }
 
 export interface ContactData {

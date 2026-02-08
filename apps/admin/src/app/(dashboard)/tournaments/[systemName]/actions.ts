@@ -7,17 +7,12 @@ import {
 	tournamentInstance,
 	tournamentLink,
 } from "@mpga/database"
+import type { ActionResult } from "@mpga/types"
 import { and, asc, eq, like } from "drizzle-orm"
 
 import { db } from "@/lib/db"
 import { requireAuth } from "@/lib/require-auth"
 import { uploadToS3 } from "@/lib/s3"
-
-export interface ActionResult<T = void> {
-	success: boolean
-	error?: string
-	data?: T
-}
 
 // ---------- Tournament Instance ----------
 
