@@ -20,6 +20,7 @@ import {
 	FieldError,
 	FieldLabel,
 	Input,
+	Textarea,
 	toast,
 } from "@mpga/ui"
 import { Trash2 } from "lucide-react"
@@ -229,12 +230,11 @@ export function ContactForm({ contact }: ContactFormProps) {
 					{/* Row 7: Notes */}
 					<Field>
 						<FieldLabel htmlFor="notes">Notes</FieldLabel>
-						<textarea
+						<Textarea
 							id="notes"
 							value={notes}
 							onChange={(e) => setNotes(e.target.value)}
 							rows={4}
-							className="flex w-full rounded-md border border-gray-300 bg-background px-3 py-2 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:shadow-[0_0_0_1px_#96c4d0,0_0_8px_rgba(150,196,208,0.4)] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
 						/>
 					</Field>
 
