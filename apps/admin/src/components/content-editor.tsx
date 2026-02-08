@@ -1,20 +1,39 @@
 "use client"
 
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Skeleton, toast } from "@mpga/ui"
+import {
+	Button,
+	Card,
+	CardContent,
+	CardHeader,
+	CardTitle,
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+	Input,
+	Skeleton,
+	toast,
+} from "@mpga/ui"
 import Link from "@tiptap/extension-link"
 import { EditorContent, useEditor } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import {
+	AlertTriangle,
 	Bold,
+	ChevronDown,
 	Heading2,
 	Heading3,
 	Heading4,
+	Highlighter,
+	Info,
 	Italic,
+	Lightbulb,
 	Link as LinkIcon,
 	List,
 	ListOrdered,
 	Loader2,
 	Minus,
+	ShieldAlert,
 	TextQuote,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
@@ -22,6 +41,8 @@ import { useCallback, useEffect, useState } from "react"
 import { Markdown } from "tiptap-markdown"
 
 import { getContentAction, saveContentAction } from "@/app/(dashboard)/tournaments/policies/actions"
+import { Admonition, type AdmonitionType } from "@/lib/tiptap/admonition"
+import { HighlightWithMarkdown } from "@/lib/tiptap/highlight"
 
 interface ContentEditorProps {
 	contentType: string
@@ -45,6 +66,8 @@ export function ContentEditor({ contentType, backHref }: ContentEditorProps) {
 					class: "text-primary underline",
 				},
 			}),
+			HighlightWithMarkdown,
+			Admonition,
 		],
 		immediatelyRender: false,
 		editorProps: {
@@ -161,6 +184,13 @@ export function ContentEditor({ contentType, backHref }: ContentEditorProps) {
 						>
 							<Italic className="h-4 w-4" />
 						</ToolbarButton>
+						<ToolbarButton
+							onClick={() => editor.chain().focus().toggleHighlight().run()}
+							active={editor.isActive("highlight")}
+							title="Highlight"
+						>
+							<Highlighter className="h-4 w-4" />
+						</ToolbarButton>
 						<ToolbarSeparator />
 						<ToolbarButton
 							onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
@@ -206,6 +236,10 @@ export function ContentEditor({ contentType, backHref }: ContentEditorProps) {
 						>
 							<TextQuote className="h-4 w-4" />
 						</ToolbarButton>
+						<AdmonitionDropdown
+							onSelect={(type) => editor.chain().focus().toggleAdmonition({ type }).run()}
+							active={editor.isActive("admonition")}
+						/>
 						<ToolbarSeparator />
 						<ToolbarButton onClick={setLink} active={editor.isActive("link")} title="Link">
 							<LinkIcon className="h-4 w-4" />
@@ -262,4 +296,44 @@ function ToolbarButton({
 
 function ToolbarSeparator() {
 	return <div className="mx-1 w-px self-stretch bg-border" />
+}
+
+const admonitionItems: { type: AdmonitionType; label: string; icon: React.ReactNode }[] = [
+	{ type: "note", label: "Note", icon: <Info className="h-4 w-4 text-blue-500" /> },
+	{ type: "tip", label: "Tip", icon: <Lightbulb className="h-4 w-4 text-green-500" /> },
+	{ type: "warning", label: "Warning", icon: <AlertTriangle className="h-4 w-4 text-amber-500" /> },
+	{ type: "danger", label: "Danger", icon: <ShieldAlert className="h-4 w-4 text-red-500" /> },
+]
+
+function AdmonitionDropdown({
+	onSelect,
+	active,
+}: {
+	onSelect: (type: AdmonitionType) => void
+	active: boolean
+}) {
+	return (
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>
+				<button
+					type="button"
+					title="Callout block"
+					className={`flex items-center gap-0.5 rounded p-2 hover:bg-muted ${
+						active ? "bg-muted text-primary" : "text-muted-foreground"
+					}`}
+				>
+					<Info className="h-4 w-4" />
+					<ChevronDown className="h-3 w-3" />
+				</button>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent align="start">
+				{admonitionItems.map((item) => (
+					<DropdownMenuItem key={item.type} onClick={() => onSelect(item.type)}>
+						{item.icon}
+						<span className="ml-2">{item.label}</span>
+					</DropdownMenuItem>
+				))}
+			</DropdownMenuContent>
+		</DropdownMenu>
+	)
 }

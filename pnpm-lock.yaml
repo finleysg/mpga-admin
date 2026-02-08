@@ -69,6 +69,9 @@ importers:
       '@tanstack/react-table':
         specifier: ^8.21.3
         version: 8.21.3(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@tiptap/extension-highlight':
+        specifier: ^2
+        version: 2.27.2(@tiptap/core@2.27.2(@tiptap/pm@2.27.2))
       '@tiptap/extension-link':
         specifier: ^2.12.0
         version: 2.27.2(@tiptap/core@2.27.2(@tiptap/pm@2.27.2))(@tiptap/pm@2.27.2)
@@ -93,6 +96,12 @@ importers:
       lucide-react:
         specifier: ^0.563.0
         version: 0.563.0(react@19.2.3)
+      markdown-it-container:
+        specifier: ^4.0.0
+        version: 4.0.0
+      markdown-it-mark:
+        specifier: ^4.0.0
+        version: 4.0.0
       next:
         specifier: 16.1.6
         version: 16.1.6(@babel/core@7.29.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -310,6 +319,9 @@ importers:
       rehype-sanitize:
         specifier: ^6.0.0
         version: 6.0.0
+      remark-directive:
+        specifier: ^4.0.0
+        version: 4.0.0
       remark-gfm:
         specifier: ^4.0.0
         version: 4.0.1
@@ -319,6 +331,9 @@ importers:
       tailwind-merge:
         specifier: ^2.6.0
         version: 2.6.1
+      unist-util-visit:
+        specifier: ^5.1.0
+        version: 5.1.0
     devDependencies:
       '@mpga/eslint-config':
         specifier: workspace:*
@@ -2254,6 +2269,11 @@ packages:
     peerDependencies:
       '@tiptap/core': ^2.7.0
 
+  '@tiptap/extension-highlight@2.27.2':
+    resolution: {integrity: sha512-ZjlktDdMjruMJFAVz0TbQf0v92Jqkc7Ri1iZJqBXuLid+r+GxUzl2CVAV7qq5yagkGQgvAG+WGsMk880HgR3MA==}
+    peerDependencies:
+      '@tiptap/core': ^2.7.0
+
   '@tiptap/extension-history@2.27.2':
     resolution: {integrity: sha512-+hSyqERoFNTWPiZx4/FCyZ/0eFqB9fuMdTB4AC/q9iwu3RNWAQtlsJg5230bf/qmyO6bZxRUc0k8p4hrV6ybAw==}
     peerDependencies:
@@ -4141,6 +4161,12 @@ packages:
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
 
+  markdown-it-container@4.0.0:
+    resolution: {integrity: sha512-HaNccxUH0l7BNGYbFbjmGpf5aLHAMTinqRZQAEQbMr2cdD3z91Q6kIo1oUn1CQndkT03jat6ckrdRYuwwqLlQw==}
+
+  markdown-it-mark@4.0.0:
+    resolution: {integrity: sha512-YLhzaOsU9THO/cal0lUjfMjrqSMPjjyjChYM7oyj4DnyaXEzA8gnW6cVJeyCrCVeyesrY2PlEdUYJSPFYL4Nkg==}
+
   markdown-it-task-lists@2.1.1:
     resolution: {integrity: sha512-TxFAc76Jnhb2OUu+n3yz9RMu4CwGfaT788br6HhEDlvWfdeJcLUsxk1Hgw2yJio0OXsxv7pyIPmvECY7bMbluA==}
 
@@ -4154,6 +4180,9 @@ packages:
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
+
+  mdast-util-directive@3.1.0:
+    resolution: {integrity: sha512-I3fNFt+DHmpWCYAT7quoM6lHf9wuqtI+oCOfvILnoicNIqjh5E3dEJWiXuYME2gNe8vl1iMQwyUHa7bgFmak6Q==}
 
   mdast-util-find-and-replace@3.0.2:
     resolution: {integrity: sha512-Tmd1Vg/m3Xz43afeNxDIhWRtFZgM2VLyaf4vSTYwudTyeuTneoL3qtWMA5jeLyz/O1vDJmmV4QuScFCA2tBPwg==}
@@ -4209,6 +4238,9 @@ packages:
 
   micromark-core-commonmark@2.0.3:
     resolution: {integrity: sha512-RDBrHEMSxVFLg6xvnXmb1Ayr2WzLAWjeSATAoxwKYJV94TeNavgoIdA0a9ytzDSVzBy2YKFK+emCPOEibLeCrg==}
+
+  micromark-extension-directive@4.0.0:
+    resolution: {integrity: sha512-/C2nqVmXXmiseSSuCdItCMho7ybwwop6RrrRPk0KbOHW21JKoCldC+8rFOaundDoRBUWBnJJcxeA/Kvi34WQXg==}
 
   micromark-extension-gfm-autolink-literal@2.1.0:
     resolution: {integrity: sha512-oOg7knzhicgQ3t4QCjCWgTmfNhvQbDDnJeVu9v81r7NltNCVmhPy1fJRX27pISafdjL+SVc4d3l48Gb6pbRypw==}
@@ -4716,6 +4748,9 @@ packages:
 
   rehype-sanitize@6.0.0:
     resolution: {integrity: sha512-CsnhKNsyI8Tub6L4sm5ZFsme4puGfc6pYylvXo1AeqaGbjOYyzNv3qZPwvs0oMJ39eryyeOdmxwUIo94IpEhqg==}
+
+  remark-directive@4.0.0:
+    resolution: {integrity: sha512-7sxn4RfF1o3izevPV1DheyGDD6X4c9hrGpfdUpm7uC++dqrnJxIZVkk7CoKqcLm0VUMAuOol7Mno3m6g8cfMuA==}
 
   remark-gfm@4.0.1:
     resolution: {integrity: sha512-1quofZ2RQ9EWdeN34S79+KExV1764+wCUGop5CPL1WGdD0ocPpu91lzPGbwWMECpEpd42kJGQwzRfyov9j4yNg==}
@@ -6900,6 +6935,10 @@ snapshots:
     dependencies:
       '@tiptap/core': 2.27.2(@tiptap/pm@2.27.2)
 
+  '@tiptap/extension-highlight@2.27.2(@tiptap/core@2.27.2(@tiptap/pm@2.27.2))':
+    dependencies:
+      '@tiptap/core': 2.27.2(@tiptap/pm@2.27.2)
+
   '@tiptap/extension-history@2.27.2(@tiptap/core@2.27.2(@tiptap/pm@2.27.2))(@tiptap/pm@2.27.2)':
     dependencies:
       '@tiptap/core': 2.27.2(@tiptap/pm@2.27.2)
@@ -9009,6 +9048,10 @@ snapshots:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
 
+  markdown-it-container@4.0.0: {}
+
+  markdown-it-mark@4.0.0: {}
+
   markdown-it-task-lists@2.1.1: {}
 
   markdown-it@14.1.0:
@@ -9023,6 +9066,20 @@ snapshots:
   markdown-table@3.0.4: {}
 
   math-intrinsics@1.1.0: {}
+
+  mdast-util-directive@3.1.0:
+    dependencies:
+      '@types/mdast': 4.0.4
+      '@types/unist': 3.0.3
+      ccount: 2.0.1
+      devlop: 1.1.0
+      mdast-util-from-markdown: 2.0.2
+      mdast-util-to-markdown: 2.1.2
+      parse-entities: 4.0.2
+      stringify-entities: 4.0.4
+      unist-util-visit-parents: 6.0.2
+    transitivePeerDependencies:
+      - supports-color
 
   mdast-util-find-and-replace@3.0.2:
     dependencies:
@@ -9199,6 +9256,16 @@ snapshots:
       micromark-util-subtokenize: 2.1.0
       micromark-util-symbol: 2.0.1
       micromark-util-types: 2.0.2
+
+  micromark-extension-directive@4.0.0:
+    dependencies:
+      devlop: 1.1.0
+      micromark-factory-space: 2.0.1
+      micromark-factory-whitespace: 2.0.1
+      micromark-util-character: 2.1.1
+      micromark-util-symbol: 2.0.1
+      micromark-util-types: 2.0.2
+      parse-entities: 4.0.2
 
   micromark-extension-gfm-autolink-literal@2.1.0:
     dependencies:
@@ -9866,6 +9933,15 @@ snapshots:
     dependencies:
       '@types/hast': 3.0.4
       hast-util-sanitize: 5.0.2
+
+  remark-directive@4.0.0:
+    dependencies:
+      '@types/mdast': 4.0.4
+      mdast-util-directive: 3.1.0
+      micromark-extension-directive: 4.0.0
+      unified: 11.0.5
+    transitivePeerDependencies:
+      - supports-color
 
   remark-gfm@4.0.1:
     dependencies:
