@@ -1,7 +1,7 @@
 "use client"
 
-import { Button, H1, Sheet, toast } from "@mpga/ui"
-import { ChevronLeft, ChevronRight, Search } from "lucide-react"
+import { EmptyState, H1, Pagination, SearchInput, Sheet, toast } from "@mpga/ui"
+import { ChevronLeft } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useMemo, useState } from "react"
 
@@ -75,32 +75,28 @@ export default function DuplicatesPage() {
 			</div>
 
 			{loading ? (
-				<div className="py-8 text-center text-gray-500">Scanning for duplicates...</div>
+				<EmptyState message="Scanning for duplicates..." />
 			) : groups.length === 0 ? (
-				<div className="py-8 text-center text-gray-500">No duplicate contacts found</div>
+				<EmptyState message="No duplicate contacts found" />
 			) : (
 				<div className="space-y-4">
 					<div className="flex items-center justify-between">
-						<div className="relative">
-							<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-							<input
-								type="text"
-								placeholder="Search groups..."
-								value={searchFilter}
-								onChange={(e) => {
-									setSearchFilter(e.target.value)
-									setCurrentPage(0)
-								}}
-								className="w-full rounded-md border border-gray-300 bg-white py-2 pl-10 pr-4 text-sm focus:border-secondary-500 focus:outline-none focus:ring-1 focus:ring-secondary-500 sm:w-64"
-							/>
-						</div>
+						<SearchInput
+							variant="secondary"
+							placeholder="Search groups..."
+							value={searchFilter}
+							onChange={(e) => {
+								setSearchFilter(e.target.value)
+								setCurrentPage(0)
+							}}
+						/>
 						<p className="text-sm text-gray-600">
 							{filteredGroups.length} {filteredGroups.length === 1 ? "group" : "groups"}
 						</p>
 					</div>
 
 					{filteredGroups.length === 0 ? (
-						<div className="py-8 text-center text-gray-500">No groups match your search</div>
+						<EmptyState message="No groups match your search" />
 					) : (
 						<>
 							<div className="space-y-3">
@@ -110,27 +106,12 @@ export default function DuplicatesPage() {
 							</div>
 
 							{totalPages > 1 && (
-								<div className="flex items-center justify-center gap-4">
-									<Button
-										variant="outline"
-										size="sm"
-										onClick={() => setCurrentPage((p) => p - 1)}
-										disabled={currentPage === 0}
-									>
-										<ChevronLeft className="h-4 w-4" />
-									</Button>
-									<span className="text-sm text-gray-600">
-										Page {currentPage + 1} of {totalPages}
-									</span>
-									<Button
-										variant="outline"
-										size="sm"
-										onClick={() => setCurrentPage((p) => p + 1)}
-										disabled={currentPage >= totalPages - 1}
-									>
-										<ChevronRight className="h-4 w-4" />
-									</Button>
-								</div>
+								<Pagination
+									currentPage={currentPage + 1}
+									totalPages={totalPages}
+									onPreviousPage={() => setCurrentPage((p) => p - 1)}
+									onNextPage={() => setCurrentPage((p) => p + 1)}
+								/>
 							)}
 						</>
 					)}

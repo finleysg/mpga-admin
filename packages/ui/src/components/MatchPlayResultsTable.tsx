@@ -2,6 +2,7 @@
 
 import * as React from "react"
 
+import { Badge } from "./ui/badge"
 import { H3 } from "./ui/heading"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table"
 
@@ -129,11 +130,7 @@ export function MatchPlayResultsTable({ results }: MatchPlayResultsTableProps) {
 												{result.awayTeamScore}
 											</TableCell>
 											<TableCell className="whitespace-nowrap px-4 py-3 text-center text-sm">
-												{result.forfeit && (
-													<span className="inline-flex rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800">
-														Forfeit
-													</span>
-												)}
+												{result.forfeit && <Badge variant="destructive">Forfeit</Badge>}
 											</TableCell>
 										</TableRow>
 									)

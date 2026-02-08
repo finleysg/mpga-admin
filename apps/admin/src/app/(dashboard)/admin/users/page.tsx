@@ -3,12 +3,17 @@
 import {
 	Badge,
 	Button,
+	Card,
+	CardContent,
+	CardHeader,
+	CardTitle,
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
+	EmptyState,
 	H1,
 	H2,
 	Table,
@@ -135,15 +140,17 @@ export default function UsersPage() {
 				<H1 variant="secondary">User Management</H1>
 			</div>
 
-			<div className="rounded-lg bg-white shadow">
-				<div className="border-b border-gray-200 px-6 py-4">
-					<H2 variant="secondary">All Users</H2>
-				</div>
-				<div className="p-6">
+			<Card>
+				<CardHeader>
+					<CardTitle>
+						<H2 variant="secondary">All Users</H2>
+					</CardTitle>
+				</CardHeader>
+				<CardContent>
 					{loading ? (
-						<div className="text-center text-gray-500 py-8">Loading users...</div>
+						<EmptyState message="Loading users..." />
 					) : users.length === 0 ? (
-						<div className="text-center text-gray-500 py-8">No users found</div>
+						<EmptyState message="No users found" />
 					) : (
 						<Table>
 							<TableHeader>
@@ -230,8 +237,8 @@ export default function UsersPage() {
 							</TableBody>
 						</Table>
 					)}
-				</div>
-			</div>
+				</CardContent>
+			</Card>
 		</main>
 	)
 }

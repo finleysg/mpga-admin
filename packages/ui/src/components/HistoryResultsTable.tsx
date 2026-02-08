@@ -1,9 +1,10 @@
 "use client"
 
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from "lucide-react"
+import { ChevronDown, ChevronUp } from "lucide-react"
 import * as React from "react"
 
-import { Button } from "./ui/button"
+import { PageSizeSelect } from "./ui/page-size-select"
+import { Pagination } from "./ui/pagination"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table"
 
 export interface HistoryResult {
@@ -88,26 +89,10 @@ export function HistoryResultsTable({ results }: HistoryResultsTableProps) {
 		<div className="space-y-4">
 			{/* Controls row */}
 			<div className="flex items-center justify-between">
-				<div className="flex items-center gap-2">
-					<label htmlFor="pageSize" className="text-sm text-gray-600">
-						Show:
-					</label>
-					<select
-						id="pageSize"
-						value={pageSize}
-						onChange={(e) =>
-							handlePageSizeChange(
-								e.target.value === "all" ? "all" : (Number(e.target.value) as 10 | 25 | 50),
-							)
-						}
-						className="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-					>
-						<option value={10}>10</option>
-						<option value={25}>25</option>
-						<option value={50}>50</option>
-						<option value="all">All</option>
-					</select>
-				</div>
+				<PageSizeSelect
+					value={String(pageSize)}
+					onChange={(v) => handlePageSizeChange(v === "all" ? "all" : (Number(v) as 10 | 25 | 50))}
+				/>
 				<p className="text-sm text-gray-600">
 					{results.length} {results.length === 1 ? "result" : "results"}
 				</p>
@@ -184,27 +169,12 @@ export function HistoryResultsTable({ results }: HistoryResultsTableProps) {
 
 			{/* Pagination */}
 			{showPagination && (
-				<div className="flex items-center justify-center gap-4">
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={() => setCurrentPage((prev) => prev - 1)}
-						disabled={currentPage === 1}
-					>
-						<ChevronLeft className="h-4 w-4" />
-					</Button>
-					<span className="text-sm text-gray-600">
-						Page {currentPage} of {totalPages}
-					</span>
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={() => setCurrentPage((prev) => prev + 1)}
-						disabled={currentPage === totalPages}
-					>
-						<ChevronRight className="h-4 w-4" />
-					</Button>
-				</div>
+				<Pagination
+					currentPage={currentPage}
+					totalPages={totalPages}
+					onPreviousPage={() => setCurrentPage((prev) => prev - 1)}
+					onNextPage={() => setCurrentPage((prev) => prev + 1)}
+				/>
 			)}
 		</div>
 	)

@@ -155,6 +155,10 @@ export {
 } from "./ui/table"
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "./ui/tooltip"
 export { Badge, badgeVariants, type BadgeProps } from "./ui/badge"
+export { EmptyState, type EmptyStateProps } from "./ui/empty-state"
+export { PageSizeSelect, type PageSizeSelectProps } from "./ui/page-size-select"
+export { Pagination, type PaginationProps } from "./ui/pagination"
+export { SearchInput, type SearchInputProps } from "./ui/search-input"
 export {
 	DropdownMenu,
 	DropdownMenuTrigger,

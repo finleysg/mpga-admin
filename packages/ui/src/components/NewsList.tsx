@@ -1,10 +1,9 @@
 "use client"
 
-import { ChevronLeft, ChevronRight } from "lucide-react"
 import * as React from "react"
 
 import { AnnouncementCard, type AnnouncementCardProps } from "./AnnouncementCard"
-import { Button } from "./ui/button"
+import { Pagination } from "./ui/pagination"
 
 const PAGE_SIZE = 10
 
@@ -36,27 +35,12 @@ export function NewsList({ announcements }: NewsListProps) {
 			))}
 
 			{totalPages > 1 && (
-				<div className="flex items-center justify-center gap-4">
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={() => setCurrentPage((prev) => prev - 1)}
-						disabled={currentPage === 1}
-					>
-						<ChevronLeft className="h-4 w-4" />
-					</Button>
-					<span className="text-sm text-gray-600">
-						Page {currentPage} of {totalPages}
-					</span>
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={() => setCurrentPage((prev) => prev + 1)}
-						disabled={currentPage === totalPages}
-					>
-						<ChevronRight className="h-4 w-4" />
-					</Button>
-				</div>
+				<Pagination
+					currentPage={currentPage}
+					totalPages={totalPages}
+					onPreviousPage={() => setCurrentPage((prev) => prev - 1)}
+					onNextPage={() => setCurrentPage((prev) => prev + 1)}
+				/>
 			)}
 		</div>
 	)

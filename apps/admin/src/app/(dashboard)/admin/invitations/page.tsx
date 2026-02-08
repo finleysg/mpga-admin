@@ -3,6 +3,11 @@
 import {
 	Badge,
 	Button,
+	Card,
+	CardContent,
+	CardHeader,
+	CardTitle,
+	EmptyState,
 	H1,
 	H2,
 	Input,
@@ -151,11 +156,13 @@ export default function InvitationsPage() {
 			</div>
 
 			{/* Send Invitation Form */}
-			<div className="mb-8 rounded-lg bg-white shadow">
-				<div className="border-b border-gray-200 px-6 py-4">
-					<H2 variant="secondary">Send New Invitation</H2>
-				</div>
-				<div className="p-6">
+			<Card className="mb-8">
+				<CardHeader>
+					<CardTitle>
+						<H2 variant="secondary">Send New Invitation</H2>
+					</CardTitle>
+				</CardHeader>
+				<CardContent>
 					<form onSubmit={handleSendInvitation} className="flex gap-4">
 						<div className="relative flex-1">
 							<Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -175,19 +182,21 @@ export default function InvitationsPage() {
 					</form>
 					{error && <p className="mt-3 text-sm text-red-600">{error}</p>}
 					{success && <p className="mt-3 text-sm text-green-600">{success}</p>}
-				</div>
-			</div>
+				</CardContent>
+			</Card>
 
 			{/* Invitations List */}
-			<div className="rounded-lg bg-white shadow">
-				<div className="border-b border-gray-200 px-6 py-4">
-					<H2 variant="secondary">All Invitations</H2>
-				</div>
-				<div className="p-6">
+			<Card>
+				<CardHeader>
+					<CardTitle>
+						<H2 variant="secondary">All Invitations</H2>
+					</CardTitle>
+				</CardHeader>
+				<CardContent>
 					{loading ? (
-						<div className="py-8 text-center text-gray-500">Loading invitations...</div>
+						<EmptyState message="Loading invitations..." />
 					) : invitations.length === 0 ? (
-						<div className="py-8 text-center text-gray-500">No invitations found</div>
+						<EmptyState message="No invitations found" />
 					) : (
 						<Table>
 							<TableHeader>
@@ -229,8 +238,8 @@ export default function InvitationsPage() {
 							</TableBody>
 						</Table>
 					)}
-				</div>
-			</div>
+				</CardContent>
+			</Card>
 		</main>
 	)
 }

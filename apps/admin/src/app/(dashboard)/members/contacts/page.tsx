@@ -3,7 +3,11 @@
 import {
 	Button,
 	Card,
+	EmptyState,
 	H1,
+	PageSizeSelect,
+	Pagination,
+	SearchInput,
 	Table,
 	TableBody,
 	TableCell,
@@ -25,15 +29,7 @@ import {
 	getSortedRowModel,
 	useReactTable,
 } from "@tanstack/react-table"
-import {
-	ChevronDown,
-	ChevronLeft,
-	ChevronRight,
-	ChevronUp,
-	ChevronsUpDown,
-	Download,
-	Search,
-} from "lucide-react"
+import { ChevronDown, ChevronUp, ChevronsUpDown, Download } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import ExcelJS from "exceljs"
@@ -242,41 +238,26 @@ export default function ContactsPage() {
 			</div>
 
 			{loading ? (
-				<div className="py-8 text-center text-gray-500">Loading contacts...</div>
+				<EmptyState message="Loading contacts..." />
 			) : contacts.length === 0 ? (
-				<div className="py-8 text-center text-gray-500">No contacts found</div>
+				<EmptyState message="No contacts found" />
 			) : (
 				<div className="space-y-4">
 					{/* Controls row */}
 					<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-						<div className="relative">
-							<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-							<input
-								type="text"
-								placeholder="Search contacts..."
-								value={globalFilter}
-								onChange={(e) => setGlobalFilter(e.target.value)}
-								className="w-full rounded-md border border-gray-300 bg-white py-2 pl-10 pr-4 text-sm focus:border-secondary-500 focus:outline-none focus:ring-1 focus:ring-secondary-500 sm:w-64"
-							/>
-						</div>
+						<SearchInput
+							variant="secondary"
+							placeholder="Search contacts..."
+							value={globalFilter}
+							onChange={(e) => setGlobalFilter(e.target.value)}
+						/>
 						<div className="flex items-center gap-4">
-							<div className="flex items-center gap-2">
-								<label htmlFor="pageSize" className="text-sm text-gray-600">
-									Show:
-								</label>
-								<select
-									id="pageSize"
-									value={pageSizeOption}
-									onChange={(e) => handlePageSizeChange(e.target.value)}
-									className="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm focus:border-secondary-500 focus:outline-none focus:ring-1 focus:ring-secondary-500"
-								>
-									<option value="10">10</option>
-									<option value="25">25</option>
-									<option value="50">50</option>
-									<option value="100">100</option>
-									<option value="all">All</option>
-								</select>
-							</div>
+							<PageSizeSelect
+								variant="secondary"
+								value={pageSizeOption}
+								onChange={handlePageSizeChange}
+								options={[10, 25, 50, 100, "all"]}
+							/>
 							<p className="text-sm text-gray-600">
 								{filteredCount} {filteredCount === 1 ? "contact" : "contacts"}
 								{globalFilter && ` (filtered)`}
@@ -289,7 +270,7 @@ export default function ContactsPage() {
 					</div>
 
 					{filteredCount === 0 ? (
-						<div className="py-8 text-center text-gray-500">No contacts match your search</div>
+						<EmptyState message="No contacts match your search" />
 					) : (
 						<>
 							{/* Table */}
@@ -341,27 +322,12 @@ export default function ContactsPage() {
 
 							{/* Pagination */}
 							{showPagination && (
-								<div className="flex items-center justify-center gap-4">
-									<Button
-										variant="outline"
-										size="sm"
-										onClick={() => table.previousPage()}
-										disabled={!table.getCanPreviousPage()}
-									>
-										<ChevronLeft className="h-4 w-4" />
-									</Button>
-									<span className="text-sm text-gray-600">
-										Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
-									</span>
-									<Button
-										variant="outline"
-										size="sm"
-										onClick={() => table.nextPage()}
-										disabled={!table.getCanNextPage()}
-									>
-										<ChevronRight className="h-4 w-4" />
-									</Button>
-								</div>
+								<Pagination
+									currentPage={table.getState().pagination.pageIndex + 1}
+									totalPages={table.getPageCount()}
+									onPreviousPage={() => table.previousPage()}
+									onNextPage={() => table.nextPage()}
+								/>
 							)}
 						</>
 					)}

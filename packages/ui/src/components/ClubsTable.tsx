@@ -1,17 +1,13 @@
 "use client"
 
-import {
-	ChevronDown,
-	ChevronLeft,
-	ChevronRight,
-	ChevronUp,
-	ExternalLink,
-	Search,
-} from "lucide-react"
+import { ChevronDown, ChevronUp, ExternalLink } from "lucide-react"
 import Link from "next/link"
 import * as React from "react"
 
-import { Button } from "./ui/button"
+import { Badge } from "./ui/badge"
+import { PageSizeSelect } from "./ui/page-size-select"
+import { Pagination } from "./ui/pagination"
+import { SearchInput } from "./ui/search-input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table"
 
 export interface ClubRow {
@@ -80,37 +76,18 @@ export function ClubsTable({ clubs }: ClubsTableProps) {
 		<div className="space-y-4">
 			{/* Controls row */}
 			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-				<div className="relative">
-					<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-					<input
-						type="text"
-						placeholder="Search clubs..."
-						value={searchTerm}
-						onChange={handleSearchChange}
-						className="w-full rounded-md border border-gray-300 bg-white py-2 pl-10 pr-4 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 sm:w-64"
-					/>
-				</div>
+				<SearchInput
+					placeholder="Search clubs..."
+					value={searchTerm}
+					onChange={handleSearchChange}
+				/>
 				<div className="flex items-center gap-4">
-					<div className="flex items-center gap-2">
-						<label htmlFor="pageSize" className="text-sm text-gray-600">
-							Show:
-						</label>
-						<select
-							id="pageSize"
-							value={pageSize}
-							onChange={(e) =>
-								handlePageSizeChange(
-									e.target.value === "all" ? "all" : (Number(e.target.value) as 10 | 25 | 50),
-								)
-							}
-							className="rounded-md border border-gray-300 bg-white px-2 py-1 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-						>
-							<option value={10}>10</option>
-							<option value={25}>25</option>
-							<option value={50}>50</option>
-							<option value="all">All</option>
-						</select>
-					</div>
+					<PageSizeSelect
+						value={String(pageSize)}
+						onChange={(v) =>
+							handlePageSizeChange(v === "all" ? "all" : (Number(v) as 10 | 25 | 50))
+						}
+					/>
 					<p className="text-sm text-gray-600">
 						{sortedClubs.length} {sortedClubs.length === 1 ? "club" : "clubs"}
 						{searchTerm && ` (filtered)`}
@@ -174,11 +151,7 @@ export function ClubsTable({ clubs }: ClubsTableProps) {
 										)}
 									</TableCell>
 									<TableCell className="whitespace-nowrap px-4 py-3 text-sm">
-										{club.isMember && (
-											<span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-												Member
-											</span>
-										)}
+										{club.isMember && <Badge variant="success">Member</Badge>}
 									</TableCell>
 									<TableCell className="px-4 py-3 text-sm">
 										{club.website && (
@@ -202,27 +175,12 @@ export function ClubsTable({ clubs }: ClubsTableProps) {
 
 			{/* Pagination */}
 			{showPagination && (
-				<div className="flex items-center justify-center gap-4">
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={() => setCurrentPage((prev) => prev - 1)}
-						disabled={currentPage === 1}
-					>
-						<ChevronLeft className="h-4 w-4" />
-					</Button>
-					<span className="text-sm text-gray-600">
-						Page {currentPage} of {totalPages}
-					</span>
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={() => setCurrentPage((prev) => prev + 1)}
-						disabled={currentPage === totalPages}
-					>
-						<ChevronRight className="h-4 w-4" />
-					</Button>
-				</div>
+				<Pagination
+					currentPage={currentPage}
+					totalPages={totalPages}
+					onPreviousPage={() => setCurrentPage((prev) => prev - 1)}
+					onNextPage={() => setCurrentPage((prev) => prev + 1)}
+				/>
 			)}
 		</div>
 	)
