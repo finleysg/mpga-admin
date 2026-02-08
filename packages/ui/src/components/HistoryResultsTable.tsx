@@ -4,6 +4,7 @@ import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from "lucide-react"
 import * as React from "react"
 
 import { Button } from "./ui/button"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table"
 
 export interface HistoryResult {
 	id: number
@@ -113,14 +114,14 @@ export function HistoryResultsTable({ results }: HistoryResultsTableProps) {
 			</div>
 
 			{/* Table */}
-			<div className="overflow-x-auto rounded-lg bg-white shadow-sm">
-				<table className="min-w-full divide-y divide-gray-200">
-					<thead className="bg-primary-50">
-						<tr>
-							<th
+			<div className="rounded-lg bg-white shadow-sm">
+				<Table className="min-w-full divide-y divide-gray-200">
+					<TableHeader className="bg-primary-50">
+						<TableRow className="hover:bg-transparent">
+							<TableHead
 								scope="col"
 								onClick={toggleSort}
-								className="cursor-pointer px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-primary-900 transition-colors hover:bg-primary-100"
+								className="cursor-pointer px-4 py-3 text-xs font-semibold uppercase tracking-wider text-primary-900 transition-colors hover:bg-primary-100"
 							>
 								<span className="flex items-center gap-1">
 									Year
@@ -130,53 +131,55 @@ export function HistoryResultsTable({ results }: HistoryResultsTableProps) {
 										<ChevronUp className="h-4 w-4" />
 									)}
 								</span>
-							</th>
-							<th
+							</TableHead>
+							<TableHead
 								scope="col"
-								className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-primary-900"
+								className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-primary-900"
 							>
 								Division
-							</th>
-							<th
+							</TableHead>
+							<TableHead
 								scope="col"
-								className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-primary-900"
+								className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-primary-900"
 							>
 								Location
-							</th>
-							<th
+							</TableHead>
+							<TableHead
 								scope="col"
-								className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-primary-900"
+								className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-primary-900"
 							>
 								Champion
-							</th>
-							<th
+							</TableHead>
+							<TableHead
 								scope="col"
-								className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-primary-900"
+								className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-primary-900"
 							>
 								Score
-							</th>
-						</tr>
-					</thead>
-					<tbody className="divide-y divide-gray-100 bg-white">
+							</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody className="divide-y divide-gray-100 bg-white">
 						{paginatedResults.map((result) => (
-							<tr key={result.id} className="hover:bg-gray-50">
-								<td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900">
+							<TableRow key={result.id} className="hover:bg-gray-50">
+								<TableCell className="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900">
 									{result.year}
-								</td>
-								<td className="whitespace-nowrap px-4 py-3 text-sm text-gray-700">
+								</TableCell>
+								<TableCell className="whitespace-nowrap px-4 py-3 text-sm text-gray-700">
 									{result.division}
-								</td>
-								<td className="whitespace-nowrap px-4 py-3 text-sm text-gray-700">
+								</TableCell>
+								<TableCell className="whitespace-nowrap px-4 py-3 text-sm text-gray-700">
 									{result.location}
-								</td>
-								<td className="px-4 py-3 text-sm text-gray-700">{formatChampion(result)}</td>
-								<td className="whitespace-nowrap px-4 py-3 text-sm text-gray-700">
+								</TableCell>
+								<TableCell className="px-4 py-3 text-sm text-gray-700">
+									{formatChampion(result)}
+								</TableCell>
+								<TableCell className="whitespace-nowrap px-4 py-3 text-sm text-gray-700">
 									{formatScore(result)}
-								</td>
-							</tr>
+								</TableCell>
+							</TableRow>
 						))}
-					</tbody>
-				</table>
+					</TableBody>
+				</Table>
 			</div>
 
 			{/* Pagination */}

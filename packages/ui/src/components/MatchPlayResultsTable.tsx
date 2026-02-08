@@ -3,6 +3,7 @@
 import * as React from "react"
 
 import { H3 } from "./ui/heading"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table"
 
 export interface MatchPlayResultRow {
 	id: number
@@ -53,49 +54,49 @@ export function MatchPlayResultsTable({ results }: MatchPlayResultsTableProps) {
 			{Array.from(grouped.entries()).map(([groupName, groupResults]) => (
 				<div key={groupName}>
 					<H3 className="mb-3 text-lg">{groupName}</H3>
-					<div className="overflow-x-auto rounded-lg bg-white shadow-sm">
-						<table className="min-w-full divide-y divide-gray-200">
-							<thead className="bg-primary-50">
-								<tr>
-									<th
+					<div className="rounded-lg bg-white shadow-sm">
+						<Table className="min-w-full divide-y divide-gray-200">
+							<TableHeader className="bg-primary-50">
+								<TableRow className="hover:bg-transparent">
+									<TableHead
 										scope="col"
-										className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-primary-900"
+										className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-primary-900"
 									>
 										Date
-									</th>
-									<th
+									</TableHead>
+									<TableHead
 										scope="col"
-										className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-primary-900"
+										className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-primary-900"
 									>
 										Home
-									</th>
-									<th
+									</TableHead>
+									<TableHead
 										scope="col"
 										className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-primary-900"
 									>
 										Score
-									</th>
-									<th
+									</TableHead>
+									<TableHead
 										scope="col"
-										className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-primary-900"
+										className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-primary-900"
 									>
 										Away
-									</th>
-									<th
+									</TableHead>
+									<TableHead
 										scope="col"
 										className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-primary-900"
 									>
 										Score
-									</th>
-									<th
+									</TableHead>
+									<TableHead
 										scope="col"
 										className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wider text-primary-900"
 									>
 										Forfeit
-									</th>
-								</tr>
-							</thead>
-							<tbody className="divide-y divide-gray-100 bg-white">
+									</TableHead>
+								</TableRow>
+							</TableHeader>
+							<TableBody className="divide-y divide-gray-100 bg-white">
 								{groupResults.map((result) => {
 									const homeScore = parseFloat(result.homeTeamScore)
 									const awayScore = parseFloat(result.awayTeamScore)
@@ -103,42 +104,42 @@ export function MatchPlayResultsTable({ results }: MatchPlayResultsTableProps) {
 									const awayWins = awayScore > homeScore
 
 									return (
-										<tr key={result.id} className="hover:bg-gray-50">
-											<td className="whitespace-nowrap px-4 py-3 text-sm text-gray-700">
+										<TableRow key={result.id} className="hover:bg-gray-50">
+											<TableCell className="whitespace-nowrap px-4 py-3 text-sm text-gray-700">
 												{formatDate(result.matchDate)}
-											</td>
-											<td
+											</TableCell>
+											<TableCell
 												className={`whitespace-nowrap px-4 py-3 text-sm ${homeWins ? "font-semibold text-primary-900" : "text-gray-700"}`}
 											>
 												{result.homeClubName}
-											</td>
-											<td
+											</TableCell>
+											<TableCell
 												className={`whitespace-nowrap px-4 py-3 text-center text-sm ${homeWins ? "font-semibold text-primary-900" : "text-gray-700"}`}
 											>
 												{result.homeTeamScore}
-											</td>
-											<td
+											</TableCell>
+											<TableCell
 												className={`whitespace-nowrap px-4 py-3 text-sm ${awayWins ? "font-semibold text-primary-900" : "text-gray-700"}`}
 											>
 												{result.awayClubName}
-											</td>
-											<td
+											</TableCell>
+											<TableCell
 												className={`whitespace-nowrap px-4 py-3 text-center text-sm ${awayWins ? "font-semibold text-primary-900" : "text-gray-700"}`}
 											>
 												{result.awayTeamScore}
-											</td>
-											<td className="whitespace-nowrap px-4 py-3 text-center text-sm">
+											</TableCell>
+											<TableCell className="whitespace-nowrap px-4 py-3 text-center text-sm">
 												{result.forfeit && (
 													<span className="inline-flex rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800">
 														Forfeit
 													</span>
 												)}
-											</td>
-										</tr>
+											</TableCell>
+										</TableRow>
 									)
 								})}
-							</tbody>
-						</table>
+							</TableBody>
+						</Table>
 					</div>
 				</div>
 			))}

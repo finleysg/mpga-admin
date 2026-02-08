@@ -12,6 +12,7 @@ import Link from "next/link"
 import * as React from "react"
 
 import { Button } from "./ui/button"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table"
 
 export interface ClubRow {
 	id: number
@@ -118,14 +119,14 @@ export function ClubsTable({ clubs }: ClubsTableProps) {
 			</div>
 
 			{/* Table */}
-			<div className="overflow-x-auto rounded-lg bg-white shadow-sm">
-				<table className="min-w-full divide-y divide-gray-200">
-					<thead className="bg-primary-50">
-						<tr>
-							<th
+			<div className="rounded-lg bg-white shadow-sm">
+				<Table className="min-w-full divide-y divide-gray-200">
+					<TableHeader className="bg-primary-50">
+						<TableRow className="hover:bg-transparent">
+							<TableHead
 								scope="col"
 								onClick={toggleSort}
-								className="cursor-pointer px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-primary-900 transition-colors hover:bg-primary-100"
+								className="cursor-pointer px-4 py-3 text-xs font-semibold uppercase tracking-wider text-primary-900 transition-colors hover:bg-primary-100"
 							>
 								<span className="flex items-center gap-1">
 									Club Name
@@ -135,32 +136,32 @@ export function ClubsTable({ clubs }: ClubsTableProps) {
 										<ChevronDown className="h-4 w-4" />
 									)}
 								</span>
-							</th>
-							<th
+							</TableHead>
+							<TableHead
 								scope="col"
-								className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-primary-900"
+								className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-primary-900"
 							>
 								Status
-							</th>
-							<th
+							</TableHead>
+							<TableHead
 								scope="col"
-								className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-primary-900"
+								className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-primary-900"
 							>
 								Website
-							</th>
-						</tr>
-					</thead>
-					<tbody className="divide-y divide-gray-100 bg-white">
+							</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody className="divide-y divide-gray-100 bg-white">
 						{paginatedClubs.length === 0 ? (
-							<tr>
-								<td colSpan={3} className="px-4 py-8 text-center text-sm text-gray-500">
+							<TableRow className="hover:bg-transparent">
+								<TableCell colSpan={3} className="px-4 py-8 text-center text-sm text-gray-500">
 									No clubs found
-								</td>
-							</tr>
+								</TableCell>
+							</TableRow>
 						) : (
 							paginatedClubs.map((club) => (
-								<tr key={club.id} className="hover:bg-gray-50">
-									<td className="px-4 py-3 text-sm">
+								<TableRow key={club.id} className="hover:bg-gray-50">
+									<TableCell className="px-4 py-3 text-sm">
 										{club.systemName ? (
 											<Link
 												href={`/members/${club.systemName}`}
@@ -171,15 +172,15 @@ export function ClubsTable({ clubs }: ClubsTableProps) {
 										) : (
 											<span className="font-medium text-gray-900">{club.name}</span>
 										)}
-									</td>
-									<td className="whitespace-nowrap px-4 py-3 text-sm">
+									</TableCell>
+									<TableCell className="whitespace-nowrap px-4 py-3 text-sm">
 										{club.isMember && (
 											<span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
 												Member
 											</span>
 										)}
-									</td>
-									<td className="px-4 py-3 text-sm">
+									</TableCell>
+									<TableCell className="px-4 py-3 text-sm">
 										{club.website && (
 											<a
 												href={club.website}
@@ -191,12 +192,12 @@ export function ClubsTable({ clubs }: ClubsTableProps) {
 												<span className="sr-only">Visit website</span>
 											</a>
 										)}
-									</td>
-								</tr>
+									</TableCell>
+								</TableRow>
 							))
 						)}
-					</tbody>
-				</table>
+					</TableBody>
+				</Table>
 			</div>
 
 			{/* Pagination */}
