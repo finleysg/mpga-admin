@@ -1,4 +1,11 @@
-import { Button, Markdown } from "@mpga/ui";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Markdown,
+} from "@mpga/ui";
 import { Pencil, Plus } from "lucide-react";
 import Link from "next/link";
 
@@ -31,18 +38,24 @@ export default async function PoliciesPage() {
         </Button>
       </div>
       {content ? (
-        <div className="rounded-lg border bg-white p-6">
-          <h2 className="font-heading mb-4 text-xl font-semibold">
-            {content.title}
-          </h2>
-          <Markdown content={content.contentText} />
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle className="font-heading text-xl">
+              {content.title}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Markdown content={content.contentText} />
+          </CardContent>
+        </Card>
       ) : (
-        <div className="rounded-lg border bg-white p-6">
-          <p className="text-gray-500">
-            No tournament policies have been created yet.
-          </p>
-        </div>
+        <Card>
+          <CardContent>
+            <p className="text-gray-500">
+              No tournament policies have been created yet.
+            </p>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

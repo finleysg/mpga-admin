@@ -61,7 +61,7 @@ export function ContentEditor({ contentType, backHref }: ContentEditorProps) {
     immediatelyRender: false,
     editorProps: {
       attributes: {
-        class: "tiptap-editor min-h-[400px] p-4 focus:outline-none",
+        class: "prose min-h-[400px] p-4 focus:outline-none",
       },
     },
   });

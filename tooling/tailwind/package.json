@@ -10,6 +10,7 @@
     "base.css"
   ],
   "dependencies": {
+    "@tailwindcss/typography": "^0.5.19",
     "tw-animate-css": "^1.0.0"
   },
   "devDependencies": {
