@@ -36,9 +36,9 @@ const navGroups = [
 	{
 		title: "Match Play",
 		items: [
+			{ title: "Landing Page", url: "/match-play/landing" },
 			{ title: "Teams", url: "/match-play/teams" },
 			{ title: "Results", url: "/match-play/results" },
-			{ title: "Landing Page", url: "/match-play/landing" },
 			{ title: "Rules", url: "/match-play/rules" },
 			{ title: "Documents", url: "/match-play/documents" },
 		],

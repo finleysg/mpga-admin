@@ -91,6 +91,17 @@ export {
 	FieldTitle,
 } from "./ui/field"
 export { Input } from "./ui/input"
+export {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectLabel,
+	SelectSeparator,
+	SelectTrigger,
+	SelectValue,
+} from "./ui/select"
+export { Textarea } from "./ui/textarea"
 export { Label } from "./ui/label"
 export {
 	NavigationMenu,
@@ -103,6 +114,18 @@ export {
 	NavigationMenuViewport,
 	navigationMenuTriggerStyle,
 } from "./ui/navigation-menu"
+export {
+	Item,
+	ItemActions,
+	ItemContent,
+	ItemDescription,
+	ItemFooter,
+	ItemGroup,
+	ItemHeader,
+	ItemMedia,
+	ItemSeparator,
+	ItemTitle,
+} from "./ui/item"
 export { Separator } from "./ui/separator"
 export {
 	Sheet,

@@ -1,15 +1,10 @@
 "use server"
 
+import type { ActionResult } from "@mpga/types"
 import { headers } from "next/headers"
 
 import { auth } from "@/lib/auth"
 import { requireSuperAdmin } from "@/lib/require-auth"
-
-interface ActionResult<T = void> {
-	success: boolean
-	error?: string
-	data?: T
-}
 
 interface UserData {
 	id: string

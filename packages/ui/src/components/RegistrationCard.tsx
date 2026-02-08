@@ -2,6 +2,7 @@ import { Calendar, ExternalLink } from "lucide-react"
 
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
 import { H2 } from "./ui/heading"
+import { Item, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "./ui/item"
 
 export interface TournamentLinkItem {
 	id: number
@@ -52,22 +53,30 @@ export function RegistrationCard({
 				{hasRegistrationDates && (
 					<div className="mb-4 space-y-3">
 						{registrationStart && (
-							<div className="flex items-start gap-3">
-								<Calendar className="mt-0.5 h-5 w-5 shrink-0 text-gray-400" />
-								<div>
-									<div className="text-sm font-medium text-gray-500">Opens</div>
-									<div className="text-gray-900">{formatDateTime(registrationStart)}</div>
-								</div>
-							</div>
+							<Item size="sm">
+								<ItemMedia>
+									<Calendar className="h-5 w-5 text-gray-400" />
+								</ItemMedia>
+								<ItemContent>
+									<ItemTitle className="text-gray-500">Opens</ItemTitle>
+									<ItemDescription className="text-gray-900">
+										{formatDateTime(registrationStart)}
+									</ItemDescription>
+								</ItemContent>
+							</Item>
 						)}
 						{registrationEnd && (
-							<div className="flex items-start gap-3">
-								<Calendar className="mt-0.5 h-5 w-5 shrink-0 text-gray-400" />
-								<div>
-									<div className="text-sm font-medium text-gray-500">Closes</div>
-									<div className="text-gray-900">{formatDateTime(registrationEnd)}</div>
-								</div>
-							</div>
+							<Item size="sm">
+								<ItemMedia>
+									<Calendar className="h-5 w-5 text-gray-400" />
+								</ItemMedia>
+								<ItemContent>
+									<ItemTitle className="text-gray-500">Closes</ItemTitle>
+									<ItemDescription className="text-gray-900">
+										{formatDateTime(registrationEnd)}
+									</ItemDescription>
+								</ItemContent>
+							</Item>
 						)}
 					</div>
 				)}
@@ -75,16 +84,21 @@ export function RegistrationCard({
 				{hasLinks && (
 					<div className="space-y-2">
 						{links.map((link) => (
-							<a
-								key={link.id}
-								href={link.url}
-								target="_blank"
-								rel="noopener noreferrer"
-								className="flex items-center gap-2 text-secondary-600 hover:text-secondary-700"
-							>
-								<ExternalLink className="h-4 w-4 shrink-0" />
-								<span>{link.title}</span>
-							</a>
+							<Item asChild size="sm" key={link.id}>
+								<a
+									href={link.url}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="text-secondary-600 hover:text-secondary-700"
+								>
+									<ItemMedia>
+										<ExternalLink className="h-4 w-4" />
+									</ItemMedia>
+									<ItemContent>
+										<ItemTitle>{link.title}</ItemTitle>
+									</ItemContent>
+								</a>
+							</Item>
 						))}
 					</div>
 				)}

@@ -12,6 +12,7 @@
 		"test": "vitest run --config ../../vitest.config.ts"
 	},
 	"dependencies": {
+		"@aws-sdk/client-s3": "^3.985.0",
 		"@mpga/database": "workspace:*",
 		"@mpga/types": "workspace:*",
 		"@mpga/ui": "workspace:*",

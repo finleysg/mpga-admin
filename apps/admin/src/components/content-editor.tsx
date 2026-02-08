@@ -13,12 +13,14 @@ import {
 	FieldLabel,
 	Input,
 	Skeleton,
+	Textarea,
 	toast,
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
 } from "@mpga/ui"
+import type { ActionResult } from "@mpga/types"
 import Link from "@tiptap/extension-link"
 import { EditorContent, useEditor } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
@@ -49,16 +51,26 @@ import { useRouter } from "next/navigation"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Markdown } from "tiptap-markdown"
 
-import { getContentAction, saveContentAction } from "@/app/(dashboard)/tournaments/policies/actions"
 import { Admonition, type AdmonitionType } from "@/lib/tiptap/admonition"
 import { HighlightWithMarkdown } from "@/lib/tiptap/highlight"
 
 interface ContentEditorProps {
-	contentType: string
 	backHref: string
+	loadContent: () => Promise<{ title: string; content: string; id?: number } | null>
+	saveContent: (data: {
+		id?: number
+		title: string
+		content: string
+	}) => Promise<ActionResult<{ id: number }>>
+	showTitle?: boolean
 }
 
-export function ContentEditor({ contentType, backHref }: ContentEditorProps) {
+export function ContentEditor({
+	backHref,
+	loadContent,
+	saveContent,
+	showTitle = true,
+}: ContentEditorProps) {
 	const router = useRouter()
 	const [loading, setLoading] = useState(true)
 	const [saving, setSaving] = useState(false)
@@ -89,25 +101,27 @@ export function ContentEditor({ contentType, backHref }: ContentEditorProps) {
 		},
 	})
 
+	const loaded = useRef(false)
+
 	useEffect(() => {
-		async function loadContent() {
-			const result = await getContentAction(contentType)
-			if (!result.success) {
-				toast.error(result.error ?? "Failed to load content")
-			} else if (result.data) {
-				setTitle(result.data.title)
-				setContentId(result.data.id)
-				savedState.current = { title: result.data.title, content: result.data.contentText }
+		async function load() {
+			if (loaded.current) return
+			loaded.current = true
+			const data = await loadContent()
+			if (data) {
+				setTitle(data.title)
+				setContentId(data.id)
+				savedState.current = { title: data.title, content: data.content }
 				if (editor) {
-					editor.commands.setContent(result.data.contentText)
+					editor.commands.setContent(data.content)
 				}
 			}
 			setLoading(false)
 		}
 		if (editor) {
-			loadContent()
+			load()
 		}
-	}, [contentType, editor])
+	}, [editor, loadContent])
 
 	const switchToMarkdown = useCallback(() => {
 		if (!editor) return
@@ -129,11 +143,10 @@ export function ContentEditor({ contentType, backHref }: ContentEditorProps) {
 		try {
 			const markdownContent =
 				mode === "markdown" ? markdownText : (editor.storage.markdown.getMarkdown() as string)
-			const result = await saveContentAction({
+			const result = await saveContent({
 				id: contentId,
-				contentType,
 				title: title.trim(),
-				contentText: markdownContent,
+				content: markdownContent,
 			})
 
 			if (result.success) {
@@ -150,7 +163,7 @@ export function ContentEditor({ contentType, backHref }: ContentEditorProps) {
 		} finally {
 			setSaving(false)
 		}
-	}, [editor, contentId, contentType, title, mode, markdownText])
+	}, [editor, contentId, title, mode, markdownText, saveContent])
 
 	const isDirty = useCallback(() => {
 		if (!editor) return false
@@ -203,18 +216,24 @@ export function ContentEditor({ contentType, backHref }: ContentEditorProps) {
 	return (
 		<Card>
 			<div className="sticky top-0 z-10 rounded-t-lg bg-card">
-				<div className="flex">
+				<div className="flex pb-2">
 					<div className="w-[70%]">
 						<CardHeader>
 							<CardTitle>
-								<FieldLabel htmlFor="content-title">Title (h2)</FieldLabel>
-								<Input
-									id="content-title"
-									value={title}
-									onChange={(e) => setTitle(e.target.value)}
-									placeholder="Title"
-									className="text-lg font-semibold"
-								/>
+								{showTitle ? (
+									<>
+										<FieldLabel htmlFor="content-title">Title (h2)</FieldLabel>
+										<Input
+											id="content-title"
+											value={title}
+											onChange={(e) => setTitle(e.target.value)}
+											placeholder="Title"
+											className="text-lg font-semibold"
+										/>
+									</>
+								) : (
+									<span className="text-lg font-semibold">{title}</span>
+								)}
 							</CardTitle>
 						</CardHeader>
 					</div>
@@ -223,7 +242,11 @@ export function ContentEditor({ contentType, backHref }: ContentEditorProps) {
 							<ArrowLeft className="h-4 w-4" />
 							Back
 						</Button>
-						<Button variant="secondary" onClick={handleSave} disabled={saving || !title.trim()}>
+						<Button
+							variant="secondary"
+							onClick={handleSave}
+							disabled={saving || (showTitle && !title.trim())}
+						>
 							{saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
 							Save
 						</Button>
@@ -369,10 +392,10 @@ export function ContentEditor({ contentType, backHref }: ContentEditorProps) {
 						<EditorContent editor={editor} />
 					</div>
 				) : (
-					<textarea
+					<Textarea
 						value={markdownText}
 						onChange={(e) => setMarkdownText(e.target.value)}
-						className="min-h-[400px] w-full resize-none rounded-md border border-gray-300 p-4 font-mono text-sm focus:border-secondary-500 focus:outline-none focus:ring-1 focus:ring-secondary-500"
+						className="min-h-[400px] resize-none p-4 font-mono text-sm"
 					/>
 				)}
 			</CardContent>

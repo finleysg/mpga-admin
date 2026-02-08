@@ -1,17 +1,12 @@
 "use server"
 
 import { invitation } from "@mpga/database"
+import type { ActionResult } from "@mpga/types"
 import { desc, eq } from "drizzle-orm"
 
 import { db } from "@/lib/db"
 import { createInvitation } from "@/lib/invitation"
 import { requireSuperAdmin } from "@/lib/require-auth"
-
-interface ActionResult<T = void> {
-	success: boolean
-	error?: string
-	data?: T
-}
 
 interface InvitationData {
 	id: string

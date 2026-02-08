@@ -253,7 +253,6 @@ export default function ContactsPage() {
 						/>
 						<div className="flex items-center gap-4">
 							<PageSizeSelect
-								variant="secondary"
 								value={pageSizeOption}
 								onChange={handlePageSizeChange}
 								options={[10, 25, 50, 100, "all"]}

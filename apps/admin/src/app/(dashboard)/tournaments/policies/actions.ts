@@ -1,16 +1,11 @@
 "use server"
 
 import { content } from "@mpga/database"
+import type { ActionResult } from "@mpga/types"
 import { eq } from "drizzle-orm"
 
 import { db } from "@/lib/db"
 import { requireAuth } from "@/lib/require-auth"
-
-export interface ActionResult<T = void> {
-	success: boolean
-	error?: string
-	data?: T
-}
 
 export interface ContentData {
 	id: number
