@@ -36,6 +36,30 @@
   color: var(--color-primary-700);
 }
 
+/* Highlight */
+.prose mark {
+  background-color: var(--color-gold-200);
+  padding: 0.125em 0.25em;
+  border-radius: 0.125rem;
+}
+
+/* Admonition base */
+.prose [data-admonition] {
+  border-left-width: 4px;
+  padding: 1rem 1.25rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: 0.25rem;
+}
+.prose [data-admonition] > :first-child { margin-top: 0; }
+.prose [data-admonition] > :last-child { margin-bottom: 0; }
+
+/* Admonition type variants */
+.prose [data-admonition][data-type="note"]    { border-color: #3b82f6; background-color: #eff6ff; }
+.prose [data-admonition][data-type="tip"]     { border-color: #22c55e; background-color: #f0fdf4; }
+.prose [data-admonition][data-type="warning"] { border-color: #f59e0b; background-color: #fffbeb; }
+.prose [data-admonition][data-type="danger"]  { border-color: #ef4444; background-color: #fef2f2; }
+
 @theme {
   /* DS-001: MPGA Green primary color palette */
   --color-primary-50: #e6f7ef;
@@ -79,6 +103,13 @@
   /* Card surface */
   --color-card: #ffffff;
   --color-card-foreground: #1a1a1a;
+
+  /* Popover surface */
+  --color-popover: var(--color-gold-50);
+  --color-popover-foreground: #1a1a1a;
+
+  /* Borders */
+  --color-border: #e5e7eb;
 
   /* DS-005: Typography font families */
   --font-heading: "Playfair Display", Georgia, serif;

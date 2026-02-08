@@ -1,6 +1,6 @@
+import { Markdown } from "./Markdown"
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "./ui/card"
 import { H1, H2, H3, H4 } from "./ui/heading"
-import { Markdown } from "./Markdown"
 
 export interface ContentCardProps {
 	heading: "h1" | "h2" | "h3" | "h4"
