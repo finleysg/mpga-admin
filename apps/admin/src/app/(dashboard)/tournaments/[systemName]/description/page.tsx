@@ -24,8 +24,11 @@ export default async function EditDescriptionPage({
 
 	async function saveContent(data: { id?: number; title: string; content: string }) {
 		"use server"
+		if (data.id == null) {
+			return { success: false, error: "No instance loaded" }
+		}
 		return saveInstanceDescriptionAction({
-			instanceId: data.id!,
+			instanceId: data.id,
 			description: data.content,
 		})
 	}

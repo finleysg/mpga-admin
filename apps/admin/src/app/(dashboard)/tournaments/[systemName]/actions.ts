@@ -68,14 +68,11 @@ export async function getTournamentInstanceAction(
 				),
 			)
 
-		// startDate is a date column, so we filter by year in JS
-		const filtered = results.filter((r) => r.startDate.startsWith(`${currentYear}`))
-
-		if (filtered.length === 0) {
+		if (results.length === 0) {
 			return { success: false, error: "No tournament instance found for this year" }
 		}
 
-		const row = filtered[0]!
+		const row = results[0]!
 		return {
 			success: true,
 			data: {
@@ -145,6 +142,10 @@ export async function saveTournamentInstanceAction(
 
 	if (!data.name.trim()) {
 		return { success: false, error: "Name is required" }
+	}
+
+	if (data.rounds < 1) {
+		return { success: false, error: "Rounds must be at least 1" }
 	}
 
 	try {
@@ -342,7 +343,7 @@ export async function saveDocumentAction(
 				tournamentId: data.tournamentId,
 				year: data.year,
 				lastUpdate: new Date().toISOString().replace("T", " ").replace("Z", ""),
-				createdBy: "admin",
+				createdBy: userId,
 			})
 			return { success: true, data: { id: result[0].insertId } }
 		}
@@ -384,8 +385,14 @@ export async function uploadDocumentFileAction(
 
 	try {
 		const buffer = Buffer.from(await file.arrayBuffer())
-		const key = `documents/${Date.now()}-${file.name}`
+		const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_")
+		const key = `documents/${Date.now()}-${safeName}`
 		await uploadToS3(buffer, key, file.type)
+
+		const docId = parseInt(documentId, 10)
+		if (isNaN(docId)) {
+			return { success: false, error: "Invalid document ID" }
+		}
 
 		await db
 			.update(document)
@@ -393,7 +400,7 @@ export async function uploadDocumentFileAction(
 				file: key,
 				lastUpdate: new Date().toISOString().replace("T", " ").replace("Z", ""),
 			})
-			.where(eq(document.id, parseInt(documentId, 10)))
+			.where(eq(document.id, docId))
 
 		return { success: true, data: { file: key } }
 	} catch (error) {

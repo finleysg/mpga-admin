@@ -24,8 +24,11 @@ export default async function EditOverviewPage({
 
 	async function saveContent(data: { id?: number; title: string; content: string }) {
 		"use server"
+		if (!data.id) {
+			return { success: false, error: "Tournament ID is required" }
+		}
 		return saveTournamentDescriptionAction({
-			tournamentId: data.id!,
+			tournamentId: data.id,
 			description: data.content,
 		})
 	}

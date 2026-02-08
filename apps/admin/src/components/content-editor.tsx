@@ -106,8 +106,12 @@ export function ContentEditor({
 		},
 	})
 
+	const loaded = useRef(false)
+
 	useEffect(() => {
 		async function load() {
+			if (loaded.current) return
+			loaded.current = true
 			const data = await loadContent()
 			if (data) {
 				setTitle(data.title)

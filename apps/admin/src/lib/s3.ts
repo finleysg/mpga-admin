@@ -5,7 +5,10 @@ const s3 = new S3Client({
 })
 
 export async function uploadToS3(buffer: Buffer, key: string, contentType: string) {
-	const bucket = process.env.S3_BUCKET_NAME ?? "mpgagolf"
+	const bucket = process.env.S3_BUCKET_NAME
+	if (!bucket) {
+		throw new Error("S3_BUCKET_NAME environment variable is not set")
+	}
 	const prefix = process.env.S3_MEDIA_PREFIX ?? "media"
 	const fullKey = `${prefix}/${key}`
 
