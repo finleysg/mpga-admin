@@ -14,8 +14,8 @@ export default async function PoliciesPage() {
 	return (
 		<div className="mx-auto max-w-6xl">
 			<div className="mb-6 flex items-center justify-between">
-				<H1 variant="secondary">Tournament Policies</H1>
-				<Button asChild>
+				<H1 variant="secondary">Manage Tournament Policies</H1>
+				<Button variant="secondary" asChild>
 					<Link href="/tournaments/policies/edit">
 						{content ? (
 							<>
@@ -33,10 +33,10 @@ export default async function PoliciesPage() {
 			</div>
 			{content ? (
 				<ContentCard
-					heading="h3"
+					heading="h2"
 					title={content.title}
 					content={content.contentText}
-					variant="secondary"
+					variant="primary"
 				/>
 			) : (
 				<Card>

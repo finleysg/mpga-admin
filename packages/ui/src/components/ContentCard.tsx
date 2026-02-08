@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from "./ui/card"
 import { H1, H2, H3, H4 } from "./ui/heading"
 import { Markdown } from "./Markdown"
 
@@ -8,6 +8,7 @@ export interface ContentCardProps {
 	content: string
 	variant?: "primary" | "secondary"
 	className?: string
+	action?: React.ReactNode
 }
 
 const headingComponents = {
@@ -17,7 +18,14 @@ const headingComponents = {
 	h4: H4,
 } as const
 
-export function ContentCard({ heading, title, content, variant, className }: ContentCardProps) {
+export function ContentCard({
+	heading,
+	title,
+	content,
+	variant,
+	className,
+	action,
+}: ContentCardProps) {
 	const Heading = headingComponents[heading]
 
 	return (
@@ -26,6 +34,7 @@ export function ContentCard({ heading, title, content, variant, className }: Con
 				<CardTitle>
 					<Heading variant={variant}>{title}</Heading>
 				</CardTitle>
+				{action && <CardAction>{action}</CardAction>}
 			</CardHeader>
 			<CardContent>
 				<Markdown content={content} />

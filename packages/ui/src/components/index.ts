@@ -34,6 +34,7 @@ export { ClubDetailCard, type ClubDetailCardProps } from "./ClubDetailCard"
 export { OfficersCard, type OfficersCardProps, type Officer } from "./OfficersCard"
 export { MatchPlaySignUp, type MatchPlaySignUpProps } from "./MatchPlaySignUp"
 export { MatchPlayRulesTabs, type MatchPlayRulesTabsProps } from "./MatchPlayRulesTabs"
+export { PrintButton } from "./PrintButton"
 export { NewsList, type NewsListProps } from "./NewsList"
 export {
 	MatchPlayGroupCards,

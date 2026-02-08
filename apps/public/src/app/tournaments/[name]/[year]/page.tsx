@@ -7,6 +7,7 @@ import {
 	GolfCourseCard,
 	H1,
 	Markdown,
+	PrintButton,
 	RegistrationCard,
 } from "@mpga/ui"
 import { notFound } from "next/navigation"
@@ -57,11 +58,11 @@ export default async function TournamentYearPage({ params }: { params: Params })
 
 	return (
 		<main className="mx-auto max-w-6xl px-4 py-8">
-			<H1 className="mb-2">{instance.instanceName}</H1>
+			<H1 className="mb-2 print:hidden">{instance.instanceName}</H1>
 
 			<div className="flex flex-col gap-8 lg:flex-row">
 				<div className="lg:w-[70%]">
-					<Card>
+					<Card className="print:hidden">
 						<CardContent>
 							<Markdown content={instance.instanceDescription} />
 						</CardContent>
@@ -73,11 +74,12 @@ export default async function TournamentYearPage({ params }: { params: Params })
 							title={policies.title}
 							content={policies.content}
 							className="mt-6"
+							action={<PrintButton />}
 						/>
 					)}
 				</div>
 
-				<div className="flex flex-col gap-6 lg:w-[30%]">
+				<div className="flex flex-col gap-6 print:hidden lg:w-[30%]">
 					<RegistrationCard
 						registrationStart={instance.registrationStart}
 						registrationEnd={instance.registrationEnd}
