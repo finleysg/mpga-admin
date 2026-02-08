@@ -10,6 +10,7 @@ import {
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
+	FieldLabel,
 	Input,
 	Skeleton,
 	toast,
@@ -157,112 +158,126 @@ export function ContentEditor({ contentType, backHref }: ContentEditorProps) {
 
 	return (
 		<Card>
-			<CardHeader>
-				<CardTitle>
-					<Input
-						value={title}
-						onChange={(e) => setTitle(e.target.value)}
-						placeholder="Title"
-						className="text-lg font-semibold"
-					/>
-				</CardTitle>
-			</CardHeader>
-			<CardContent className="space-y-4">
+			<div className="sticky top-0 z-10 rounded-t-lg bg-card">
+				<div className="flex">
+					<div className="w-[70%]">
+						<CardHeader>
+							<CardTitle>
+								<FieldLabel htmlFor="content-title">Title (h2)</FieldLabel>
+								<Input
+									id="content-title"
+									value={title}
+									onChange={(e) => setTitle(e.target.value)}
+									placeholder="Title"
+									className="text-lg font-semibold"
+								/>
+							</CardTitle>
+						</CardHeader>
+					</div>
+					<div className="flex w-[30%] items-center justify-end gap-2 pr-6">
+						<Button
+							variant="secondaryoutline"
+							onClick={() => router.push(backHref)}
+							disabled={saving}
+						>
+							Cancel
+						</Button>
+						<Button variant="secondary" onClick={handleSave} disabled={saving || !title.trim()}>
+							{saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+							Save
+						</Button>
+					</div>
+				</div>
 				{editor && (
-					<div className="flex flex-wrap gap-1 rounded-md border bg-muted/50 p-1">
-						<ToolbarButton
-							onClick={() => editor.chain().focus().toggleBold().run()}
-							active={editor.isActive("bold")}
-							title="Bold"
-						>
-							<Bold className="h-4 w-4" />
-						</ToolbarButton>
-						<ToolbarButton
-							onClick={() => editor.chain().focus().toggleItalic().run()}
-							active={editor.isActive("italic")}
-							title="Italic"
-						>
-							<Italic className="h-4 w-4" />
-						</ToolbarButton>
-						<ToolbarButton
-							onClick={() => editor.chain().focus().toggleHighlight().run()}
-							active={editor.isActive("highlight")}
-							title="Highlight"
-						>
-							<Highlighter className="h-4 w-4" />
-						</ToolbarButton>
-						<ToolbarSeparator />
-						<ToolbarButton
-							onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-							active={editor.isActive("heading", { level: 2 })}
-							title="Heading 2"
-						>
-							<Heading2 className="h-4 w-4" />
-						</ToolbarButton>
-						<ToolbarButton
-							onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-							active={editor.isActive("heading", { level: 3 })}
-							title="Heading 3"
-						>
-							<Heading3 className="h-4 w-4" />
-						</ToolbarButton>
-						<ToolbarButton
-							onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()}
-							active={editor.isActive("heading", { level: 4 })}
-							title="Heading 4"
-						>
-							<Heading4 className="h-4 w-4" />
-						</ToolbarButton>
-						<ToolbarSeparator />
-						<ToolbarButton
-							onClick={() => editor.chain().focus().toggleBulletList().run()}
-							active={editor.isActive("bulletList")}
-							title="Bullet list"
-						>
-							<List className="h-4 w-4" />
-						</ToolbarButton>
-						<ToolbarButton
-							onClick={() => editor.chain().focus().toggleOrderedList().run()}
-							active={editor.isActive("orderedList")}
-							title="Ordered list"
-						>
-							<ListOrdered className="h-4 w-4" />
-						</ToolbarButton>
-						<ToolbarSeparator />
-						<ToolbarButton
-							onClick={() => editor.chain().focus().toggleBlockquote().run()}
-							active={editor.isActive("blockquote")}
-							title="Block quote"
-						>
-							<TextQuote className="h-4 w-4" />
-						</ToolbarButton>
-						<AdmonitionDropdown
-							onSelect={(type) => editor.chain().focus().toggleAdmonition({ type }).run()}
-							active={editor.isActive("admonition")}
-						/>
-						<ToolbarSeparator />
-						<ToolbarButton onClick={setLink} active={editor.isActive("link")} title="Link">
-							<LinkIcon className="h-4 w-4" />
-						</ToolbarButton>
-						<ToolbarButton
-							onClick={() => editor.chain().focus().setHorizontalRule().run()}
-							title="Horizontal rule"
-						>
-							<Minus className="h-4 w-4" />
-						</ToolbarButton>
+					<div className="px-6 pb-4">
+						<div className="flex flex-wrap gap-1 rounded-md border-2 border-secondary-500 bg-muted/50 p-1">
+							<ToolbarButton
+								onClick={() => editor.chain().focus().toggleBold().run()}
+								active={editor.isActive("bold")}
+								title="Bold"
+							>
+								<Bold className="h-4 w-4" />
+							</ToolbarButton>
+							<ToolbarButton
+								onClick={() => editor.chain().focus().toggleItalic().run()}
+								active={editor.isActive("italic")}
+								title="Italic"
+							>
+								<Italic className="h-4 w-4" />
+							</ToolbarButton>
+							<ToolbarButton
+								onClick={() => editor.chain().focus().toggleHighlight().run()}
+								active={editor.isActive("highlight")}
+								title="Highlight"
+							>
+								<Highlighter className="h-4 w-4" />
+							</ToolbarButton>
+							<ToolbarSeparator />
+							<ToolbarButton
+								onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+								active={editor.isActive("heading", { level: 2 })}
+								title="Heading 2"
+							>
+								<Heading2 className="h-4 w-4" />
+							</ToolbarButton>
+							<ToolbarButton
+								onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+								active={editor.isActive("heading", { level: 3 })}
+								title="Heading 3"
+							>
+								<Heading3 className="h-4 w-4" />
+							</ToolbarButton>
+							<ToolbarButton
+								onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()}
+								active={editor.isActive("heading", { level: 4 })}
+								title="Heading 4"
+							>
+								<Heading4 className="h-4 w-4" />
+							</ToolbarButton>
+							<ToolbarSeparator />
+							<ToolbarButton
+								onClick={() => editor.chain().focus().toggleBulletList().run()}
+								active={editor.isActive("bulletList")}
+								title="Bullet list"
+							>
+								<List className="h-4 w-4" />
+							</ToolbarButton>
+							<ToolbarButton
+								onClick={() => editor.chain().focus().toggleOrderedList().run()}
+								active={editor.isActive("orderedList")}
+								title="Ordered list"
+							>
+								<ListOrdered className="h-4 w-4" />
+							</ToolbarButton>
+							<ToolbarSeparator />
+							<ToolbarButton
+								onClick={() => editor.chain().focus().toggleBlockquote().run()}
+								active={editor.isActive("blockquote")}
+								title="Block quote"
+							>
+								<TextQuote className="h-4 w-4" />
+							</ToolbarButton>
+							<AdmonitionDropdown
+								onSelect={(type) => editor.chain().focus().toggleAdmonition({ type }).run()}
+								active={editor.isActive("admonition")}
+							/>
+							<ToolbarSeparator />
+							<ToolbarButton onClick={setLink} active={editor.isActive("link")} title="Link">
+								<LinkIcon className="h-4 w-4" />
+							</ToolbarButton>
+							<ToolbarButton
+								onClick={() => editor.chain().focus().setHorizontalRule().run()}
+								title="Horizontal rule"
+							>
+								<Minus className="h-4 w-4" />
+							</ToolbarButton>
+						</div>
 					</div>
 				)}
-				<div className="rounded-md border">
+			</div>
+			<CardContent>
+				<div className="rounded-md border border-gray-300">
 					<EditorContent editor={editor} />
-				</div>
-				<div className="flex gap-2">
-					<Button onClick={handleSave} disabled={saving || !title.trim()}>
-						{saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-						Save
-					</Button>
-					<Button variant="outline" onClick={() => router.push(backHref)} disabled={saving}>
-						Cancel
-					</Button>
 				</div>
 			</CardContent>
 		</Card>

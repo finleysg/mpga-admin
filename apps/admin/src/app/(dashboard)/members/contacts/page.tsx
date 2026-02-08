@@ -29,10 +29,10 @@ import {
 	getSortedRowModel,
 	useReactTable,
 } from "@tanstack/react-table"
+import ExcelJS from "exceljs"
 import { ChevronDown, ChevronUp, ChevronsUpDown, Download } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import ExcelJS from "exceljs"
 
 import { type ContactData, listContactsAction } from "./actions"
 
