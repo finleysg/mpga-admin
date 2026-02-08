@@ -65,16 +65,11 @@ export default async function TournamentYearPage({
         <div className="lg:w-[70%]">
           <div className="rounded-lg bg-white p-6 shadow-sm">
             <Markdown content={instance.instanceDescription} />
-            {instance.instanceNotes && (
-              <div className="mt-6 border-t border-gray-100 pt-6">
-                <Markdown content={instance.instanceNotes} />
-              </div>
-            )}
           </div>
 
           {policies && (
             <div className="mt-6 rounded-lg bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-xl font-bold font-heading text-primary-900">
+              <h2 className="mb-4 text-2xl font-bold font-heading text-primary-900">
                 {policies.title}
               </h2>
               <Markdown content={policies.content} />

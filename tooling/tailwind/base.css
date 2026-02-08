@@ -1,6 +1,12 @@
 @import "tailwindcss";
 @import "./node_modules/tw-animate-css/dist/tw-animate.css";
 
+@plugin "@tailwindcss/typography";
+
+.prose {
+  max-width: none;
+}
+
 @theme {
   /* DS-001: MPGA Green primary color palette */
   --color-primary-50: #e6f7ef;
@@ -40,6 +46,10 @@
   --color-secondary-800: #042a37;
   --color-secondary-900: #031f29;
   --color-secondary-950: #02141b;
+
+  /* Card surface */
+  --color-card: #ffffff;
+  --color-card-foreground: #1a1a1a;
 
   /* DS-005: Typography font families */
   --font-heading: "Playfair Display", Georgia, serif;
