@@ -1,8 +1,6 @@
 ---
 name: review-pr
 description: Read and respond to GitHub PR code review comments on the current branch's PR.
-user-invocable: true
-disable-model-invocation: true
 ---
 
 # Review PR Comments
@@ -59,6 +57,8 @@ For each thread:
 - The original comment (abbreviated if long)
 - Any code changes made (as a diff or description)
 - The drafted reply text
+
+IMPORTANT: Summarize in table form as well.
 
 Ask the user to approve, edit, or skip each response.
 

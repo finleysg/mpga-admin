@@ -1,0 +1,46 @@
+"use client"
+
+import { EmptyState, H1 } from "@mpga/ui"
+import { useEffect, useState } from "react"
+
+import { type GolfCourseOption, listGolfCourseOptionsAction } from "../actions"
+import { ClubForm } from "../club-form"
+
+export default function NewClubPage() {
+	const [golfCourses, setGolfCourses] = useState<GolfCourseOption[]>([])
+	const [loading, setLoading] = useState(true)
+
+	useEffect(() => {
+		async function fetchOptions() {
+			try {
+				const result = await listGolfCourseOptionsAction()
+				if (result.success && result.data) {
+					setGolfCourses(result.data)
+				}
+			} catch (err) {
+				console.error("Failed to fetch golf courses:", err)
+			} finally {
+				setLoading(false)
+			}
+		}
+
+		fetchOptions()
+	}, [])
+
+	if (loading) {
+		return (
+			<div className="mx-auto max-w-6xl">
+				<EmptyState message="Loading..." />
+			</div>
+		)
+	}
+
+	return (
+		<div className="mx-auto max-w-6xl">
+			<H1 variant="secondary" className="mb-6">
+				New Club
+			</H1>
+			<ClubForm golfCourses={golfCourses} />
+		</div>
+	)
+}
