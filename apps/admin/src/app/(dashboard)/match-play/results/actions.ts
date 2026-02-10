@@ -156,6 +156,10 @@ export async function saveResultAction(data: ResultInput): Promise<ActionResult<
 		return { success: false, error: "Home and away teams must be different" }
 	}
 
+	if (!data.matchDate?.trim()) {
+		return { success: false, error: "Match date is required" }
+	}
+
 	try {
 		if (data.id !== undefined) {
 			await db

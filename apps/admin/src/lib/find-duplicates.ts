@@ -32,6 +32,7 @@ export function findDuplicateGroups(contacts: ContactData[]): DuplicateGroup[] {
 		const rb = find(b)
 		if (ra === rb) {
 			matchTypes.get(ra)!.add(type)
+			matchReasons.get(ra)!.push(reason)
 			return
 		}
 		const rankA = rank.get(ra) ?? 0

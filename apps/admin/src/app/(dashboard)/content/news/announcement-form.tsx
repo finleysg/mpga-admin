@@ -34,7 +34,7 @@ interface AnnouncementFormProps {
 }
 
 function toDateInputValue(dateStr: string): string {
-	const d = new Date(dateStr)
+	const d = new Date(dateStr.replace(" ", "T"))
 	return d.toISOString().slice(0, 10)
 }
 

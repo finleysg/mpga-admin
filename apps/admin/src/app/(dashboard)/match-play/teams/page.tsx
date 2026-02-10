@@ -98,24 +98,30 @@ export default function MatchPlayTeamsPage() {
 	useEffect(() => setMounted(true), [])
 
 	useEffect(() => {
+		let cancelled = false
 		async function fetchTeams() {
 			setLoading(true)
 			try {
 				const result = await listTeamsAction(year)
+				if (cancelled) return
 				if (result.success && result.data) {
 					setTeams(result.data)
 				} else {
 					setError(result.error ?? "Failed to load teams")
 				}
 			} catch (err) {
+				if (cancelled) return
 				console.error("Failed to fetch teams:", err)
 				setError("Failed to load teams")
 			} finally {
-				setLoading(false)
+				if (!cancelled) setLoading(false)
 			}
 		}
 
 		fetchTeams()
+		return () => {
+			cancelled = true
+		}
 	}, [year])
 
 	const table = useReactTable({

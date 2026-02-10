@@ -8,6 +8,9 @@ import { WinnersCard } from "../winners-card"
 export default async function AwardPage({ params }: { params: Promise<{ id: string }> }) {
 	const { id: idParam } = await params
 	const awardId = Number(idParam)
+	if (Number.isNaN(awardId)) {
+		return <p>Award not found.</p>
+	}
 
 	const awardResult = await getAwardAction(awardId)
 	if (!awardResult.success || !awardResult.data) {

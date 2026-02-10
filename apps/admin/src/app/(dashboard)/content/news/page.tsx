@@ -43,7 +43,7 @@ const announcementGlobalFilterFn: FilterFn<AnnouncementData> = (row, _columnId, 
 }
 
 function formatDate(dateStr: string): string {
-	const d = new Date(dateStr)
+	const d = new Date(dateStr.replace(" ", "T"))
 	return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
 }
 

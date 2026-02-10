@@ -11,8 +11,16 @@ describe("getMediaUrl", () => {
 	})
 
 	afterEach(() => {
-		process.env.S3_BUCKET_NAME = originalEnv.S3_BUCKET_NAME
-		process.env.S3_MEDIA_PREFIX = originalEnv.S3_MEDIA_PREFIX
+		if (originalEnv.S3_BUCKET_NAME !== undefined) {
+			process.env.S3_BUCKET_NAME = originalEnv.S3_BUCKET_NAME
+		} else {
+			delete process.env.S3_BUCKET_NAME
+		}
+		if (originalEnv.S3_MEDIA_PREFIX !== undefined) {
+			process.env.S3_MEDIA_PREFIX = originalEnv.S3_MEDIA_PREFIX
+		} else {
+			delete process.env.S3_MEDIA_PREFIX
+		}
 	})
 
 	it("returns undefined for null", () => {
