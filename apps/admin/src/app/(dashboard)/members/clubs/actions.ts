@@ -320,9 +320,11 @@ export async function removeClubContactAction(clubContactId: number): Promise<Ac
 	}
 
 	try {
-		// Delete roles first due to FK constraint
-		await db.delete(clubContactRole).where(eq(clubContactRole.clubContactId, clubContactId))
-		await db.delete(clubContact).where(eq(clubContact.id, clubContactId))
+		await db.transaction(async (tx) => {
+			// Delete roles first due to FK constraint
+			await tx.delete(clubContactRole).where(eq(clubContactRole.clubContactId, clubContactId))
+			await tx.delete(clubContact).where(eq(clubContact.id, clubContactId))
+		})
 		return { success: true }
 	} catch (error) {
 		console.error("Failed to remove club contact:", error)
@@ -484,6 +486,15 @@ export async function saveClubPaymentAction(data: {
 	const currentYear = new Date().getFullYear()
 
 	try {
+		const existing = await db
+			.select({ id: membership.id })
+			.from(membership)
+			.where(and(eq(membership.clubId, data.clubId), eq(membership.year, currentYear)))
+
+		if (existing.length > 0) {
+			return { success: false, error: "A payment for this year already exists" }
+		}
+
 		const result = await db.insert(membership).values({
 			clubId: data.clubId,
 			year: currentYear,

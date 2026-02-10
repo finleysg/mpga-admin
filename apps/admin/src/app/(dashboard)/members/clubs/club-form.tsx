@@ -64,7 +64,7 @@ export function ClubForm({ club: existingClub, golfCourses }: ClubFormProps) {
 				name: name.trim(),
 				website: website.trim(),
 				golfCourseId,
-				size: size ? parseInt(size, 10) : null,
+				size: size ? (Number.isNaN(parseInt(size, 10)) ? null : parseInt(size, 10)) : null,
 				archived,
 				notes: notes.trim() || null,
 			})

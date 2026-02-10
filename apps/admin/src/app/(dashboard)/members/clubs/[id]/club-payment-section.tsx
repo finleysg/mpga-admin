@@ -30,7 +30,7 @@ export function ClubPaymentSection({
 	membership,
 	onRefresh,
 }: ClubPaymentSectionProps) {
-	const today = new Date().toISOString().split("T")[0]
+	const today = new Date().toLocaleDateString("en-CA")
 	const [paymentDate, setPaymentDate] = useState(today)
 	const [paymentCode, setPaymentCode] = useState("")
 	const [saving, setSaving] = useState(false)

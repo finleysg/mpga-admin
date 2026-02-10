@@ -99,6 +99,7 @@ export default function ClubsPage() {
 	const router = useRouter()
 	const [clubs, setClubs] = useState<ClubData[]>([])
 	const [loading, setLoading] = useState(true)
+	const [error, setError] = useState<string | null>(null)
 	const [globalFilter, setGlobalFilter] = useState("")
 	const [sorting, setSorting] = useState<SortingState>([{ id: "name", desc: false }])
 	const [pagination, setPagination] = useState<PaginationState>({
@@ -113,9 +114,12 @@ export default function ClubsPage() {
 				const result = await listClubsAction()
 				if (result.success && result.data) {
 					setClubs(result.data)
+				} else {
+					setError(result.error ?? "Failed to load clubs")
 				}
 			} catch (err) {
 				console.error("Failed to fetch clubs:", err)
+				setError("Failed to load clubs")
 			} finally {
 				setLoading(false)
 			}
@@ -167,6 +171,8 @@ export default function ClubsPage() {
 
 			{loading ? (
 				<EmptyState message="Loading clubs..." />
+			) : error ? (
+				<EmptyState message={error} />
 			) : clubs.length === 0 ? (
 				<EmptyState message="No clubs found" />
 			) : (

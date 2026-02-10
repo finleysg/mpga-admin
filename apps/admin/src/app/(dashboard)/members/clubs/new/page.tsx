@@ -9,6 +9,7 @@ import { ClubForm } from "../club-form"
 export default function NewClubPage() {
 	const [golfCourses, setGolfCourses] = useState<GolfCourseOption[]>([])
 	const [loading, setLoading] = useState(true)
+	const [error, setError] = useState<string | null>(null)
 
 	useEffect(() => {
 		async function fetchOptions() {
@@ -16,9 +17,12 @@ export default function NewClubPage() {
 				const result = await listGolfCourseOptionsAction()
 				if (result.success && result.data) {
 					setGolfCourses(result.data)
+				} else {
+					setError(result.error ?? "Failed to load golf course options")
 				}
 			} catch (err) {
 				console.error("Failed to fetch golf courses:", err)
+				setError("Failed to load golf course options")
 			} finally {
 				setLoading(false)
 			}
@@ -31,6 +35,14 @@ export default function NewClubPage() {
 		return (
 			<div className="mx-auto max-w-6xl">
 				<EmptyState message="Loading..." />
+			</div>
+		)
+	}
+
+	if (error) {
+		return (
+			<div className="mx-auto max-w-6xl">
+				<EmptyState message={error} />
 			</div>
 		)
 	}

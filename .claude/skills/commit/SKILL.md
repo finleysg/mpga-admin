@@ -38,6 +38,6 @@ EOF
 
 Push branch to remote: `git push -u origin <branch-name>`
 
-## Step 9: PR
+## Step 5: PR
 
 If there is not already an open PR create one using `gh pr create` with a summary of changes

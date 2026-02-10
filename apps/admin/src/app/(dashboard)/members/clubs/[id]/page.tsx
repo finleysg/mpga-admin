@@ -31,16 +31,24 @@ export default function EditClubPage() {
 	const currentYear = new Date().getFullYear()
 
 	const fetchContacts = useCallback(async () => {
-		const result = await listClubContactsAction(clubId)
-		if (result.success && result.data) {
-			setContacts(result.data)
+		try {
+			const result = await listClubContactsAction(clubId)
+			if (result.success && result.data) {
+				setContacts(result.data)
+			}
+		} catch (err) {
+			console.error("Failed to fetch contacts:", err)
 		}
 	}, [clubId])
 
 	const fetchMembership = useCallback(async () => {
-		const result = await getClubMembershipAction(clubId, currentYear)
-		if (result.success) {
-			setMembershipData(result.data ?? null)
+		try {
+			const result = await getClubMembershipAction(clubId, currentYear)
+			if (result.success) {
+				setMembershipData(result.data ?? null)
+			}
+		} catch (err) {
+			console.error("Failed to fetch membership:", err)
 		}
 	}, [clubId, currentYear])
 

@@ -104,6 +104,7 @@ export default function GolfCoursesPage() {
 	const router = useRouter()
 	const [courses, setCourses] = useState<GolfCourseData[]>([])
 	const [loading, setLoading] = useState(true)
+	const [error, setError] = useState<string | null>(null)
 	const [globalFilter, setGlobalFilter] = useState("")
 	const [sorting, setSorting] = useState<SortingState>([{ id: "name", desc: false }])
 	const [pagination, setPagination] = useState<PaginationState>({
@@ -118,9 +119,12 @@ export default function GolfCoursesPage() {
 				const result = await listGolfCoursesAction()
 				if (result.success && result.data) {
 					setCourses(result.data)
+				} else {
+					setError(result.error ?? "Failed to load golf courses")
 				}
 			} catch (err) {
 				console.error("Failed to fetch golf courses:", err)
+				setError("Failed to load golf courses")
 			} finally {
 				setLoading(false)
 			}
@@ -172,6 +176,8 @@ export default function GolfCoursesPage() {
 
 			{loading ? (
 				<EmptyState message="Loading golf courses..." />
+			) : error ? (
+				<EmptyState message={error} />
 			) : courses.length === 0 ? (
 				<EmptyState message="No golf courses found" />
 			) : (

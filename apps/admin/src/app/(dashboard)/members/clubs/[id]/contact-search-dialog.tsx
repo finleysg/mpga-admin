@@ -33,6 +33,7 @@ export function ContactSearchDialog({
 	const [results, setResults] = useState<ContactSearchResult[]>([])
 	const [searching, setSearching] = useState(false)
 	const [adding, setAdding] = useState(false)
+	const [error, setError] = useState<string | null>(null)
 	const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
 	const doSearch = useCallback(
@@ -67,6 +68,7 @@ export function ContactSearchDialog({
 
 	const handleAdd = async (contactId: number) => {
 		setAdding(true)
+		setError(null)
 		try {
 			const result = await addClubContactAction(clubId, contactId)
 			if (result.success) {
@@ -74,9 +76,12 @@ export function ContactSearchDialog({
 				setSearch("")
 				setResults([])
 				onContactAdded()
+			} else {
+				setError(result.error ?? "Failed to add contact")
 			}
 		} catch (err) {
 			console.error("Failed to add contact:", err)
+			setError("Failed to add contact")
 		} finally {
 			setAdding(false)
 		}
@@ -92,7 +97,7 @@ export function ContactSearchDialog({
 			</AlertDialogTrigger>
 			<AlertDialogContent className="max-w-md">
 				<AlertDialogHeader>
-					<AlertDialogTitle>Search Contacts</AlertDialogTitle>
+					<AlertDialogTitle className="font-heading">Search Contacts</AlertDialogTitle>
 					<AlertDialogDescription>
 						Search by name or email to add a contact to this club.
 					</AlertDialogDescription>
@@ -104,6 +109,8 @@ export function ContactSearchDialog({
 					onChange={(e) => setSearch(e.target.value)}
 					autoFocus
 				/>
+
+				{error && <p className="text-sm text-destructive">{error}</p>}
 
 				<div className="max-h-60 overflow-y-auto">
 					{searching && <p className="py-2 text-center text-sm text-gray-500">Searching...</p>}
