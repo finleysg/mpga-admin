@@ -4,7 +4,7 @@ import { ContentEditor } from "@/components/content-editor"
 
 import { getContentAction, saveContentAction } from "./actions"
 
-async function loadRulesContent() {
+async function loadSeniorRulesContent() {
 	"use server"
 	const result = await getContentAction()
 	if (!result.success || !result.data) return null
@@ -15,25 +15,25 @@ async function loadRulesContent() {
 	}
 }
 
-async function saveRulesContent(data: { id?: number; title: string; content: string }) {
+async function saveSeniorRulesContent(data: { id?: number; title: string; content: string }) {
 	"use server"
 	return saveContentAction({
 		id: data.id,
-		contentType: "MP",
+		contentType: "SP",
 		title: data.title,
 		contentText: data.content,
 	})
 }
 
-export default function MatchPlayRulesPage() {
+export default function SeniorMatchPlayRulesPage() {
 	return (
 		<div className="mx-auto max-w-6xl">
 			<H1 variant="secondary" className="mb-6">
-				Match Play Rules
+				Senior Match Play Rules
 			</H1>
 			<ContentEditor
-				loadContent={loadRulesContent}
-				saveContent={saveRulesContent}
+				loadContent={loadSeniorRulesContent}
+				saveContent={saveSeniorRulesContent}
 				preview={{ heading: "h1" }}
 			/>
 		</div>

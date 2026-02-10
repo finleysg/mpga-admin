@@ -67,14 +67,9 @@ Located in `packages/database/src/schema/`:
 - The admin site should be responsive, but users will primarily be on a laptop
 - Always use the font-heading class for h tags
 
-## Docker Development
+## Feedback
 
-```bash
-docker compose up     # Starts: public, admin, mysql, stripe-cli, mailpit
-```
-
-Services: MySQL (26061), Mailpit web UI (8035), Stripe webhook forwarding
-
-## Environment Variables
-
-Copy `.env.example` to `.env`. Required: `DATABASE_*`, `BETTER_AUTH_*`, `STRIPE_*`, `MAIL_*`
+ALWAYS: pnpm format
+ALWAYS: pnpm lint (fix warnings and errors)
+ALWAYS: pnpm test (fix failures)
+ALWAYS: pnpm build
