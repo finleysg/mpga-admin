@@ -37,6 +37,32 @@
   }
 }
 
+/* Markdown editor scrollbar */
+.markdown-editor-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.markdown-editor-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.markdown-editor-scroll::-webkit-scrollbar-thumb {
+  background-color: var(--color-secondary-200);
+  border-radius: 3px;
+}
+
+.markdown-editor-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-secondary-400);
+}
+
+/* Firefox */
+@supports not selector(::-webkit-scrollbar) {
+  .markdown-editor-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-secondary-200) transparent;
+  }
+}
+
 /* Tiptap WYSIWYG editor styles */
 .tiptap-editor {
   h1, h2, h3, h4, h5, h6 {
