@@ -1,5 +1,5 @@
 import { Button, H1 } from "@mpga/ui"
-import { Image, Pencil, Trophy } from "lucide-react"
+import { ImageIcon, Pencil, Trophy } from "lucide-react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
@@ -68,7 +68,7 @@ export default async function TournamentInstancePage({
 				</Button>
 				<Button variant="secondaryoutline" asChild>
 					<Link href={`${basePath}/photos`}>
-						<Image className="mr-2 h-4 w-4" />
+						<ImageIcon className="mr-2 h-4 w-4" />
 						Upload Photos
 					</Link>
 				</Button>

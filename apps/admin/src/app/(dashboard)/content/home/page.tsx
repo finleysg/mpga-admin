@@ -1,14 +1,123 @@
-import { H1 } from "@mpga/ui"
+import { H1, H2 } from "@mpga/ui"
+
+import { ContentEditor } from "@/components/content-editor"
+
+import { getHomeContentAction, saveHomeContentAction } from "./actions"
+
+async function loadAboutContent() {
+	"use server"
+	const result = await getHomeContentAction("H")
+	if (!result.success || !result.data) return null
+	return {
+		title: result.data.title,
+		content: result.data.contentText,
+		id: result.data.id,
+	}
+}
+
+async function saveAboutContent(data: { id?: number; title: string; content: string }) {
+	"use server"
+	return saveHomeContentAction({
+		id: data.id,
+		contentType: "H",
+		title: data.title,
+		contentText: data.content,
+	})
+}
+
+async function loadTournamentsContent() {
+	"use server"
+	const result = await getHomeContentAction("T1")
+	if (!result.success || !result.data) return null
+	return {
+		title: result.data.title,
+		content: result.data.contentText,
+		id: result.data.id,
+	}
+}
+
+async function saveTournamentsContent(data: { id?: number; title: string; content: string }) {
+	"use server"
+	return saveHomeContentAction({
+		id: data.id,
+		contentType: "T1",
+		title: data.title,
+		contentText: data.content,
+	})
+}
+
+async function loadMatchPlayContent() {
+	"use server"
+	const result = await getHomeContentAction("M1")
+	if (!result.success || !result.data) return null
+	return {
+		title: result.data.title,
+		content: result.data.contentText,
+		id: result.data.id,
+	}
+}
+
+async function saveMatchPlayContent(data: { id?: number; title: string; content: string }) {
+	"use server"
+	return saveHomeContentAction({
+		id: data.id,
+		contentType: "M1",
+		title: data.title,
+		contentText: data.content,
+	})
+}
+
+async function loadMembersContent() {
+	"use server"
+	const result = await getHomeContentAction("C1")
+	if (!result.success || !result.data) return null
+	return {
+		title: result.data.title,
+		content: result.data.contentText,
+		id: result.data.id,
+	}
+}
+
+async function saveMembersContent(data: { id?: number; title: string; content: string }) {
+	"use server"
+	return saveHomeContentAction({
+		id: data.id,
+		contentType: "C1",
+		title: data.title,
+		contentText: data.content,
+	})
+}
 
 export default function HomePagePage() {
 	return (
-		<div className="mx-auto max-w-6xl">
-			<H1 variant="secondary" className="mb-6">
-				Home Page
-			</H1>
-			<div className="rounded-lg border bg-white p-6">
-				<p className="text-gray-500">Home Page management coming soon.</p>
+		<div className="mx-auto max-w-6xl space-y-8">
+			<div>
+				<H1 variant="secondary" className="mb-2">
+					Home Page
+				</H1>
+				<p className="text-muted-foreground">
+					Manage the content displayed on the public home page.
+				</p>
 			</div>
+
+			<section className="space-y-4">
+				<H2 variant="secondary">About Section</H2>
+				<ContentEditor
+					loadContent={loadAboutContent}
+					saveContent={saveAboutContent}
+					preview={{ heading: "h1" }}
+				/>
+			</section>
+
+			<section className="space-y-4">
+				<H2 variant="secondary">Feature Cards</H2>
+				<p className="text-muted-foreground">
+					These cards appear below the about section on the home page.
+				</p>
+				<ContentEditor loadContent={loadTournamentsContent} saveContent={saveTournamentsContent} />
+				<ContentEditor loadContent={loadMatchPlayContent} saveContent={saveMatchPlayContent} />
+				<ContentEditor loadContent={loadMembersContent} saveContent={saveMembersContent} />
+			</section>
 		</div>
 	)
 }

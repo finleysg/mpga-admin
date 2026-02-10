@@ -5,6 +5,12 @@ import type { ActionResult } from "@mpga/types"
 import { asc, eq, inArray } from "drizzle-orm"
 
 import { db } from "@/lib/db"
+import { findDuplicateGroups } from "@/lib/find-duplicates"
+import {
+	buildMergeFieldUpdates,
+	classifyClubContact,
+	classifyCommittee,
+} from "@/lib/merge-contacts"
 import { requireAuth } from "@/lib/require-auth"
 
 interface ContactInput {
@@ -193,163 +199,7 @@ export async function findDuplicatesAction(): Promise<ActionResult<DuplicateGrou
 			.from(contact)
 			.orderBy(asc(contact.lastName), asc(contact.firstName))
 
-		// Union-Find
-		const parent = new Map<number, number>()
-		const rank = new Map<number, number>()
-		const matchTypes = new Map<number, Set<string>>()
-		const matchReasons = new Map<number, string[]>()
-
-		function find(x: number): number {
-			if (!parent.has(x)) {
-				parent.set(x, x)
-				rank.set(x, 0)
-			}
-			if (parent.get(x) !== x) {
-				parent.set(x, find(parent.get(x)!))
-			}
-			return parent.get(x)!
-		}
-
-		function union(a: number, b: number, type: string, reason: string) {
-			const ra = find(a)
-			const rb = find(b)
-			if (ra === rb) {
-				matchTypes.get(ra)!.add(type)
-				return
-			}
-			const rankA = rank.get(ra) ?? 0
-			const rankB = rank.get(rb) ?? 0
-			let newRoot: number
-			let oldRoot: number
-			if (rankA < rankB) {
-				parent.set(ra, rb)
-				newRoot = rb
-				oldRoot = ra
-			} else if (rankA > rankB) {
-				parent.set(rb, ra)
-				newRoot = ra
-				oldRoot = rb
-			} else {
-				parent.set(rb, ra)
-				rank.set(ra, rankA + 1)
-				newRoot = ra
-				oldRoot = rb
-			}
-			// Merge match info
-			const newTypes = matchTypes.get(newRoot) ?? new Set<string>()
-			const oldTypes = matchTypes.get(oldRoot) ?? new Set<string>()
-			for (const t of oldTypes) newTypes.add(t)
-			newTypes.add(type)
-			matchTypes.set(newRoot, newTypes)
-			const newReasons = matchReasons.get(newRoot) ?? []
-			const oldReasons = matchReasons.get(oldRoot) ?? []
-			matchReasons.set(newRoot, [...newReasons, ...oldReasons, reason])
-		}
-
-		// Initialize all contacts
-		for (const c of results) {
-			find(c.id)
-			matchTypes.set(find(c.id), new Set())
-			matchReasons.set(find(c.id), [])
-		}
-
-		// Build lookup maps
-		const contactById = new Map<number, ContactData>()
-		const emailMap = new Map<string, number[]>()
-		const phoneMap = new Map<string, number[]>()
-		const nameMap = new Map<string, number[]>()
-
-		for (const c of results) {
-			contactById.set(c.id, c)
-			if (c.email?.trim()) {
-				const key = c.email.trim().toLowerCase()
-				if (!emailMap.has(key)) emailMap.set(key, [])
-				emailMap.get(key)!.push(c.id)
-			}
-			const phones = [c.primaryPhone, c.alternatePhone].filter(Boolean)
-			for (const p of phones) {
-				const digits = p!.replace(/\D/g, "")
-				if (digits) {
-					if (!phoneMap.has(digits)) phoneMap.set(digits, [])
-					phoneMap.get(digits)!.push(c.id)
-				}
-			}
-			const name = `${c.firstName} ${c.lastName}`.trim().toLowerCase()
-			if (name) {
-				if (!nameMap.has(name)) nameMap.set(name, [])
-				nameMap.get(name)!.push(c.id)
-			}
-		}
-
-		// Helper: do two contacts share a first or last name?
-		function sharesNamePart(idA: number, idB: number): boolean {
-			const a = contactById.get(idA)!
-			const b = contactById.get(idB)!
-			const aFirst = a.firstName.trim().toLowerCase()
-			const bFirst = b.firstName.trim().toLowerCase()
-			const aLast = a.lastName.trim().toLowerCase()
-			const bLast = b.lastName.trim().toLowerCase()
-			return (aFirst !== "" && aFirst === bFirst) || (aLast !== "" && aLast === bLast)
-		}
-
-		// Name matches: always union
-		for (const [key, ids] of nameMap) {
-			for (let i = 1; i < ids.length; i++) {
-				union(ids[0]!, ids[i]!, "NAME", `Name: ${key}`)
-			}
-		}
-		// Email matches: only union contacts that share a name part
-		for (const [key, ids] of emailMap) {
-			for (let i = 0; i < ids.length; i++) {
-				for (let j = i + 1; j < ids.length; j++) {
-					if (sharesNamePart(ids[i]!, ids[j]!)) {
-						union(ids[i]!, ids[j]!, "EMAIL", `Email: ${key}`)
-					}
-				}
-			}
-		}
-		// Phone matches: only union contacts that share a name part
-		for (const [key, ids] of phoneMap) {
-			for (let i = 0; i < ids.length; i++) {
-				for (let j = i + 1; j < ids.length; j++) {
-					if (sharesNamePart(ids[i]!, ids[j]!)) {
-						union(ids[i]!, ids[j]!, "PHONE", `Phone: ${key}`)
-					}
-				}
-			}
-		}
-
-		// Collect groups
-		const groupMap = new Map<number, ContactData[]>()
-		for (const c of results) {
-			const root = find(c.id)
-			if (!groupMap.has(root)) groupMap.set(root, [])
-			groupMap.get(root)!.push(c)
-		}
-
-		const groups: DuplicateGroup[] = []
-		for (const [root, contacts] of groupMap) {
-			if (contacts.length < 2) continue
-			const types = matchTypes.get(root) ?? new Set()
-			const reasons = matchReasons.get(root) ?? []
-			const confidence = types.has("EMAIL") || types.has("PHONE") ? "HIGH" : "LOW"
-			const uniqueReasons = [...new Set(reasons)]
-			groups.push({
-				id: `group-${root}`,
-				contacts,
-				confidence,
-				matchReason: uniqueReasons.join("; "),
-			})
-		}
-
-		// Sort: HIGH first, then by group size descending
-		groups.sort((a, b) => {
-			if (a.confidence !== b.confidence) {
-				return a.confidence === "HIGH" ? -1 : 1
-			}
-			return b.contacts.length - a.contacts.length
-		})
-
+		const groups = findDuplicateGroups(results)
 		return { success: true, data: groups }
 	} catch (error) {
 		console.error("Failed to find duplicates:", error)
@@ -383,26 +233,7 @@ export async function mergeContactsAction(
 			// 2. Fetch source contacts and copy missing data to target
 			const sources = await tx.select().from(contact).where(inArray(contact.id, sourceIds))
 
-			const fillableFields = [
-				"primaryPhone",
-				"alternatePhone",
-				"email",
-				"addressText",
-				"city",
-				"state",
-				"zip",
-				"notes",
-			] as const
-
-			const updates: Record<string, string> = {}
-			for (const field of fillableFields) {
-				if (!target[field]) {
-					const donor = sources.find((s) => s[field])
-					if (donor) {
-						updates[field] = donor[field] as string
-					}
-				}
-			}
+			const updates = buildMergeFieldUpdates(target, sources)
 			if (Object.keys(updates).length > 0) {
 				await tx.update(contact).set(updates).where(eq(contact.id, targetId))
 			}
@@ -421,8 +252,7 @@ export async function mergeContactsAction(
 					.where(eq(clubContact.contactId, sourceId))
 
 				for (const scc of sourceClubContacts) {
-					if (targetClubIds.has(scc.clubId)) {
-						// Delete child roles first, then the clubContact
+					if (classifyClubContact(scc.clubId, targetClubIds) === "delete") {
 						await tx.delete(clubContactRole).where(eq(clubContactRole.clubContactId, scc.id))
 						await tx.delete(clubContact).where(eq(clubContact.id, scc.id))
 					} else {
@@ -449,12 +279,11 @@ export async function mergeContactsAction(
 					.where(eq(committee.contactId, sourceId))
 
 				for (const sc of sourceCommittees) {
-					const key = `${sc.role}|${sc.homeClubId}`
-					if (targetCommitteeKeys.has(key)) {
+					if (classifyCommittee(sc.role, sc.homeClubId, targetCommitteeKeys) === "delete") {
 						await tx.delete(committee).where(eq(committee.id, sc.id))
 					} else {
 						await tx.update(committee).set({ contactId: targetId }).where(eq(committee.id, sc.id))
-						targetCommitteeKeys.add(key)
+						targetCommitteeKeys.add(`${sc.role}|${sc.homeClubId}`)
 					}
 				}
 			}

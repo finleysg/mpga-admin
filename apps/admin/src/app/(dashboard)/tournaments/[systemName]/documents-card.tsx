@@ -1,5 +1,6 @@
 "use client"
 
+import { getMediaUrl } from "@mpga/types"
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -29,7 +30,6 @@ import {
 	SelectValue,
 	toast,
 } from "@mpga/ui"
-import { getMediaUrl } from "@mpga/types"
 import { ExternalLink, Pencil, Plus, Trash2, Upload, X } from "lucide-react"
 import { useRef, useState } from "react"
 

@@ -28,7 +28,7 @@ export interface HistoryResultsTableProps {
 type PageSize = 10 | 25 | 50 | "all"
 type SortOrder = "asc" | "desc"
 
-function formatChampion(result: HistoryResult): string {
+export function formatChampion(result: HistoryResult): string {
 	const primary = `${result.winner} (${result.winnerClub})`
 	if (result.coWinner) {
 		return `${primary} & ${result.coWinner} (${result.coWinnerClub})`
@@ -36,7 +36,7 @@ function formatChampion(result: HistoryResult): string {
 	return primary
 }
 
-function formatScore(result: HistoryResult): string {
+export function formatScore(result: HistoryResult): string {
 	if (result.isMatch) {
 		return result.score
 	}
