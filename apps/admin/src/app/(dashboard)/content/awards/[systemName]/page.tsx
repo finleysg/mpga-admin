@@ -46,6 +46,7 @@ export default async function AwardPage({ params }: { params: Promise<{ systemNa
 				loadContent={loadDescription}
 				saveContent={saveDescription}
 				showTitle={false}
+				preview={{ heading: "h2" }}
 			/>
 			<WinnersCard initialWinners={winners} awardId={awardData.id} />
 		</div>

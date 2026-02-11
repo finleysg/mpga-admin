@@ -49,6 +49,7 @@ export default async function EditOverviewPage({
 				loadContent={loadContent}
 				saveContent={saveContent}
 				showTitle={false}
+				preview={{ heading: "h2" }}
 			/>
 		</div>
 	)

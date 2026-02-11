@@ -28,7 +28,7 @@ export interface ClubOption {
 }
 
 export async function getECContentAction() {
-	return getContentAction("EC")
+	return getContentAction(ContentSystemName.ExecutiveCommittee)
 }
 
 export async function saveECContentAction(data: { id?: number; title: string; content: string }) {
