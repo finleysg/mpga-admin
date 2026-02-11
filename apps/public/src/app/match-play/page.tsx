@@ -1,7 +1,6 @@
-import { ContentCard, H2, MatchPlaySignUp, MatchPlayGroupCards } from "@mpga/ui"
+import { ContentCard, MatchPlaySignUp } from "@mpga/ui"
 
 import { getMatchPlayContent } from "@/lib/queries/content"
-import { getTeamsForYear } from "@/lib/queries/match-play"
 import { getCurrentSeason } from "@/lib/season"
 
 export default async function MatchPlayPage() {
@@ -14,7 +13,7 @@ export default async function MatchPlayPage() {
 	if (deadlineStr) {
 		const deadline = new Date(`${deadlineStr}T23:59:59`)
 		if (!isNaN(deadline.getTime()) && new Date() <= deadline) {
-			showSignUp = false
+			showSignUp = true
 			formattedDeadline = deadline.toLocaleDateString("en-US", {
 				month: "long",
 				day: "numeric",
@@ -23,13 +22,15 @@ export default async function MatchPlayPage() {
 		}
 	}
 
-	const [content, teams] = await Promise.all([
-		getMatchPlayContent(),
-		showSignUp ? Promise.resolve([]) : getTeamsForYear(currentYear),
-	])
+	const content = await getMatchPlayContent()
 
 	return (
-		<main className="mx-auto max-w-6xl px-4 py-8">
+		<div className="mx-auto max-w-6xl px-4 py-8">
+			{showSignUp && (
+				<div className="mb-8">
+					<MatchPlaySignUp year={currentYear} deadline={formattedDeadline} />
+				</div>
+			)}
 			{content && (
 				<ContentCard
 					heading="h1"
@@ -38,14 +39,6 @@ export default async function MatchPlayPage() {
 					className="mb-8"
 				/>
 			)}
-			{showSignUp ? (
-				<MatchPlaySignUp year={currentYear} deadline={formattedDeadline} />
-			) : (
-				<>
-					<H2 className="mb-4 font-semibold text-primary-800">{currentYear} Match Play Groups</H2>
-					<MatchPlayGroupCards teams={teams} year={currentYear} />
-				</>
-			)}
-		</main>
+		</div>
 	)
 }

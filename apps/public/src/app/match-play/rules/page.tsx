@@ -15,9 +15,9 @@ export default async function MatchPlayRulesPage() {
 	])
 
 	return (
-		<main className="mx-auto max-w-4xl px-4 py-8">
+		<div className="mx-auto max-w-4xl px-4 py-8">
 			<H1 className="mb-8">Match Play Rules</H1>
 			<MatchPlayRulesTabs matchPlayRules={matchPlayRules} seniorRules={seniorRules} />
-		</main>
+		</div>
 	)
 }

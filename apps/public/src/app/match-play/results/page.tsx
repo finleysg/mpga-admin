@@ -18,7 +18,7 @@ export default async function MatchPlayResultsPage() {
 	}))
 
 	return (
-		<main className="mx-auto max-w-4xl px-4 py-8">
+		<div className="mx-auto max-w-4xl px-4 py-8">
 			<H1 className="mb-8">Schedule and Results</H1>
 
 			{documentItems.length > 0 && (
@@ -33,6 +33,6 @@ export default async function MatchPlayResultsPage() {
         </h2> */}
 				<MatchPlayResultsTable results={results} />
 			</section>
-		</main>
+		</div>
 	)
 }

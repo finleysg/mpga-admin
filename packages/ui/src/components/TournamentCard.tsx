@@ -2,6 +2,7 @@ import { Calendar, MapPin, ArrowRight, Trophy, History } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 
+import { Markdown } from "./Markdown"
 import { Card, CardContent, CardHeader } from "./ui/card"
 import { H3 } from "./ui/heading"
 
@@ -25,7 +26,7 @@ export function TournamentCard({
 	historyHref,
 }: TournamentCardProps) {
 	return (
-		<Card>
+		<Card className="overflow-hidden">
 			<CardHeader>
 				<div className="flex items-start gap-4">
 					<div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gray-100">
@@ -41,18 +42,20 @@ export function TournamentCard({
 							<Trophy className="h-8 w-8 text-gray-400" />
 						)}
 					</div>
-					<H3 className="font-bold">{name}</H3>
+					<div className="min-w-0">
+						<H3 className="font-bold">{name}</H3>
+					</div>
 				</div>
 			</CardHeader>
 			<CardContent>
-				<p className="mb-4 flex-1 line-clamp-3 text-gray-600">{description}</p>
+				<Markdown content={description} className="prose mb-4 flex-1 line-clamp-3 text-gray-600" />
 				{historyHref && (
 					<Link
 						href={historyHref}
 						className="mb-2 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
 					>
 						<History className="h-4 w-4" />
-						View History
+						History
 					</Link>
 				)}
 				<div className="mb-4 space-y-2 text-sm text-gray-500">
