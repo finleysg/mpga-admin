@@ -1,8 +1,10 @@
 "use client"
 
-import { ChevronDown, ChevronUp } from "lucide-react"
+import { ArrowDownUp, ChevronDown, ChevronUp } from "lucide-react"
 import * as React from "react"
 
+import { Badge } from "./ui/badge"
+import { Button } from "./ui/button"
 import { PageSizeSelect } from "./ui/page-size-select"
 import { Pagination } from "./ui/pagination"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table"
@@ -89,17 +91,31 @@ export function HistoryResultsTable({ results }: HistoryResultsTableProps) {
 		<div className="space-y-4">
 			{/* Controls row */}
 			<div className="flex items-center justify-between">
-				<PageSizeSelect
-					value={String(pageSize)}
-					onChange={(v) => handlePageSizeChange(v === "all" ? "all" : (Number(v) as 10 | 25 | 50))}
-				/>
+				<div className="flex items-center gap-2">
+					<PageSizeSelect
+						value={String(pageSize)}
+						onChange={(v) =>
+							handlePageSizeChange(v === "all" ? "all" : (Number(v) as 10 | 25 | 50))
+						}
+					/>
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={toggleSort}
+						className="md:hidden"
+						aria-label={`Sort by year ${sortOrder === "desc" ? "ascending" : "descending"}`}
+					>
+						<ArrowDownUp className="mr-1 h-4 w-4" />
+						{sortOrder === "desc" ? "Newest" : "Oldest"}
+					</Button>
+				</div>
 				<p className="text-sm text-gray-600">
 					{results.length} {results.length === 1 ? "result" : "results"}
 				</p>
 			</div>
 
-			{/* Table */}
-			<div className="rounded-lg bg-white shadow-sm">
+			{/* Table (desktop) */}
+			<div className="hidden rounded-lg bg-white shadow-sm md:block">
 				<Table className="min-w-full divide-y divide-gray-200">
 					<TableHeader className="bg-primary-50">
 						<TableRow className="hover:bg-transparent">
@@ -165,6 +181,28 @@ export function HistoryResultsTable({ results }: HistoryResultsTableProps) {
 						))}
 					</TableBody>
 				</Table>
+			</div>
+
+			{/* Cards (mobile) */}
+			<div className="space-y-2 md:hidden">
+				{paginatedResults.map((result) => (
+					<div
+						key={result.id}
+						className="rounded-lg border border-gray-200 bg-white px-3 py-2.5 shadow-sm"
+					>
+						<div className="flex items-center justify-between">
+							<div className="flex items-center gap-2">
+								<span className="text-sm font-bold text-primary-900">{result.year}</span>
+								<Badge variant="outline" className="px-1.5 py-0 text-xs">
+									{result.division}
+								</Badge>
+							</div>
+							<span className="text-sm font-medium text-gray-700">{formatScore(result)}</span>
+						</div>
+						<p className="mt-1 text-sm text-gray-900">{formatChampion(result)}</p>
+						<p className="mt-0.5 text-xs text-gray-500">{result.location}</p>
+					</div>
+				))}
 			</div>
 
 			{/* Pagination */}
