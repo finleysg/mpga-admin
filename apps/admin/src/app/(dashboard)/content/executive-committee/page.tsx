@@ -43,7 +43,7 @@ export default async function ExecutiveCommitteePage() {
 			<H1 variant="secondary" className="mb-6">
 				Executive Committee
 			</H1>
-			<ContentEditor loadContent={loadEC} saveContent={saveEC} />
+			<ContentEditor loadContent={loadEC} saveContent={saveEC} preview={{ heading: "h1" }} />
 			<MembersCard initialMembers={members} contacts={contacts} clubs={clubs} />
 		</div>
 	)

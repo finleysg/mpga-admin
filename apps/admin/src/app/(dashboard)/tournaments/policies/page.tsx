@@ -33,9 +33,9 @@ export default function EditPoliciesPage() {
 				Edit Tournament Policies
 			</H1>
 			<ContentEditor
-				backHref="/tournaments/policies"
 				loadContent={loadPoliciesContent}
 				saveContent={savePoliciesContent}
+				preview={{ heading: "h1" }}
 			/>
 		</div>
 	)

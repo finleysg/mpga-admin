@@ -115,9 +115,21 @@ export default function HomePagePage() {
 				<p className="text-muted-foreground">
 					These cards appear below the about section on the home page.
 				</p>
-				<ContentEditor loadContent={loadTournamentsContent} saveContent={saveTournamentsContent} />
-				<ContentEditor loadContent={loadMatchPlayContent} saveContent={saveMatchPlayContent} />
-				<ContentEditor loadContent={loadMembersContent} saveContent={saveMembersContent} />
+				<ContentEditor
+					loadContent={loadTournamentsContent}
+					saveContent={saveTournamentsContent}
+					preview={{ heading: "h3" }}
+				/>
+				<ContentEditor
+					loadContent={loadMatchPlayContent}
+					saveContent={saveMatchPlayContent}
+					preview={{ heading: "h3" }}
+				/>
+				<ContentEditor
+					loadContent={loadMembersContent}
+					saveContent={saveMembersContent}
+					preview={{ heading: "h3" }}
+				/>
 			</section>
 		</div>
 	)

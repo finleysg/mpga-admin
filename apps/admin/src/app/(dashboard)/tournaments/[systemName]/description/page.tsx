@@ -43,6 +43,7 @@ export default async function EditDescriptionPage({
 				loadContent={loadContent}
 				saveContent={saveContent}
 				showTitle={false}
+				preview={{ heading: "h2" }}
 			/>
 		</div>
 	)
