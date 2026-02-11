@@ -1,3 +1,4 @@
+import { ContentSystemName } from "@mpga/types"
 import { H1, H2 } from "@mpga/ui"
 
 import { ContentEditor } from "@/components/content-editor"
@@ -6,7 +7,7 @@ import { getHomeContentAction, saveHomeContentAction } from "./actions"
 
 async function loadAboutContent() {
 	"use server"
-	const result = await getHomeContentAction("H")
+	const result = await getHomeContentAction(ContentSystemName.Home)
 	if (!result.success || !result.data) return null
 	return {
 		title: result.data.title,
@@ -19,7 +20,7 @@ async function saveAboutContent(data: { id?: number; title: string; content: str
 	"use server"
 	return saveHomeContentAction({
 		id: data.id,
-		contentType: "H",
+		systemName: ContentSystemName.Home,
 		title: data.title,
 		contentText: data.content,
 	})
@@ -27,7 +28,7 @@ async function saveAboutContent(data: { id?: number; title: string; content: str
 
 async function loadTournamentsContent() {
 	"use server"
-	const result = await getHomeContentAction("T1")
+	const result = await getHomeContentAction(ContentSystemName.HomeTournaments)
 	if (!result.success || !result.data) return null
 	return {
 		title: result.data.title,
@@ -40,7 +41,7 @@ async function saveTournamentsContent(data: { id?: number; title: string; conten
 	"use server"
 	return saveHomeContentAction({
 		id: data.id,
-		contentType: "T1",
+		systemName: ContentSystemName.HomeTournaments,
 		title: data.title,
 		contentText: data.content,
 	})
@@ -48,7 +49,7 @@ async function saveTournamentsContent(data: { id?: number; title: string; conten
 
 async function loadMatchPlayContent() {
 	"use server"
-	const result = await getHomeContentAction("M1")
+	const result = await getHomeContentAction(ContentSystemName.HomeMatchPlay)
 	if (!result.success || !result.data) return null
 	return {
 		title: result.data.title,
@@ -61,7 +62,7 @@ async function saveMatchPlayContent(data: { id?: number; title: string; content:
 	"use server"
 	return saveHomeContentAction({
 		id: data.id,
-		contentType: "M1",
+		systemName: ContentSystemName.HomeMatchPlay,
 		title: data.title,
 		contentText: data.content,
 	})
@@ -69,7 +70,7 @@ async function saveMatchPlayContent(data: { id?: number; title: string; content:
 
 async function loadMembersContent() {
 	"use server"
-	const result = await getHomeContentAction("C1")
+	const result = await getHomeContentAction(ContentSystemName.HomeClubs)
 	if (!result.success || !result.data) return null
 	return {
 		title: result.data.title,
@@ -82,7 +83,7 @@ async function saveMembersContent(data: { id?: number; title: string; content: s
 	"use server"
 	return saveHomeContentAction({
 		id: data.id,
-		contentType: "C1",
+		systemName: ContentSystemName.HomeClubs,
 		title: data.title,
 		contentText: data.content,
 	})

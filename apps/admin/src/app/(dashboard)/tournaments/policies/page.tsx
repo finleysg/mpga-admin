@@ -1,50 +1,42 @@
-import { Button, Card, CardContent, ContentCard, H1 } from "@mpga/ui"
-import { Pencil, Plus } from "lucide-react"
-import Link from "next/link"
+import { ContentSystemName } from "@mpga/types"
+import { H1 } from "@mpga/ui"
 
-import { getContentAction } from "./actions"
+import { ContentEditor } from "@/components/content-editor"
 
-export default async function PoliciesPage() {
-	const result = await getContentAction("TP")
-	if (!result.success) {
-		throw new Error(result.error ?? "Failed to load content")
+import { getContentAction, saveContentAction } from "./actions"
+
+async function loadPoliciesContent() {
+	"use server"
+	const result = await getContentAction(ContentSystemName.TournamentPolicies)
+	if (!result.success || !result.data) return null
+	return {
+		title: result.data.title,
+		content: result.data.contentText,
+		id: result.data.id,
 	}
-	const content = result.data
+}
 
+async function savePoliciesContent(data: { id?: number; title: string; content: string }) {
+	"use server"
+	return saveContentAction({
+		id: data.id,
+		systemName: ContentSystemName.TournamentPolicies,
+		title: data.title,
+		contentText: data.content,
+	})
+}
+
+export default function EditPoliciesPage() {
 	return (
 		<div className="mx-auto max-w-6xl">
-			<div className="mb-6 flex items-center justify-between">
-				<H1 variant="secondary">Manage Tournament Policies</H1>
-				<Button variant="secondary" asChild>
-					<Link href="/tournaments/policies/edit">
-						{content ? (
-							<>
-								<Pencil className="mr-2 h-4 w-4" />
-								Edit
-							</>
-						) : (
-							<>
-								<Plus className="mr-2 h-4 w-4" />
-								Create
-							</>
-						)}
-					</Link>
-				</Button>
-			</div>
-			{content ? (
-				<ContentCard
-					heading="h2"
-					title={content.title}
-					content={content.contentText}
-					variant="primary"
-				/>
-			) : (
-				<Card>
-					<CardContent>
-						<p className="text-gray-500">No tournament policies have been created yet.</p>
-					</CardContent>
-				</Card>
-			)}
+			<H1 variant="secondary" className="mb-6">
+				Edit Tournament Policies
+			</H1>
+			<ContentEditor
+				backHref="/tournaments/policies"
+				loadContent={loadPoliciesContent}
+				saveContent={savePoliciesContent}
+			/>
 		</div>
 	)
 }

@@ -9,12 +9,12 @@ import { requireAuth } from "@/lib/require-auth"
 
 export interface ContentData {
 	id: number
-	contentType: string
+	systemName: string
 	title: string
 	contentText: string
 }
 
-export async function getContentAction(contentType: string): Promise<ActionResult<ContentData>> {
+export async function getContentAction(systemName: string): Promise<ActionResult<ContentData>> {
 	const userId = await requireAuth()
 	if (!userId) {
 		return { success: false, error: "Unauthorized" }
@@ -24,12 +24,12 @@ export async function getContentAction(contentType: string): Promise<ActionResul
 		const results = await db
 			.select({
 				id: content.id,
-				contentType: content.contentType,
+				systemName: content.systemName,
 				title: content.title,
 				contentText: content.contentText,
 			})
 			.from(content)
-			.where(eq(content.contentType, contentType))
+			.where(eq(content.systemName, systemName))
 
 		if (results.length === 0) {
 			return { success: true }
@@ -45,7 +45,7 @@ export async function getContentAction(contentType: string): Promise<ActionResul
 export async function saveContentAction(
 	data: {
 		id?: number
-		contentType: string
+		systemName: string
 		title: string
 		contentText: string
 	},
@@ -75,7 +75,7 @@ export async function saveContentAction(
 			id = data.id
 		} else {
 			const result = await db.insert(content).values({
-				contentType: data.contentType,
+				systemName: data.systemName,
 				title,
 				contentText: data.contentText,
 			})

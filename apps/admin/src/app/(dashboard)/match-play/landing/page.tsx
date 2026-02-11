@@ -1,3 +1,4 @@
+import { ContentSystemName } from "@mpga/types"
 import { H1 } from "@mpga/ui"
 
 import { ContentEditor } from "@/components/content-editor"
@@ -19,7 +20,7 @@ async function saveLandingContent(data: { id?: number; title: string; content: s
 	"use server"
 	return saveContentAction({
 		id: data.id,
-		contentType: "M",
+		systemName: ContentSystemName.MatchPlay,
 		title: data.title,
 		contentText: data.content,
 	})

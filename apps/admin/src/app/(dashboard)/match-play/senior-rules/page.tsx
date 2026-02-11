@@ -1,3 +1,4 @@
+import { ContentSystemName } from "@mpga/types"
 import { H1 } from "@mpga/ui"
 
 import { ContentEditor } from "@/components/content-editor"
@@ -19,7 +20,7 @@ async function saveSeniorRulesContent(data: { id?: number; title: string; conten
 	"use server"
 	return saveContentAction({
 		id: data.id,
-		contentType: "SP",
+		systemName: ContentSystemName.SeniorMatchPlayRules,
 		title: data.title,
 		contentText: data.content,
 	})

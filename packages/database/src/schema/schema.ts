@@ -31,6 +31,7 @@ export const award = mysqlTable(
 		id: int().autoincrement().notNull(),
 		name: varchar({ length: 100 }).notNull(),
 		description: longtext().notNull(),
+		systemName: varchar({ length: 20 }),
 	},
 	(table) => [primaryKey({ columns: [table.id], name: "award_id" })],
 )
@@ -131,7 +132,7 @@ export const content = mysqlTable(
 	"content",
 	{
 		id: int().autoincrement().notNull(),
-		contentType: varchar({ length: 2 }).notNull(),
+		systemName: varchar({ length: 20 }).notNull(),
 		title: varchar({ length: 120 }).notNull(),
 		contentText: longtext().notNull(),
 	},

@@ -1,6 +1,6 @@
 "use server"
 
-import type { ActionResult } from "@mpga/types"
+import { ContentSystemName, type ActionResult } from "@mpga/types"
 
 import type { ContentData } from "@/lib/content-actions"
 import {
@@ -9,12 +9,12 @@ import {
 } from "@/lib/content-actions"
 
 export async function getContentAction(): Promise<ActionResult<ContentData>> {
-	return getContent("C")
+	return getContent(ContentSystemName.MemberClubs)
 }
 
 export async function saveContentAction(data: {
 	id?: number
-	contentType: string
+	systemName: string
 	title: string
 	contentText: string
 }): Promise<ActionResult<{ id: number }>> {

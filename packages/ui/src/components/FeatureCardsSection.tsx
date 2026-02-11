@@ -15,7 +15,7 @@ export function FeatureCardsSection({ cards }: FeatureCardsSectionProps) {
 	}
 
 	const sortedCards = [...cards].sort(
-		(a, b) => displayOrder.indexOf(a.contentType) - displayOrder.indexOf(b.contentType),
+		(a, b) => displayOrder.indexOf(a.systemName) - displayOrder.indexOf(b.systemName),
 	)
 
 	return (
@@ -24,7 +24,7 @@ export function FeatureCardsSection({ cards }: FeatureCardsSectionProps) {
 				<H2 className="mb-10 text-center text-3xl">What We Do</H2>
 				<div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
 					{sortedCards.map((card) => (
-						<FeatureCard key={card.contentType} {...card} />
+						<FeatureCard key={card.systemName} {...card} />
 					))}
 				</div>
 			</div>
