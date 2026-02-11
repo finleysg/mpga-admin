@@ -1,15 +1,16 @@
 import { content } from "@mpga/database"
+import { ContentSystemName } from "@mpga/types"
 import { eq, inArray } from "drizzle-orm"
 
 import { db } from "../db"
 
 export interface FeatureCard {
-	contentType: string
+	systemName: string
 	title: string
 	description: string
 }
 
-export interface AboutContent {
+export interface Content {
 	title: string
 	content: string
 }
@@ -18,12 +19,18 @@ export async function getFeatureCards(): Promise<FeatureCard[]> {
 	try {
 		const results = await db
 			.select({
-				contentType: content.contentType,
+				systemName: content.systemName,
 				title: content.title,
 				description: content.contentText,
 			})
 			.from(content)
-			.where(inArray(content.contentType, ["T1", "M1", "C1"]))
+			.where(
+				inArray(content.systemName, [
+					ContentSystemName.HomeTournaments,
+					ContentSystemName.HomeMatchPlay,
+					ContentSystemName.HomeClubs,
+				]),
+			)
 
 		return results
 	} catch (error) {
@@ -32,7 +39,7 @@ export async function getFeatureCards(): Promise<FeatureCard[]> {
 	}
 }
 
-export async function getAboutContent(): Promise<AboutContent | null> {
+export async function getAboutContent(): Promise<Content | null> {
 	try {
 		const results = await db
 			.select({
@@ -40,7 +47,7 @@ export async function getAboutContent(): Promise<AboutContent | null> {
 				content: content.contentText,
 			})
 			.from(content)
-			.where(eq(content.contentType, "H"))
+			.where(eq(content.systemName, ContentSystemName.Home))
 			.limit(1)
 
 		return results[0] || null
@@ -50,7 +57,7 @@ export async function getAboutContent(): Promise<AboutContent | null> {
 	}
 }
 
-export async function getMatchPlayContent(): Promise<AboutContent | null> {
+export async function getMatchPlayContent(): Promise<Content | null> {
 	try {
 		const results = await db
 			.select({
@@ -58,7 +65,7 @@ export async function getMatchPlayContent(): Promise<AboutContent | null> {
 				content: content.contentText,
 			})
 			.from(content)
-			.where(eq(content.contentType, "M"))
+			.where(eq(content.systemName, ContentSystemName.MatchPlay))
 			.limit(1)
 
 		return results[0] || null
@@ -68,7 +75,7 @@ export async function getMatchPlayContent(): Promise<AboutContent | null> {
 	}
 }
 
-export async function getMatchPlayRules(): Promise<AboutContent | null> {
+export async function getMatchPlayRules(): Promise<Content | null> {
 	try {
 		const results = await db
 			.select({
@@ -76,7 +83,7 @@ export async function getMatchPlayRules(): Promise<AboutContent | null> {
 				content: content.contentText,
 			})
 			.from(content)
-			.where(eq(content.contentType, "MP"))
+			.where(eq(content.systemName, ContentSystemName.MatchPlayRules))
 			.limit(1)
 
 		return results[0] || null
@@ -86,7 +93,7 @@ export async function getMatchPlayRules(): Promise<AboutContent | null> {
 	}
 }
 
-export async function getSeniorMatchPlayRules(): Promise<AboutContent | null> {
+export async function getSeniorMatchPlayRules(): Promise<Content | null> {
 	try {
 		const results = await db
 			.select({
@@ -94,7 +101,7 @@ export async function getSeniorMatchPlayRules(): Promise<AboutContent | null> {
 				content: content.contentText,
 			})
 			.from(content)
-			.where(eq(content.contentType, "SP"))
+			.where(eq(content.systemName, ContentSystemName.SeniorMatchPlayRules))
 			.limit(1)
 
 		return results[0] || null
@@ -104,7 +111,7 @@ export async function getSeniorMatchPlayRules(): Promise<AboutContent | null> {
 	}
 }
 
-export async function getTournamentPolicies(): Promise<AboutContent | null> {
+export async function getTournamentPolicies(): Promise<Content | null> {
 	try {
 		const results = await db
 			.select({
@@ -112,7 +119,7 @@ export async function getTournamentPolicies(): Promise<AboutContent | null> {
 				content: content.contentText,
 			})
 			.from(content)
-			.where(eq(content.contentType, "TP"))
+			.where(eq(content.systemName, ContentSystemName.TournamentPolicies))
 			.limit(1)
 
 		return results[0] || null

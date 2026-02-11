@@ -1,7 +1,7 @@
 "use server"
 
 import { club, committee, contact } from "@mpga/database"
-import type { ActionResult } from "@mpga/types"
+import { ContentSystemName, type ActionResult } from "@mpga/types"
 import { asc, eq } from "drizzle-orm"
 
 import { getContentAction, saveContentAction } from "@/lib/content-actions"
@@ -35,7 +35,7 @@ export async function saveECContentAction(data: { id?: number; title: string; co
 	return saveContentAction(
 		{
 			id: data.id,
-			contentType: "EC",
+			systemName: ContentSystemName.ExecutiveCommittee,
 			title: data.title,
 			contentText: data.content,
 		},

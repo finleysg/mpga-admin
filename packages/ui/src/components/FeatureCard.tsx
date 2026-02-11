@@ -8,7 +8,7 @@ import { Card, CardContent } from "./ui/card"
 import { H3 } from "./ui/heading"
 
 export interface FeatureCardProps {
-	contentType: string
+	systemName: string
 	title: string
 	description: string
 }
@@ -19,8 +19,8 @@ const iconMap: Record<string, { icon: LucideIcon; route: string }> = {
 	C1: { icon: MapPin, route: "/members" },
 }
 
-export function FeatureCard({ contentType, title, description }: FeatureCardProps) {
-	const { icon: Icon, route } = iconMap[contentType] || {
+export function FeatureCard({ systemName, title, description }: FeatureCardProps) {
+	const { icon: Icon, route } = iconMap[systemName] || {
 		icon: Trophy,
 		route: "/",
 	}

@@ -5,14 +5,10 @@ import { ContentEditor } from "@/components/content-editor"
 import { getAwardAction, listAwardWinnersAction, saveAwardDescriptionAction } from "../actions"
 import { WinnersCard } from "../winners-card"
 
-export default async function AwardPage({ params }: { params: Promise<{ id: string }> }) {
-	const { id: idParam } = await params
-	const awardId = Number(idParam)
-	if (Number.isNaN(awardId)) {
-		return <p>Award not found.</p>
-	}
+export default async function AwardPage({ params }: { params: Promise<{ systemName: string }> }) {
+	const { systemName } = await params
 
-	const awardResult = await getAwardAction(awardId)
+	const awardResult = await getAwardAction(systemName)
 	if (!awardResult.success || !awardResult.data) {
 		return <p>Award not found.</p>
 	}
@@ -21,7 +17,7 @@ export default async function AwardPage({ params }: { params: Promise<{ id: stri
 
 	async function loadDescription() {
 		"use server"
-		const result = await getAwardAction(awardId)
+		const result = await getAwardAction(systemName)
 		if (!result.success || !result.data) return null
 		return {
 			title: result.data.name,
@@ -33,12 +29,12 @@ export default async function AwardPage({ params }: { params: Promise<{ id: stri
 	async function saveDescription(data: { id?: number; title: string; content: string }) {
 		"use server"
 		return saveAwardDescriptionAction({
-			id: data.id ?? awardId,
+			id: data.id ?? awardData.id,
 			description: data.content,
 		})
 	}
 
-	const winnersResult = await listAwardWinnersAction(awardId)
+	const winnersResult = await listAwardWinnersAction(awardData.id)
 	const winners = winnersResult.success && winnersResult.data ? winnersResult.data : []
 
 	return (
@@ -51,7 +47,7 @@ export default async function AwardPage({ params }: { params: Promise<{ id: stri
 				saveContent={saveDescription}
 				showTitle={false}
 			/>
-			<WinnersCard initialWinners={winners} awardId={awardId} />
+			<WinnersCard initialWinners={winners} awardId={awardData.id} />
 		</div>
 	)
 }

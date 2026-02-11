@@ -217,7 +217,7 @@ export function ClubContactsSection({ clubId, contacts, onRefresh }: ClubContact
 														value=""
 														onValueChange={(value) => handleAddRole(cc.clubContactId, value)}
 													>
-														<SelectTrigger className="h-7 w-[140px] text-xs">
+														<SelectTrigger className="h-7 w-35 text-xs">
 															<SelectValue placeholder="Add role..." />
 														</SelectTrigger>
 														<SelectContent>

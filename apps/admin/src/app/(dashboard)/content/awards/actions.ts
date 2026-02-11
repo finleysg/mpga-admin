@@ -11,6 +11,7 @@ export interface AwardData {
 	id: number
 	name: string
 	description: string
+	systemName: string | null
 }
 
 export interface AwardWinnerData {
@@ -21,7 +22,7 @@ export interface AwardWinnerData {
 	awardId: number
 }
 
-export async function getAwardAction(id: number): Promise<ActionResult<AwardData>> {
+export async function getAwardAction(systemName: string): Promise<ActionResult<AwardData>> {
 	const userId = await requireAuth()
 	if (!userId) {
 		return { success: false, error: "Unauthorized" }
@@ -33,9 +34,10 @@ export async function getAwardAction(id: number): Promise<ActionResult<AwardData
 				id: award.id,
 				name: award.name,
 				description: award.description,
+				systemName: award.systemName,
 			})
 			.from(award)
-			.where(eq(award.id, id))
+			.where(eq(award.systemName, systemName))
 
 		if (results.length === 0) {
 			return { success: false, error: "Award not found" }

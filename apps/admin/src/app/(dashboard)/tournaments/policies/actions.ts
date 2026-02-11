@@ -8,13 +8,13 @@ import {
 	saveContentAction as saveContent,
 } from "@/lib/content-actions"
 
-export async function getContentAction(contentType: string): Promise<ActionResult<ContentData>> {
-	return getContent(contentType)
+export async function getContentAction(systemName: string): Promise<ActionResult<ContentData>> {
+	return getContent(systemName)
 }
 
 export async function saveContentAction(data: {
 	id?: number
-	contentType: string
+	systemName: string
 	title: string
 	contentText: string
 }): Promise<ActionResult<{ id: number }>> {

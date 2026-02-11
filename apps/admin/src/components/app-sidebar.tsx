@@ -1,5 +1,6 @@
 "use client"
 
+import { AwardSystemName, TournamentSystemName } from "@mpga/types"
 import {
 	Button,
 	Sidebar,
@@ -23,13 +24,13 @@ const navGroups = [
 	{
 		title: "Tournaments",
 		items: [
-			{ title: "Four Ball", url: "/tournaments/four-ball" },
-			{ title: "Mid Am", url: "/tournaments/mid-am" },
-			{ title: "Low Net", url: "/tournaments/low-net" },
-			{ title: "Jr. Public Links", url: "/tournaments/jr-public-links" },
-			{ title: "Sr. Public Links", url: "/tournaments/sr-public-links" },
-			{ title: "Public Links", url: "/tournaments/public-links" },
-			{ title: "Combination", url: "/tournaments/combination" },
+			{ title: "Four Ball", url: `/tournaments/${TournamentSystemName.FourBall}` },
+			{ title: "Mid Am", url: `/tournaments/${TournamentSystemName.MidAm}` },
+			{ title: "Low Net", url: `/tournaments/${TournamentSystemName.LowNet}` },
+			{ title: "Jr. Public Links", url: `/tournaments/${TournamentSystemName.JrPubLinks}` },
+			{ title: "Sr. Public Links", url: `/tournaments/${TournamentSystemName.SrPubLinks}` },
+			{ title: "Public Links", url: `/tournaments/${TournamentSystemName.PubLinks}` },
+			{ title: "Combination", url: `/tournaments/${TournamentSystemName.Combo}` },
 			{ title: "Policies", url: "/tournaments/policies" },
 		],
 	},
@@ -63,10 +64,10 @@ const navGroups = [
 				title: "Executive Committee",
 				url: "/content/executive-committee",
 			},
-			{ title: "Past Presidents", url: "/content/awards/1" },
-			{ title: "Ron Self", url: "/content/awards/2" },
-			{ title: "Clasen Cup", url: "/content/awards/3" },
-			{ title: "Al Wareham", url: "/content/awards/5" },
+			{ title: "Past Presidents", url: `/content/awards/${AwardSystemName.PastPresidents}` },
+			{ title: "Ron Self", url: `/content/awards/${AwardSystemName.RonSelf}` },
+			{ title: "Clasen Cup", url: `/content/awards/${AwardSystemName.ClasenCup}` },
+			{ title: "Al Wareham", url: `/content/awards/${AwardSystemName.AlWareham}` },
 		],
 	},
 	{

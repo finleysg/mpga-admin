@@ -7,6 +7,7 @@ import {
 	golfCourse,
 	membership,
 } from "@mpga/database"
+import { ContentSystemName } from "@mpga/types"
 import { eq, and, desc } from "drizzle-orm"
 
 import { db } from "../db"
@@ -24,7 +25,7 @@ export async function getMembersContent(): Promise<MembersContent | null> {
 				content: content.contentText,
 			})
 			.from(content)
-			.where(eq(content.contentType, "C"))
+			.where(eq(content.systemName, ContentSystemName.MemberClubs))
 			.limit(1)
 
 		return results[0] || null
