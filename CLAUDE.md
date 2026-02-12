@@ -16,6 +16,11 @@ pnpm format           # Format with Prettier
 pnpm db:generate      # Generate migrations from schema
 pnpm db:push          # Push schema changes to database
 pnpm db:studio        # Open Drizzle Studio UI
+
+# Docker (dev runs in docker compose)
+docker compose up -d --build admin    # Rebuild & restart admin container
+docker compose up -d --build public   # Rebuild & restart public container
+docker compose up -d --build          # Rebuild & restart all containers
 ```
 
 ## Architecture
