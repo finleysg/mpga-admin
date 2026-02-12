@@ -3,6 +3,13 @@ import { headers } from "next/headers"
 
 import { auth } from "@/lib/auth"
 
+import { ClubContactsSection } from "./club-contacts-section"
+import { ClubEditForm } from "./club-edit-form"
+import {
+	getClubForContact,
+	listClubContactsForContact,
+	listGolfCourseOptionsForContact,
+} from "../../actions"
 import { ClubContactLoginForm } from "../../club-contact-login-form"
 import { validateClubContact } from "../../validate-contact"
 
@@ -38,20 +45,41 @@ export default async function EditClubPage({ params }: { params: Promise<{ clubI
 		)
 	}
 
+	const [clubResult, coursesResult, contactsResult] = await Promise.all([
+		getClubForContact(clubIdNum),
+		listGolfCourseOptionsForContact(clubIdNum),
+		listClubContactsForContact(clubIdNum),
+	])
+
+	if (!clubResult.success || !clubResult.data) {
+		return (
+			<div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
+				<div className="w-full max-w-md">
+					<Card>
+						<CardHeader className="text-center">
+							<CardTitle className="font-heading text-xl">Error</CardTitle>
+						</CardHeader>
+						<CardContent>
+							<p className="text-muted-foreground text-center text-sm">
+								{clubResult.error ?? "Failed to load club data."}
+							</p>
+						</CardContent>
+					</Card>
+				</div>
+			</div>
+		)
+	}
+
+	const clubData = clubResult.data
+	const golfCourses = coursesResult.success && coursesResult.data ? coursesResult.data : []
+	const contacts = contactsResult.success && contactsResult.data ? contactsResult.data : []
+
 	return (
-		<div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
-			<div className="w-full max-w-md">
-				<Card>
-					<CardHeader className="text-center">
-						<CardTitle className="font-heading text-xl">Update Club Information</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<p className="text-muted-foreground text-center text-sm">
-							Club information editing is coming soon. Please contact the MPGA to update your club
-							details.
-						</p>
-					</CardContent>
-				</Card>
+		<div className="bg-muted min-h-svh p-4 md:p-6">
+			<div className="mx-auto max-w-lg space-y-6">
+				<h1 className="font-heading text-xl font-bold">Edit {clubData.name}</h1>
+				<ClubEditForm club={clubData} golfCourses={golfCourses} />
+				<ClubContactsSection clubId={clubIdNum} initialContacts={contacts} />
 			</div>
 		</div>
 	)

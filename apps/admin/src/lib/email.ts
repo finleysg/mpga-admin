@@ -49,6 +49,27 @@ export async function sendMagicLinkEmail(email: string, url: string): Promise<vo
 }
 
 /**
+ * Sends a dues payment confirmation email to all club contacts.
+ */
+export async function sendDuesPaymentEmail(
+	to: string[],
+	clubName: string,
+	year: number,
+): Promise<void> {
+	await transporter.sendMail({
+		from: process.env.MAIL_FROM ?? "noreply@mpga.golf",
+		to: to.join(", "),
+		subject: `MPGA Dues Payment Confirmation — ${clubName}`,
+		text: `This is a confirmation that ${year} MPGA membership dues have been paid for ${clubName}.\n\nThank you for your continued membership in the Minnesota Public Golf Association.`,
+		html: `
+      <h1>Dues Payment Confirmation</h1>
+      <p>This is a confirmation that <strong>${year}</strong> MPGA membership dues have been paid for <strong>${clubName}</strong>.</p>
+      <p>Thank you for your continued membership in the Minnesota Public Golf Association.</p>
+    `,
+	})
+}
+
+/**
  * Sends an invitation email to the specified address with an accept link.
  */
 export async function sendInvitationEmail(email: string, token: string): Promise<void> {

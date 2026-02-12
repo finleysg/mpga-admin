@@ -4,6 +4,9 @@ services:
     build:
       context: .
       dockerfile: apps/public/Dockerfile.dev
+    environment:
+      - NODE_OPTIONS=--max-old-space-size=3072
+    mem_limit: 4g
     ports:
       - "4000:4000"
     volumes:
@@ -19,8 +22,8 @@ services:
       context: .
       dockerfile: apps/admin/Dockerfile.dev
     environment:
-      - NODE_OPTIONS=--max-old-space-size=1536
-    mem_limit: 2g
+      - NODE_OPTIONS=--max-old-space-size=3072
+    mem_limit: 4g
     ports:
       - "4100:4100"
     volumes:
@@ -43,10 +46,11 @@ services:
     restart: unless-stopped
 
   stripe:
-    image: stripe/stripe-cli:v1.34.0
+    image: stripe/stripe-cli:v1.35.0
     environment:
       STRIPE_DEVICE_NAME: docker
-    command: listen --forward-to admin:4100/stripe/webhook/clover/
+      STRIPE_API_KEY: ${STRIPE_API_KEY}
+    command: listen --forward-to admin:4100/stripe/webhook/clover
     restart: unless-stopped
     depends_on:
       - admin
