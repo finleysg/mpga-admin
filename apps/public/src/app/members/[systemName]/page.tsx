@@ -1,5 +1,6 @@
 import { getMediaUrl } from "@mpga/types"
 import {
+	Button,
 	Card,
 	CardContent,
 	CardHeader,
@@ -14,6 +15,8 @@ import { notFound } from "next/navigation"
 
 import { getClubBySystemName, getClubMembershipInfo, getClubOfficers } from "@/lib/queries/clubs"
 import { getCurrentSeason } from "@/lib/season"
+
+const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL
 
 type Params = Promise<{ systemName: string }>
 
@@ -50,6 +53,17 @@ export default async function ClubDetailPage({ params }: { params: Params }) {
 	return (
 		<main className="mx-auto max-w-6xl px-4 py-8">
 			<H1 className="mb-8">{club.name}</H1>
+
+			<div className="mb-8 flex gap-3">
+				{!membershipInfo.currentYearPaymentDate && (
+					<Button asChild>
+						<a href={`${adminUrl}/club-contact/pay-dues/${club.id}`}>Pay Dues</a>
+					</Button>
+				)}
+				<Button asChild variant="outline">
+					<a href={`${adminUrl}/club-contact/edit-club/${club.id}`}>Update Club Information</a>
+				</Button>
+			</div>
 
 			<div className="grid items-start gap-6 lg:grid-cols-3">
 				<ClubDetailCard
