@@ -15,9 +15,14 @@ export async function POST(request: Request) {
 		return NextResponse.json({ error: "Missing signature" }, { status: 400 })
 	}
 
+	if (!process.env.STRIPE_WEBHOOK_SECRET) {
+		console.error("STRIPE_WEBHOOK_SECRET environment variable is not set")
+		return NextResponse.json({ error: "Server configuration error" }, { status: 500 })
+	}
+
 	let event
 	try {
-		event = getStripe().webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!)
+		event = getStripe().webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET)
 	} catch (err) {
 		console.error("Webhook signature verification failed:", err)
 		return NextResponse.json({ error: "Invalid signature" }, { status: 400 })
@@ -25,8 +30,14 @@ export async function POST(request: Request) {
 
 	if (event.type === "payment_intent.succeeded") {
 		const paymentIntent = event.data.object
-		const clubId = parseInt(paymentIntent.metadata.clubId!, 10)
-		const year = parseInt(paymentIntent.metadata.year!, 10)
+
+		if (!paymentIntent.metadata.clubId || !paymentIntent.metadata.year) {
+			console.error("Missing metadata on payment intent", paymentIntent.id)
+			return NextResponse.json({ received: true })
+		}
+
+		const clubId = parseInt(paymentIntent.metadata.clubId, 10)
+		const year = parseInt(paymentIntent.metadata.year, 10)
 
 		try {
 			// Idempotency: check if membership already exists

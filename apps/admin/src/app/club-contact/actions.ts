@@ -289,6 +289,16 @@ export async function removeClubContactForContact(
 	}
 
 	try {
+		// Verify the club contact belongs to this club
+		const rows = await db
+			.select({ id: clubContact.id })
+			.from(clubContact)
+			.where(and(eq(clubContact.id, clubContactId), eq(clubContact.clubId, clubId)))
+
+		if (rows.length === 0) {
+			return { success: false, error: "Club contact not found" }
+		}
+
 		await db.transaction(async (tx) => {
 			await tx.delete(clubContactRole).where(eq(clubContactRole.clubContactId, clubContactId))
 			await tx.delete(clubContact).where(eq(clubContact.id, clubContactId))
@@ -313,7 +323,7 @@ export async function toggleClubContactPrimaryForContact(
 		const rows = await db
 			.select({ isPrimary: clubContact.isPrimary })
 			.from(clubContact)
-			.where(eq(clubContact.id, clubContactId))
+			.where(and(eq(clubContact.id, clubContactId), eq(clubContact.clubId, clubId)))
 
 		const row = rows[0]
 		if (!row) {
@@ -345,6 +355,16 @@ export async function addClubContactRoleForContact(
 	}
 
 	try {
+		// Verify the club contact belongs to this club
+		const owner = await db
+			.select({ id: clubContact.id })
+			.from(clubContact)
+			.where(and(eq(clubContact.id, clubContactId), eq(clubContact.clubId, clubId)))
+
+		if (owner.length === 0) {
+			return { success: false, error: "Club contact not found" }
+		}
+
 		const result = await db.insert(clubContactRole).values({
 			clubContactId,
 			role,
@@ -367,6 +387,17 @@ export async function removeClubContactRoleForContact(
 	}
 
 	try {
+		// Verify the role belongs to a club contact of this club
+		const rows = await db
+			.select({ id: clubContactRole.id })
+			.from(clubContactRole)
+			.innerJoin(clubContact, eq(clubContactRole.clubContactId, clubContact.id))
+			.where(and(eq(clubContactRole.id, roleId), eq(clubContact.clubId, clubId)))
+
+		if (rows.length === 0) {
+			return { success: false, error: "Role not found" }
+		}
+
 		await db.delete(clubContactRole).where(eq(clubContactRole.id, roleId))
 		return { success: true }
 	} catch (error) {
@@ -437,14 +468,17 @@ export async function createPaymentIntentForContact(
 			return { success: false, error: "Dues have already been paid for this year" }
 		}
 
-		const paymentIntent = await getStripe().paymentIntents.create({
-			amount: 10000,
-			currency: "usd",
-			metadata: {
-				clubId: String(clubId),
-				year: String(currentYear),
+		const paymentIntent = await getStripe().paymentIntents.create(
+			{
+				amount: 10000,
+				currency: "usd",
+				metadata: {
+					clubId: String(clubId),
+					year: String(currentYear),
+				},
 			},
-		})
+			{ idempotencyKey: `dues-${clubId}-${currentYear}` },
+		)
 
 		if (!paymentIntent.client_secret) {
 			return { success: false, error: "Failed to create payment" }

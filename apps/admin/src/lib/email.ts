@@ -29,6 +29,10 @@ function createTransporter() {
 
 const transporter = createTransporter()
 
+function escapeHtml(s: string): string {
+	return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+}
+
 /**
  * Sends a magic link email for club contact verification.
  */
@@ -63,7 +67,7 @@ export async function sendDuesPaymentEmail(
 		text: `This is a confirmation that ${year} MPGA membership dues have been paid for ${clubName}.\n\nThank you for your continued membership in the Minnesota Public Golf Association.`,
 		html: `
       <h1>Dues Payment Confirmation</h1>
-      <p>This is a confirmation that <strong>${year}</strong> MPGA membership dues have been paid for <strong>${clubName}</strong>.</p>
+      <p>This is a confirmation that <strong>${year}</strong> MPGA membership dues have been paid for <strong>${escapeHtml(clubName)}</strong>.</p>
       <p>Thank you for your continued membership in the Minnesota Public Golf Association.</p>
     `,
 	})
