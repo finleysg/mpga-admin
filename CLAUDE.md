@@ -16,7 +16,16 @@ pnpm format           # Format with Prettier
 pnpm db:generate      # Generate migrations from schema
 pnpm db:push          # Push schema changes to database
 pnpm db:studio        # Open Drizzle Studio UI
+
+# Docker (dev runs in docker compose)
+docker compose up -d --build admin    # Rebuild & restart admin container
+docker compose up -d --build public   # Rebuild & restart public container
+docker compose up -d --build          # Rebuild & restart all containers
 ```
+
+## Debugging
+
+When debugging Docker or Next.js dev server issues, always clear the .next cache directory first before investigating further. Stale caches are a frequent root cause of 404s, rendering bugs, and false alarms in this project.
 
 ## Architecture
 
@@ -38,7 +47,7 @@ pnpm db:studio        # Open Drizzle Studio UI
 - **Better Auth** for admin authentication (email/password, 7-day sessions)
 - **Tailwind CSS** with shared base config in `tooling/tailwind`
 
-## Database Migrations
+## Database
 
 - **Development**: Use `pnpm db:push` for fast iteration (applies schema directly, no migration files)
 - **Production**: Use `pnpm db:generate` to create migration files, then `drizzle-kit migrate` to apply them in order
@@ -47,9 +56,9 @@ pnpm db:studio        # Open Drizzle Studio UI
 - Schema is the source of truth: `packages/database/src/schema/`
 - Before deploying, always run `pnpm db:generate` to capture schema changes as a migration, review the SQL, and commit it
 
-## Database Schema
+For database migrations, always use `drizzle-kit push` for dev and never manually create migration/snapshot files. Be aware that drizzle-kit push may have interactive prompts that need handling.
 
-Located in `packages/database/src/schema/`:
+Database Schema is located in `packages/database/src/schema/`
 
 ## Authentication (Admin Only)
 
@@ -58,7 +67,9 @@ Located in `packages/database/src/schema/`:
 - Middleware protects all admin routes except `/login` and `/api/auth`
 - Session cookie: `better-auth.session_token`
 
-## Styles
+## UI Development
+
+After making UI/CSS changes, always verify the visual result by checking the actual rendering context (viewport position, dynamic sizing) rather than assuming static values will work.
 
 - Use shadcn blocks and components
 - The public site is based on the primary pallette
@@ -67,9 +78,26 @@ Located in `packages/database/src/schema/`:
 - The admin site should be responsive, but users will primarily be on a laptop
 - Always use the font-heading class for h tags
 
+## Code Style
+
+NOTE: we have customized Prettier in the following way:
+
+```json
+{
+	"printWidth": 100,
+	"semi": false,
+	"singleQuote": false,
+	"useTabs": true
+}
+```
+
+This project uses tab-based indentation. When editing files, preserve tab indentation exactly. If an Edit tool call fails due to whitespace mismatch, use Write or Bash(sed) instead of retrying Edit repeatedly.
+
+This project uses TypeScript with strict mode. Always handle possibly-undefined array accesses with non-null assertions or proper guards. Use the full markdown editor component (ContentEditor) for any rich text fields, not simplified alternatives.
+
 ## Feedback
 
 ALWAYS: pnpm format
-ALWAYS: pnpm lint (fix warnings and errors)
-ALWAYS: pnpm test (fix failures)
+ALWAYS: pnpm lint (fix warnings and errors, even if pre-existing)
+ALWAYS: pnpm test (fix failures, even if pre-existing)
 ALWAYS: pnpm build

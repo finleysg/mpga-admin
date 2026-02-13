@@ -1,8 +1,9 @@
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
-import { admin } from "better-auth/plugins"
+import { admin, magicLink } from "better-auth/plugins"
 
 import { db } from "./db"
+import { sendMagicLinkEmail } from "./email"
 import { ac, adminRole, superAdminRole } from "./permissions"
 
 export const auth = betterAuth({
@@ -36,6 +37,12 @@ export const auth = betterAuth({
 				super_admin: superAdminRole,
 				admin: adminRole,
 			},
+		}),
+		magicLink({
+			sendMagicLink: async ({ email, url }) => {
+				await sendMagicLinkEmail(email, url)
+			},
+			expiresIn: 600,
 		}),
 	],
 })

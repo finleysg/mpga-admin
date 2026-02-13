@@ -29,6 +29,50 @@ function createTransporter() {
 
 const transporter = createTransporter()
 
+function escapeHtml(s: string): string {
+	return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+}
+
+/**
+ * Sends a magic link email for club contact verification.
+ */
+export async function sendMagicLinkEmail(email: string, url: string): Promise<void> {
+	await transporter.sendMail({
+		from: process.env.MAIL_FROM ?? "noreply@mpga.golf",
+		to: email,
+		subject: "MPGA Club Contact Verification",
+		text: `Verify your identity to access club contact features.\n\nClick the link below to sign in:\n${url}\n\nThis link expires in 10 minutes.`,
+		html: `
+      <h1>MPGA Club Contact Verification</h1>
+      <p>Verify your identity to access club contact features.</p>
+      <p><a href="${url}">Click here to sign in</a></p>
+      <p>Or copy this link: ${url}</p>
+      <p><em>This link expires in 10 minutes.</em></p>
+    `,
+	})
+}
+
+/**
+ * Sends a dues payment confirmation email to all club contacts.
+ */
+export async function sendDuesPaymentEmail(
+	to: string[],
+	clubName: string,
+	year: number,
+): Promise<void> {
+	await transporter.sendMail({
+		from: process.env.MAIL_FROM ?? "noreply@mpga.golf",
+		to: to.join(", "),
+		subject: `MPGA Dues Payment Confirmation — ${clubName}`,
+		text: `This is a confirmation that ${year} MPGA membership dues have been paid for ${clubName}.\n\nThank you for your continued membership in the Minnesota Public Golf Association.`,
+		html: `
+      <h1>Dues Payment Confirmation</h1>
+      <p>This is a confirmation that <strong>${year}</strong> MPGA membership dues have been paid for <strong>${escapeHtml(clubName)}</strong>.</p>
+      <p>Thank you for your continued membership in the Minnesota Public Golf Association.</p>
+    `,
+	})
+}
+
 /**
  * Sends an invitation email to the specified address with an accept link.
  */
