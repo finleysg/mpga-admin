@@ -36,6 +36,9 @@ export { OfficersCard, type OfficersCardProps, type Officer } from "./OfficersCa
 export { MatchPlaySignUp, type MatchPlaySignUpProps } from "./MatchPlaySignUp"
 export { MatchPlayRulesTabs, type MatchPlayRulesTabsProps } from "./MatchPlayRulesTabs"
 export { MatchPlayNav } from "./MatchPlayNav"
+export { AboutNav } from "./AboutNav"
+export { CommitteeList, type CommitteeListProps } from "./CommitteeList"
+export { AwardWinnersList, type AwardWinnersListProps } from "./AwardWinnersList"
 export { PrintButton } from "./PrintButton"
 export { NewsList, type NewsListProps } from "./NewsList"
 export {

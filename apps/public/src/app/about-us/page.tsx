@@ -1,10 +1,13 @@
-import { H1 } from "@mpga/ui"
+import { ContentCard } from "@mpga/ui"
 
-export default function AboutUsPage() {
+import { getAboutUsContent } from "@/lib/queries/about"
+
+export default async function AboutUsPage() {
+	const content = await getAboutUsContent()
+
 	return (
-		<main className="mx-auto max-w-4xl px-4 py-8">
-			<H1 className="mb-8">About Us</H1>
-			<p className="text-sm text-gray-400">About MPGA placeholder</p>
-		</main>
+		<div className="mx-auto max-w-6xl px-4 py-8">
+			{content && <ContentCard heading="h1" title={content.title} content={content.content} />}
+		</div>
 	)
 }

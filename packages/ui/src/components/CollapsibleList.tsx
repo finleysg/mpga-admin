@@ -7,7 +7,7 @@ export interface CollapsibleListProps {
 	maxItems?: number
 }
 
-export function CollapsibleList({ children, maxItems = 10 }: CollapsibleListProps) {
+export function CollapsibleList({ children, maxItems = 8 }: CollapsibleListProps) {
 	const [isExpanded, setIsExpanded] = useState(false)
 
 	const hiddenCount = children.length - maxItems

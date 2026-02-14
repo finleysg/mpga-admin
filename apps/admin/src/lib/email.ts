@@ -74,6 +74,51 @@ export async function sendDuesPaymentEmail(
 }
 
 /**
+ * Sends a notification email when a contact form submission is received.
+ */
+export async function sendContactNotificationEmail(
+	name: string,
+	email: string,
+	phone: string,
+	messageText: string,
+	course?: string,
+): Promise<void> {
+	const to = process.env.CONTACT_EMAIL
+	if (!to) {
+		console.warn("CONTACT_EMAIL not configured — skipping contact notification email")
+		return
+	}
+
+	const courseLine = course ? `Golf Course: ${escapeHtml(course)}` : ""
+
+	await transporter.sendMail({
+		from: process.env.MAIL_FROM ?? "noreply@mpga.golf",
+		to,
+		replyTo: email,
+		subject: `MPGA Contact Form: ${name}`,
+		text: [
+			`Name: ${name}`,
+			`Email: ${email}`,
+			phone ? `Phone: ${phone}` : "",
+			course ? `Golf Course: ${course}` : "",
+			"",
+			messageText,
+		]
+			.filter(Boolean)
+			.join("\n"),
+		html: `
+      <h1>MPGA Contact Form Submission</h1>
+      <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+      <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+      ${phone ? `<p><strong>Phone:</strong> ${escapeHtml(phone)}</p>` : ""}
+      ${courseLine ? `<p><strong>${courseLine}</strong></p>` : ""}
+      <hr />
+      <p>${escapeHtml(messageText).replace(/\n/g, "<br />")}</p>
+    `,
+	})
+}
+
+/**
  * Sends an invitation email to the specified address with an accept link.
  */
 export async function sendInvitationEmail(email: string, token: string): Promise<void> {
