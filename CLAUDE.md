@@ -91,13 +91,22 @@ NOTE: we have customized Prettier in the following way:
 }
 ```
 
-This project uses tab-based indentation. When editing files, preserve tab indentation exactly. If an Edit tool call fails due to whitespace mismatch, use Write or Bash(sed) instead of retrying Edit repeatedly.
-
 This project uses TypeScript with strict mode. Always handle possibly-undefined array accesses with non-null assertions or proper guards. Use the full markdown editor component (ContentEditor) for any rich text fields, not simplified alternatives.
 
 ## Feedback
 
-ALWAYS: pnpm format
-ALWAYS: pnpm lint (fix warnings and errors, even if pre-existing)
-ALWAYS: pnpm test (fix failures, even if pre-existing)
-ALWAYS: pnpm build
+Use the following tools / commands as feedback on your work.
+
+`pnpm format`
+`pnpm lint` (fix warnings and errors, even if pre-existing)
+`pnpm test` (fix failures, even if pre-existing)
+`pnpm build`
+
+When a change is made to a next app, rebuild the container.
+
+### IMPORTANT: UX Feedback
+
+Use the `chrome-devtools` skill to validate your work directly in the browser:
+
+- Public site: http://localhost:4000
+- Admin site: http://localhost:4100

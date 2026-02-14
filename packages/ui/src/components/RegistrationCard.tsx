@@ -43,7 +43,7 @@ export function RegistrationCard({
 	}
 
 	return (
-		<Card>
+		<Card className="gap-3 py-4">
 			<CardHeader>
 				<CardTitle>
 					<H2 className="text-lg">Registration</H2>
@@ -51,9 +51,9 @@ export function RegistrationCard({
 			</CardHeader>
 			<CardContent>
 				{hasRegistrationDates && (
-					<div className="mb-4 space-y-3">
+					<div className={hasLinks ? "mb-2 space-y-1" : "space-y-1"}>
 						{registrationStart && (
-							<Item size="sm">
+							<Item size="sm" className="py-1.5">
 								<ItemMedia>
 									<Calendar className="h-5 w-5 text-gray-400" />
 								</ItemMedia>
@@ -66,7 +66,7 @@ export function RegistrationCard({
 							</Item>
 						)}
 						{registrationEnd && (
-							<Item size="sm">
+							<Item size="sm" className="py-1.5">
 								<ItemMedia>
 									<Calendar className="h-5 w-5 text-gray-400" />
 								</ItemMedia>
@@ -82,9 +82,9 @@ export function RegistrationCard({
 				)}
 
 				{hasLinks && (
-					<div className="space-y-2">
+					<div className="space-y-1">
 						{links.map((link) => (
-							<Item asChild size="sm" key={link.id}>
+							<Item asChild size="sm" className="py-1.5" key={link.id}>
 								<a
 									href={link.url}
 									target="_blank"

@@ -4,6 +4,7 @@ import {
 	clubContactRole,
 	contact,
 	content,
+	document,
 	golfCourse,
 	membership,
 } from "@mpga/database"
@@ -245,5 +246,39 @@ export async function getClubMembershipInfo(
 			lastMemberYear: null,
 			currentYearPaymentDate: null,
 		}
+	}
+}
+
+export interface ClubRegistrationDocument {
+	id: number
+	title: string
+	file: string
+}
+
+export async function getClubRegistrationDocument(
+	year: number,
+): Promise<ClubRegistrationDocument | null> {
+	try {
+		const results = await db
+			.select({
+				id: document.id,
+				title: document.title,
+				file: document.file,
+			})
+			.from(document)
+			.where(and(eq(document.documentType, "Club Registration"), eq(document.year, year)))
+			.limit(1)
+
+		const doc = results[0]
+		if (!doc?.file) return null
+
+		return {
+			id: doc.id,
+			title: doc.title,
+			file: doc.file,
+		}
+	} catch (error) {
+		console.error("Failed to fetch club registration document:", error)
+		return null
 	}
 }

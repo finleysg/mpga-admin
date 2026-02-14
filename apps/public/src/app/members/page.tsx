@@ -1,6 +1,11 @@
-import { ClubsTable, ContentCard } from "@mpga/ui"
+import { getMediaUrl } from "@mpga/types"
+import { ClubsTable, ContentCard, DownloadLink } from "@mpga/ui"
 
-import { getMembersContent, getClubsWithMembershipStatus } from "@/lib/queries/clubs"
+import {
+	getMembersContent,
+	getClubsWithMembershipStatus,
+	getClubRegistrationDocument,
+} from "@/lib/queries/clubs"
 import { getCurrentSeason } from "@/lib/season"
 
 export const metadata = {
@@ -10,10 +15,15 @@ export const metadata = {
 
 export default async function MembersPage() {
 	const currentYear = getCurrentSeason()
-	const [content, clubs] = await Promise.all([
+	const [content, clubs, registrationDoc] = await Promise.all([
 		getMembersContent(),
 		getClubsWithMembershipStatus(currentYear),
+		getClubRegistrationDocument(currentYear),
 	])
+
+	const registrationFooter = registrationDoc ? (
+		<DownloadLink href={getMediaUrl(registrationDoc.file) ?? ""} title={registrationDoc.title} />
+	) : null
 
 	return (
 		<main className="mx-auto max-w-6xl px-4 py-8">
@@ -23,6 +33,7 @@ export default async function MembersPage() {
 					title={content.title}
 					content={content.content}
 					className="mb-8"
+					footer={registrationFooter}
 				/>
 			)}
 

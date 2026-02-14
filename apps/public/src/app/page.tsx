@@ -1,41 +1,21 @@
-import {
-	HeroCarousel,
-	FeatureCardsSection,
-	AboutSection,
-	LatestNewsSection,
-	type HeroSlideProps,
-} from "@mpga/ui"
+import { HeroCarousel, FeatureCardsSection, AboutSection, LatestNewsSection } from "@mpga/ui"
 
+import { buildHeroSlides } from "@/lib/hero-slides"
 import { getLatestAnnouncements } from "@/lib/queries/announcements"
 import { getFeatureCards, getAboutContent } from "@/lib/queries/content"
-import { get2026Tournaments, formatTournamentDates } from "@/lib/queries/tournaments"
+import { getTournamentsForYear } from "@/lib/queries/tournaments"
 
 export default async function HomePage() {
+	const year = new Date().getFullYear()
 	const [tournaments, featureCards, aboutContent, announcements] = await Promise.all([
-		get2026Tournaments(),
+		getTournamentsForYear(year),
 		getFeatureCards(),
 		getAboutContent(),
 		getLatestAnnouncements(),
 	])
 
-	// Build slides array: logo slide first, then tournament slides
-	const slides: HeroSlideProps[] = [
-		{
-			type: "logo",
-			imageUrl: "/images/mpga-logo.png",
-		},
-		...tournaments
-			.filter((t) => t.systemName) // Only include tournaments with systemName (has matching image)
-			.map((t) => ({
-				type: "tournament" as const,
-				imageUrl: `/images/${t.systemName}.jpg`,
-				title: t.tournamentName,
-				subtitle: t.instanceName !== t.tournamentName ? t.instanceName : undefined,
-				dates: formatTournamentDates(t.startDate, t.rounds),
-				venue: `${t.venueName}, ${t.venueCity}`,
-				ctaUrl: `/tournaments/${t.systemName}/2026`,
-			})),
-	]
+	const today = new Date().toISOString().split("T")[0]!
+	const slides = buildHeroSlides(tournaments, year, today)
 
 	return (
 		<main>

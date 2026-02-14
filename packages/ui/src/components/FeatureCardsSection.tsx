@@ -7,7 +7,7 @@ export interface FeatureCardsSectionProps {
 	cards: FeatureCardProps[]
 }
 
-const displayOrder = ["T1", "M1", "C1"]
+const displayOrder = ["home-tournaments", "home-match-play", "home-clubs"]
 
 export function FeatureCardsSection({ cards }: FeatureCardsSectionProps) {
 	if (!cards || cards.length === 0) {
