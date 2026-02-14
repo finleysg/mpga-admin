@@ -4,4 +4,9 @@ node_modules
 *.md
 .env
 .env.local
+.env.docker
 .DS_Store
+.turbo
+coverage
+.vscode
+.github
