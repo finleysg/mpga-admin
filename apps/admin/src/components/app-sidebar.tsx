@@ -71,11 +71,12 @@ const navGroups = [
 		],
 	},
 	{
-		title: "Season Settings",
+		title: "MPGA Data",
 		items: [
 			{ title: "Tournaments", url: "/settings/tournaments" },
 			{ title: "Match Play Groups", url: "/settings/match-play-groups" },
 			{ title: "Membership", url: "/settings/membership" },
+			{ title: "Documents", url: "/settings/documents" },
 		],
 	},
 ]

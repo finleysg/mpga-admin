@@ -14,9 +14,9 @@ export interface FeatureCardProps {
 }
 
 const iconMap: Record<string, { icon: LucideIcon; route: string }> = {
-	T1: { icon: Trophy, route: "/tournaments" },
-	M1: { icon: Users, route: "/match-play" },
-	C1: { icon: MapPin, route: "/members" },
+	"home-tournaments": { icon: Trophy, route: "/tournaments" },
+	"home-match-play": { icon: Users, route: "/match-play" },
+	"home-clubs": { icon: MapPin, route: "/members" },
 }
 
 export function FeatureCard({ systemName, title, description }: FeatureCardProps) {

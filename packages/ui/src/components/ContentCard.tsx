@@ -1,5 +1,5 @@
 import { Markdown } from "./Markdown"
-import { Card, CardAction, CardContent, CardHeader, CardTitle } from "./ui/card"
+import { Card, CardAction, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card"
 import { H1, H2, H3, H4 } from "./ui/heading"
 
 export interface ContentCardProps {
@@ -9,6 +9,7 @@ export interface ContentCardProps {
 	variant?: "primary" | "secondary"
 	className?: string
 	action?: React.ReactNode
+	footer?: React.ReactNode
 }
 
 const headingComponents = {
@@ -25,6 +26,7 @@ export function ContentCard({
 	variant,
 	className,
 	action,
+	footer,
 }: ContentCardProps) {
 	const Heading = headingComponents[heading]
 
@@ -39,6 +41,7 @@ export function ContentCard({
 			<CardContent>
 				<Markdown content={content} />
 			</CardContent>
+			{footer && <CardFooter>{footer}</CardFooter>}
 		</Card>
 	)
 }

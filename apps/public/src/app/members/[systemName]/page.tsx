@@ -85,7 +85,9 @@ export default async function ClubDetailPage({ params }: { params: Params }) {
 						email={club.golfCourse.email}
 						phone={club.golfCourse.phone}
 						notes={club.golfCourse.notes}
-						logoUrl={getMediaUrl(club.golfCourse.logo)}
+						logoUrl={
+							club.golfCourse.logo?.includes("tbd") ? undefined : getMediaUrl(club.golfCourse.logo)
+						}
 					/>
 				) : (
 					<Card>

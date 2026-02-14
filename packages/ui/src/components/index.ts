@@ -20,6 +20,7 @@ export {
 	type TournamentLinkItem,
 } from "./RegistrationCard"
 export { DocumentsCard, type DocumentsCardProps, type DocumentItem } from "./DocumentsCard"
+export { DownloadLink, type DownloadLinkProps } from "./DownloadLink"
 export { GolfCourseCard, type GolfCourseCardProps } from "./GolfCourseCard"
 export {
 	HistoryResultsTable,
