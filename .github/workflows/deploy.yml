@@ -34,6 +34,8 @@ jobs:
           context: .
           file: apps/public/Dockerfile
           push: true
+          build-args: |
+            NEXT_PUBLIC_ADMIN_URL=${{ secrets.NEXT_PUBLIC_ADMIN_URL }}
           tags: |
             ${{ env.REGISTRY }}/${{ github.repository }}/public:${{ github.ref_name }}
             ${{ env.REGISTRY }}/${{ github.repository }}/public:latest

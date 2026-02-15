@@ -9,6 +9,8 @@ RUN turbo prune @mpga/public --docker
 FROM base AS installer
 WORKDIR /app
 RUN npm install -g pnpm
+ARG NEXT_PUBLIC_ADMIN_URL
+ENV NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 RUN pnpm install --frozen-lockfile
