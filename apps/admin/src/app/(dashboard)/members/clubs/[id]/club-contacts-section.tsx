@@ -77,7 +77,7 @@ export function ClubContactsSection({ clubId, contacts, onRefresh }: ClubContact
 	const handleRemoveContact = async (clubContactId: number) => {
 		setRemoving(clubContactId)
 		try {
-			const result = await removeClubContactAction(clubContactId)
+			const result = await removeClubContactAction(clubContactId, clubId)
 			if (result.success) {
 				toast.success("Contact removed")
 				await onRefresh()
@@ -94,7 +94,7 @@ export function ClubContactsSection({ clubId, contacts, onRefresh }: ClubContact
 
 	const handleAddRole = async (clubContactId: number, role: string) => {
 		try {
-			const result = await addClubContactRoleAction(clubContactId, role)
+			const result = await addClubContactRoleAction(clubContactId, role, clubId)
 			if (result.success) {
 				await onRefresh()
 			} else {
@@ -108,7 +108,7 @@ export function ClubContactsSection({ clubId, contacts, onRefresh }: ClubContact
 
 	const handleRemoveRole = async (roleId: number) => {
 		try {
-			const result = await removeClubContactRoleAction(roleId)
+			const result = await removeClubContactRoleAction(roleId, clubId)
 			if (result.success) {
 				await onRefresh()
 			} else {
@@ -122,7 +122,7 @@ export function ClubContactsSection({ clubId, contacts, onRefresh }: ClubContact
 
 	const handleTogglePrimary = async (clubContactId: number) => {
 		try {
-			const result = await toggleClubContactPrimaryAction(clubContactId)
+			const result = await toggleClubContactPrimaryAction(clubContactId, clubId)
 			if (result.success) {
 				toast.success("Primary contact updated")
 				await onRefresh()

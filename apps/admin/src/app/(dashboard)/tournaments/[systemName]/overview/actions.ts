@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm"
 
 import { db } from "@/lib/db"
 import { requireAuth } from "@/lib/require-auth"
+import { revalidatePublicSite } from "@/lib/revalidate"
 
 export async function getTournamentDescriptionAction(
 	systemName: string,
@@ -40,6 +41,7 @@ export async function getTournamentDescriptionAction(
 export async function saveTournamentDescriptionAction(data: {
 	tournamentId: number
 	description: string
+	systemName: string
 }): Promise<ActionResult<{ id: number }>> {
 	const userId = await requireAuth()
 	if (!userId) {
@@ -51,6 +53,8 @@ export async function saveTournamentDescriptionAction(data: {
 			.update(tournament)
 			.set({ description: data.description })
 			.where(eq(tournament.id, data.tournamentId))
+
+		await revalidatePublicSite(`/tournaments/${data.systemName}/history`)
 
 		return { success: true, data: { id: data.tournamentId } }
 	} catch (error) {

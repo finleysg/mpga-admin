@@ -30,6 +30,7 @@ export default async function EditDescriptionPage({
 		return saveInstanceDescriptionAction({
 			instanceId: data.id,
 			description: data.content,
+			systemName,
 		})
 	}
 

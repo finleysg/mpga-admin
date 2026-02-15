@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm"
 
 import { db } from "@/lib/db"
 import { requireAuth } from "@/lib/require-auth"
+import { revalidatePublicSite } from "@/lib/revalidate"
 
 export interface ContentData {
 	id: number
@@ -50,6 +51,7 @@ export async function saveContentAction(
 		contentText: string
 	},
 	revalidatePath: string,
+	revalidateType?: "page" | "layout",
 ): Promise<ActionResult<{ id: number }>> {
 	const userId = await requireAuth()
 	if (!userId) {
@@ -82,34 +84,11 @@ export async function saveContentAction(
 			id = result[0].insertId
 		}
 
-		await revalidatePublicSite(revalidatePath)
+		await revalidatePublicSite(revalidatePath, revalidateType)
 
 		return { success: true, data: { id } }
 	} catch (error) {
 		console.error("Failed to save content:", error)
 		return { success: false, error: "Failed to save content" }
-	}
-}
-
-async function revalidatePublicSite(path: string) {
-	const publicUrl = process.env.PUBLIC_SITE_URL
-	const secret = process.env.REVALIDATE_SECRET
-
-	if (!publicUrl || !secret) {
-		console.warn("PUBLIC_SITE_URL or REVALIDATE_SECRET not configured, skipping revalidation")
-		return
-	}
-
-	try {
-		const res = await fetch(`${publicUrl}/api/revalidate?path=${encodeURIComponent(path)}`, {
-			method: "POST",
-			signal: AbortSignal.timeout(5000),
-			headers: { "x-revalidate-secret": secret },
-		})
-		if (!res.ok) {
-			console.error(`Revalidation failed: ${res.status} ${res.statusText}`)
-		}
-	} catch (error) {
-		console.error("Failed to revalidate public site:", error)
 	}
 }

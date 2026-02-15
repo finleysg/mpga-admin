@@ -63,7 +63,7 @@ export function HeroCarousel({ slides }: HeroCarouselProps) {
 				<CarouselContent className="-ml-0">
 					{slides.map((slide, index) => (
 						<CarouselItem key={index} className="pl-0">
-							<HeroSlide {...slide} />
+							<HeroSlide {...slide} priority={index === 0} />
 						</CarouselItem>
 					))}
 				</CarouselContent>

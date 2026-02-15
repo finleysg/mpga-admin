@@ -7,6 +7,7 @@ import { headers } from "next/headers"
 
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { revalidateClubPage } from "@/lib/revalidate"
 import { getStripe } from "@/lib/stripe"
 
 import type {
@@ -119,6 +120,8 @@ export async function saveClubForContact(
 				notes: data.notes ?? null,
 			})
 			.where(eq(club.id, data.id))
+
+		await revalidateClubPage(data.id)
 
 		return { success: true, data: { id: data.id } }
 	} catch (error) {
@@ -272,6 +275,8 @@ export async function addClubContactForContact(
 			isPrimary: false,
 		})
 
+		await revalidateClubPage(clubId)
+
 		return { success: true, data: { id: result[0].insertId } }
 	} catch (error) {
 		console.error("Failed to add club contact:", error)
@@ -303,6 +308,7 @@ export async function removeClubContactForContact(
 			await tx.delete(clubContactRole).where(eq(clubContactRole.clubContactId, clubContactId))
 			await tx.delete(clubContact).where(eq(clubContact.id, clubContactId))
 		})
+		await revalidateClubPage(clubId)
 		return { success: true }
 	} catch (error) {
 		console.error("Failed to remove club contact:", error)
@@ -334,6 +340,8 @@ export async function toggleClubContactPrimaryForContact(
 			.update(clubContact)
 			.set({ isPrimary: !row.isPrimary })
 			.where(eq(clubContact.id, clubContactId))
+
+		await revalidateClubPage(clubId)
 
 		return { success: true }
 	} catch (error) {
@@ -370,6 +378,8 @@ export async function addClubContactRoleForContact(
 			role,
 		})
 
+		await revalidateClubPage(clubId)
+
 		return { success: true, data: { id: result[0].insertId } }
 	} catch (error) {
 		console.error("Failed to add role:", error)
@@ -399,6 +409,7 @@ export async function removeClubContactRoleForContact(
 		}
 
 		await db.delete(clubContactRole).where(eq(clubContactRole.id, roleId))
+		await revalidateClubPage(clubId)
 		return { success: true }
 	} catch (error) {
 		console.error("Failed to remove role:", error)

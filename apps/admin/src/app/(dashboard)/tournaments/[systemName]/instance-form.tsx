@@ -28,6 +28,7 @@ import {
 interface InstanceFormProps {
 	instance: TournamentInstanceData
 	courses: GolfCourseOption[]
+	systemName: string
 }
 
 function toDatetimeLocal(value: string | null): string {
@@ -42,7 +43,7 @@ function fromDatetimeLocal(value: string): string | null {
 	return value.replace("T", " ") + ":00.000000"
 }
 
-export function InstanceForm({ instance, courses }: InstanceFormProps) {
+export function InstanceForm({ instance, courses, systemName }: InstanceFormProps) {
 	const [mounted, setMounted] = useState(false)
 	const [saving, setSaving] = useState(false)
 	const [error, setError] = useState<string | null>(null)
@@ -78,6 +79,7 @@ export function InstanceForm({ instance, courses }: InstanceFormProps) {
 				registrationStart: fromDatetimeLocal(registrationStart),
 				registrationEnd: fromDatetimeLocal(registrationEnd),
 				locationId,
+				systemName,
 			})
 
 			if (result.success) {

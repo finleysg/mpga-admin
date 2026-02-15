@@ -18,5 +18,5 @@ export async function saveContentAction(data: {
 	title: string
 	contentText: string
 }): Promise<ActionResult<{ id: number }>> {
-	return saveContent(data, "/tournaments")
+	return saveContent(data, "/tournaments", "layout")
 }

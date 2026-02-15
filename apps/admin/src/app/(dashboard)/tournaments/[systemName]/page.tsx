@@ -75,13 +75,14 @@ export default async function TournamentInstancePage({
 			</div>
 
 			<div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-				<InstanceForm instance={instance} courses={courses} />
+				<InstanceForm instance={instance} courses={courses} systemName={systemName} />
 				<DocumentsCard
 					initialDocuments={documents}
 					tournamentId={instance.tournamentId}
 					year={parseInt(instance.startDate.slice(0, 4), 10)}
+					systemName={systemName}
 				/>
-				<LinksCard initialLinks={links} instanceId={instance.id} />
+				<LinksCard initialLinks={links} instanceId={instance.id} systemName={systemName} />
 			</div>
 		</div>
 	)

@@ -30,6 +30,7 @@ export default async function EditOverviewPage({
 		return saveTournamentDescriptionAction({
 			tournamentId: data.id,
 			description: data.content,
+			systemName,
 		})
 	}
 

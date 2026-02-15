@@ -6,6 +6,7 @@ import { and, asc, eq, like, or, sql } from "drizzle-orm"
 
 import { db } from "@/lib/db"
 import { requireAuth } from "@/lib/require-auth"
+import { revalidateClubPage } from "@/lib/revalidate"
 
 // ── Types ───────────────────────────────────────────────────────────
 
@@ -186,6 +187,8 @@ export async function saveClubAction(data: ClubInput): Promise<ActionResult<{ id
 				})
 				.where(eq(club.id, data.id))
 
+			await revalidateClubPage(data.id)
+
 			return { success: true, data: { id: data.id } }
 		} else {
 			const result = await db.insert(club).values({
@@ -306,6 +309,8 @@ export async function addClubContactAction(
 			isPrimary: false,
 		})
 
+		await revalidateClubPage(clubId)
+
 		return { success: true, data: { id: result[0].insertId } }
 	} catch (error) {
 		console.error("Failed to add club contact:", error)
@@ -313,7 +318,10 @@ export async function addClubContactAction(
 	}
 }
 
-export async function removeClubContactAction(clubContactId: number): Promise<ActionResult> {
+export async function removeClubContactAction(
+	clubContactId: number,
+	clubId: number,
+): Promise<ActionResult> {
 	const userId = await requireAuth()
 	if (!userId) {
 		return { success: false, error: "Unauthorized" }
@@ -325,6 +333,7 @@ export async function removeClubContactAction(clubContactId: number): Promise<Ac
 			await tx.delete(clubContactRole).where(eq(clubContactRole.clubContactId, clubContactId))
 			await tx.delete(clubContact).where(eq(clubContact.id, clubContactId))
 		})
+		await revalidateClubPage(clubId)
 		return { success: true }
 	} catch (error) {
 		console.error("Failed to remove club contact:", error)
@@ -371,7 +380,10 @@ export async function searchContactsAction(
 	}
 }
 
-export async function toggleClubContactPrimaryAction(clubContactId: number): Promise<ActionResult> {
+export async function toggleClubContactPrimaryAction(
+	clubContactId: number,
+	clubId: number,
+): Promise<ActionResult> {
 	const userId = await requireAuth()
 	if (!userId) {
 		return { success: false, error: "Unauthorized" }
@@ -393,6 +405,8 @@ export async function toggleClubContactPrimaryAction(clubContactId: number): Pro
 			.set({ isPrimary: !row.isPrimary })
 			.where(eq(clubContact.id, clubContactId))
 
+		await revalidateClubPage(clubId)
+
 		return { success: true }
 	} catch (error) {
 		console.error("Failed to toggle primary contact:", error)
@@ -405,6 +419,7 @@ export async function toggleClubContactPrimaryAction(clubContactId: number): Pro
 export async function addClubContactRoleAction(
 	clubContactId: number,
 	role: string,
+	clubId: number,
 ): Promise<ActionResult<{ id: number }>> {
 	const userId = await requireAuth()
 	if (!userId) {
@@ -417,6 +432,8 @@ export async function addClubContactRoleAction(
 			role,
 		})
 
+		await revalidateClubPage(clubId)
+
 		return { success: true, data: { id: result[0].insertId } }
 	} catch (error) {
 		console.error("Failed to add role:", error)
@@ -424,7 +441,10 @@ export async function addClubContactRoleAction(
 	}
 }
 
-export async function removeClubContactRoleAction(roleId: number): Promise<ActionResult> {
+export async function removeClubContactRoleAction(
+	roleId: number,
+	clubId: number,
+): Promise<ActionResult> {
 	const userId = await requireAuth()
 	if (!userId) {
 		return { success: false, error: "Unauthorized" }
@@ -432,6 +452,7 @@ export async function removeClubContactRoleAction(roleId: number): Promise<Actio
 
 	try {
 		await db.delete(clubContactRole).where(eq(clubContactRole.id, roleId))
+		await revalidateClubPage(clubId)
 		return { success: true }
 	} catch (error) {
 		console.error("Failed to remove role:", error)
@@ -503,6 +524,8 @@ export async function saveClubPaymentAction(data: {
 			paymentCode: data.paymentCode,
 			createDate: sql`NOW(6)`,
 		})
+
+		await revalidateClubPage(data.clubId)
 
 		return { success: true, data: { id: result[0].insertId } }
 	} catch (error) {
