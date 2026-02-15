@@ -19,11 +19,16 @@ function createTransporter() {
 		})
 	}
 
-	// Development: Local SMTP (Mailpit)
+	// Development / testing SMTP (Mailpit, Mailtrap, etc.)
+	const authConfig =
+		process.env.MAIL_USER && process.env.MAIL_PASS
+			? { auth: { user: process.env.MAIL_USER, pass: process.env.MAIL_PASS } }
+			: {}
 	return nodemailer.createTransport({
 		host: process.env.MAIL_HOST ?? "localhost",
 		port: parseInt(process.env.MAIL_PORT ?? "1025", 10),
 		secure: false,
+		...authConfig,
 	})
 }
 
