@@ -49,13 +49,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Create deploy tarball
+        run: tar -cf ./deploy.tar .
+
       - name: Deploy to CapRover (public)
         uses: caprover/deploy-from-github@v1.1.2
         with:
           server: ${{ secrets.CAPROVER_SERVER }}
           app: ${{ secrets.CAPROVER_APP_PUBLIC }}
           token: ${{ secrets.CAPROVER_TOKEN_PUBLIC }}
-          branch: ${{ github.ref_name }}
 
   deploy-admin:
     needs: build-admin
