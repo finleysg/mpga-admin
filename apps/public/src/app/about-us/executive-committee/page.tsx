@@ -2,6 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle, CommitteeList, ContentCard, H
 
 import { getCommitteeMembers, getExecutiveCommitteeContent } from "@/lib/queries/about"
 
+export const dynamic = "force-dynamic"
+
 export default async function ExecutiveCommitteePage() {
 	const [content, members] = await Promise.all([
 		getExecutiveCommitteeContent(),

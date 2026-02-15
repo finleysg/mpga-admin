@@ -3,6 +3,8 @@ import type { Metadata } from "next"
 
 import { getAllAnnouncements } from "@/lib/queries/announcements"
 
+export const dynamic = "force-dynamic"
+
 export const metadata: Metadata = {
 	title: "News",
 	description: "Latest news and announcements from the MPGA.",

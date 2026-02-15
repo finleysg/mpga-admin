@@ -3,6 +3,8 @@ import type { Metadata } from "next"
 
 import { getMatchPlayRules, getSeniorMatchPlayRules } from "@/lib/queries/content"
 
+export const dynamic = "force-dynamic"
+
 export const metadata: Metadata = {
 	title: "Match Play Rules",
 	description: "Rules for MPGA match play and senior match play competitions.",

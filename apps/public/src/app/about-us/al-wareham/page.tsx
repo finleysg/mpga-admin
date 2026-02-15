@@ -11,6 +11,8 @@ import {
 
 import { getAwardWithWinners } from "@/lib/queries/about"
 
+export const dynamic = "force-dynamic"
+
 export default async function AlWarehamPage() {
 	const award = await getAwardWithWinners(AwardSystemName.AlWareham)
 

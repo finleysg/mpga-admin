@@ -3,6 +3,8 @@ import { ContentCard, MatchPlaySignUp } from "@mpga/ui"
 import { getMatchPlayContent } from "@/lib/queries/content"
 import { getCurrentSeason } from "@/lib/season"
 
+export const dynamic = "force-dynamic"
+
 export default async function MatchPlayPage() {
 	const currentYear = getCurrentSeason()
 	const deadlineStr = process.env.MATCH_PLAY_DEADLINE

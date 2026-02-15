@@ -11,21 +11,11 @@ WORKDIR /app
 RUN npm install -g pnpm
 ARG NEXT_PUBLIC_ADMIN_URL
 ENV NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL
-ARG DATABASE_HOST
-ARG DATABASE_PORT
-ARG DATABASE_USER
-ARG DATABASE_PASSWORD
-ARG DATABASE_NAME
-ENV DATABASE_HOST=$DATABASE_HOST
-ENV DATABASE_PORT=$DATABASE_PORT
-ENV DATABASE_USER=$DATABASE_USER
-ENV DATABASE_PASSWORD=$DATABASE_PASSWORD
-ENV DATABASE_NAME=$DATABASE_NAME
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 RUN pnpm install --frozen-lockfile
 COPY --from=builder /app/out/full/ .
-RUN --network=host pnpm turbo build --filter=@mpga/public
+RUN pnpm turbo build --filter=@mpga/public
 
 FROM base AS runner
 WORKDIR /app

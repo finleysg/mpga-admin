@@ -18,6 +18,13 @@ import { getCurrentSeason } from "@/lib/season"
 
 const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL
 
+export const revalidate = 86400 // 24 hours — safety net; admin triggers on-demand revalidation
+export const dynamicParams = true
+
+export async function generateStaticParams() {
+	return []
+}
+
 type Params = Promise<{ systemName: string }>
 
 export async function generateMetadata({ params }: { params: Params }) {

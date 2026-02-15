@@ -4,6 +4,8 @@ import { H1, TournamentCard } from "@mpga/ui"
 import { getTournamentsForYear, formatTournamentDates } from "@/lib/queries/tournaments"
 import { getCurrentSeason } from "@/lib/season"
 
+export const dynamic = "force-dynamic"
+
 export default async function TournamentsPage() {
 	const currentYear = getCurrentSeason()
 	const tournaments = await getTournamentsForYear(currentYear)

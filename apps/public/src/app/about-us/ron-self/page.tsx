@@ -11,6 +11,8 @@ import {
 
 import { getAwardWithWinners } from "@/lib/queries/about"
 
+export const dynamic = "force-dynamic"
+
 export default async function RonSelfPage() {
 	const award = await getAwardWithWinners(AwardSystemName.RonSelf)
 

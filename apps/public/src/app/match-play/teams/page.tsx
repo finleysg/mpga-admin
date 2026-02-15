@@ -3,6 +3,8 @@ import { H1, MatchPlayGroupCards } from "@mpga/ui"
 import { getTeamsForYear } from "@/lib/queries/match-play"
 import { getCurrentSeason } from "@/lib/season"
 
+export const dynamic = "force-dynamic"
+
 export default async function MatchPlayTeamsPage() {
 	const currentYear = getCurrentSeason()
 	const teams = await getTeamsForYear(currentYear)

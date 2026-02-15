@@ -11,6 +11,8 @@ import {
 
 import { getAwardWithWinners, getPastPresidentsContent } from "@/lib/queries/about"
 
+export const dynamic = "force-dynamic"
+
 export default async function PastPresidentsPage() {
 	const [content, award] = await Promise.all([
 		getPastPresidentsContent(),

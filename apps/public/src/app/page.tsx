@@ -5,6 +5,8 @@ import { getLatestAnnouncements } from "@/lib/queries/announcements"
 import { getFeatureCards, getAboutContent } from "@/lib/queries/content"
 import { getTournamentsForYear } from "@/lib/queries/tournaments"
 
+export const dynamic = "force-dynamic"
+
 export default async function HomePage() {
 	const year = new Date().getFullYear()
 	const [tournaments, featureCards, aboutContent, announcements] = await Promise.all([

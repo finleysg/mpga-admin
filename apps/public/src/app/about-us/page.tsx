@@ -2,6 +2,8 @@ import { ContentCard } from "@mpga/ui"
 
 import { getAboutUsContent } from "@/lib/queries/about"
 
+export const dynamic = "force-dynamic"
+
 export default async function AboutUsPage() {
 	const content = await getAboutUsContent()
 

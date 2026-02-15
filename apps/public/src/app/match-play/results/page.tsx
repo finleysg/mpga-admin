@@ -4,6 +4,8 @@ import { DocumentsCard, H1, MatchPlayResultsTable } from "@mpga/ui"
 import { getMatchPlayDocuments, getMatchPlayResults } from "@/lib/queries/match-play"
 import { getCurrentSeason } from "@/lib/season"
 
+export const dynamic = "force-dynamic"
+
 export default async function MatchPlayResultsPage() {
 	const year = getCurrentSeason()
 	const [documents, results] = await Promise.all([

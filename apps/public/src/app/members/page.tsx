@@ -8,6 +8,8 @@ import {
 } from "@/lib/queries/clubs"
 import { getCurrentSeason } from "@/lib/season"
 
+export const dynamic = "force-dynamic"
+
 export const metadata = {
 	title: "Member Clubs | MPGA",
 	description: "View MPGA member clubs and their membership status.",
