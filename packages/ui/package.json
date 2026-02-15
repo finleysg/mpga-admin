@@ -55,7 +55,7 @@
 		"@mpga/typescript-config": "workspace:*",
 		"@types/react": "^19.2.0",
 		"eslint": "^9.17.0",
-		"next": "15.3.3",
+		"next": "16.1.6",
 		"react": "19.2.3",
 		"typescript": "^5.7.2"
 	},
