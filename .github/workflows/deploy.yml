@@ -59,8 +59,8 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Test DB connectivity
-        run: nc -zv ${{ secrets.DATABASE_HOST }} ${{ secrets.DATABASE_PORT }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Build and push public image
         uses: docker/build-push-action@v6
@@ -68,6 +68,7 @@ jobs:
           context: .
           file: apps/public/Dockerfile
           push: true
+          allow: network.host
           build-args: |
             NEXT_PUBLIC_ADMIN_URL=${{ secrets.NEXT_PUBLIC_ADMIN_URL }}
             DATABASE_HOST=${{ secrets.DATABASE_HOST }}
