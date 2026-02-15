@@ -69,14 +69,22 @@ jobs:
     needs: build-public
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger Coolify deploy (public)
-        run: |
-          curl -X POST "${{ secrets.COOLIFY_WEBHOOK_URL_PUBLIC }}"
+      - name: Deploy to CapRover (public)
+        uses: caprover/deploy-from-github@v1.1.2
+        with:
+          server: ${{ secrets.CAPROVER_SERVER }}
+          app: ${{ secrets.CAPROVER_APP_PUBLIC }}
+          token: ${{ secrets.CAPROVER_TOKEN_PUBLIC }}
+          image: ${{ env.REGISTRY }}/${{ github.repository }}/public:latest
 
   deploy-admin:
     needs: build-admin
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger Coolify deploy (admin)
-        run: |
-          curl -X POST "${{ secrets.COOLIFY_WEBHOOK_URL_ADMIN }}"
+      - name: Deploy to CapRover (admin)
+        uses: caprover/deploy-from-github@v1.1.2
+        with:
+          server: ${{ secrets.CAPROVER_SERVER }}
+          app: ${{ secrets.CAPROVER_APP_ADMIN }}
+          token: ${{ secrets.CAPROVER_TOKEN_ADMIN }}
+          image: ${{ env.REGISTRY }}/${{ github.repository }}/admin:latest
