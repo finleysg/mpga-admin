@@ -43,6 +43,7 @@ const linkTypes = ["Registration", "Results", "Tee Times", "Pairings", "Other"]
 interface LinksCardProps {
 	initialLinks: TournamentLinkData[]
 	instanceId: number
+	systemName: string
 }
 
 interface EditingLink {
@@ -52,7 +53,7 @@ interface EditingLink {
 	linkType: string
 }
 
-export function LinksCard({ initialLinks, instanceId }: LinksCardProps) {
+export function LinksCard({ initialLinks, instanceId, systemName }: LinksCardProps) {
 	const [links, setLinks] = useState(initialLinks)
 	const [editing, setEditing] = useState<EditingLink | null>(null)
 	const [saving, setSaving] = useState(false)
@@ -86,6 +87,7 @@ export function LinksCard({ initialLinks, instanceId }: LinksCardProps) {
 				url: editing.url,
 				linkType: editing.linkType,
 				tournamentInstanceId: instanceId,
+				systemName,
 			})
 
 			if (result.success && result.data) {
@@ -125,7 +127,7 @@ export function LinksCard({ initialLinks, instanceId }: LinksCardProps) {
 		if (deleteId === null) return
 
 		try {
-			const result = await deleteTournamentLinkAction(deleteId)
+			const result = await deleteTournamentLinkAction(deleteId, systemName)
 			if (result.success) {
 				setLinks((prev) => prev.filter((l) => l.id !== deleteId))
 				toast.success("Link deleted")

@@ -14,6 +14,7 @@ export interface HeroSlideProps {
 	venue?: string
 	ctaUrl?: string
 	ctaText?: string
+	priority?: boolean
 }
 
 export function HeroSlide({
@@ -25,6 +26,7 @@ export function HeroSlide({
 	venue,
 	ctaUrl,
 	ctaText = "Learn More",
+	priority = false,
 }: HeroSlideProps) {
 	if (type === "logo") {
 		return (
@@ -32,7 +34,14 @@ export function HeroSlide({
 				{/* Mobile: centered logo on brand background */}
 				<div className="relative flex h-[360px] w-full flex-col bg-secondary-500 md:hidden">
 					<div className="relative flex-1">
-						<Image src={imageUrl} alt="MPGA" fill className="object-contain p-6" priority />
+						<Image
+							src={imageUrl}
+							alt="MPGA"
+							fill
+							className="object-contain p-6"
+							sizes="(max-width: 768px) 100vw, 840px"
+							priority={priority}
+						/>
 					</div>
 					<div className="pb-8 text-center">
 						<h1 className="text-xl font-bold text-white">Minnesota Public Golf Association</h1>
@@ -43,7 +52,14 @@ export function HeroSlide({
 				{/* Desktop: 66/34 layout */}
 				<div className="hidden h-[500px] w-full overflow-hidden rounded-lg md:flex">
 					<div className="relative w-2/3 bg-secondary-500">
-						<Image src={imageUrl} alt="MPGA" fill className="object-contain p-8" priority />
+						<Image
+							src={imageUrl}
+							alt="MPGA"
+							fill
+							className="object-contain p-8"
+							sizes="(max-width: 768px) 100vw, 840px"
+							priority={priority}
+						/>
 					</div>
 					<div className="flex w-1/3 flex-col justify-center bg-primary-700 p-6 text-white">
 						<h1 className="mb-4 text-2xl font-bold leading-tight md:text-3xl">
@@ -63,7 +79,14 @@ export function HeroSlide({
 		<>
 			{/* Mobile: full-bleed with gradient overlay */}
 			<div className="relative h-[350px] w-full md:hidden">
-				<Image src={imageUrl} alt={title || "Tournament"} fill className="object-cover" priority />
+				<Image
+					src={imageUrl}
+					alt={title || "Tournament"}
+					fill
+					className="object-cover"
+					sizes="(max-width: 768px) 100vw, 840px"
+					priority={priority}
+				/>
 
 				{/* Gradient overlay */}
 				<div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
@@ -98,7 +121,8 @@ export function HeroSlide({
 						alt={title || "Tournament"}
 						fill
 						className="object-cover"
-						priority
+						sizes="(max-width: 768px) 100vw, 840px"
+						priority={priority}
 					/>
 				</div>
 				<div className="flex w-1/3 flex-col justify-center bg-primary-700 p-6 text-white">

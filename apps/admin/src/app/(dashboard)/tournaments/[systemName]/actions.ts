@@ -12,7 +12,12 @@ import { and, asc, eq, like } from "drizzle-orm"
 
 import { db } from "@/lib/db"
 import { requireAuth } from "@/lib/require-auth"
+import { revalidatePublicSite } from "@/lib/revalidate"
 import { uploadToS3 } from "@/lib/s3"
+
+function revalidateTournamentYearPage(systemName: string) {
+	return revalidatePublicSite(`/tournaments/${systemName}/${new Date().getFullYear()}`)
+}
 
 // ---------- Tournament Instance ----------
 
@@ -125,6 +130,7 @@ interface SaveInstanceInput {
 	registrationStart: string | null
 	registrationEnd: string | null
 	locationId: number
+	systemName: string
 }
 
 export async function saveTournamentInstanceAction(
@@ -155,6 +161,8 @@ export async function saveTournamentInstanceAction(
 				locationId: data.locationId,
 			})
 			.where(eq(tournamentInstance.id, data.id))
+
+		await revalidateTournamentYearPage(data.systemName)
 
 		return { success: true, data: { id: data.id } }
 	} catch (error) {
@@ -206,6 +214,7 @@ interface SaveLinkInput {
 	url: string
 	linkType: string
 	tournamentInstanceId: number
+	systemName: string
 }
 
 export async function saveTournamentLinkAction(
@@ -230,6 +239,9 @@ export async function saveTournamentLinkAction(
 					linkType: data.linkType,
 				})
 				.where(eq(tournamentLink.id, data.id))
+
+			await revalidateTournamentYearPage(data.systemName)
+
 			return { success: true, data: { id: data.id } }
 		} else {
 			const result = await db.insert(tournamentLink).values({
@@ -238,6 +250,9 @@ export async function saveTournamentLinkAction(
 				linkType: data.linkType,
 				tournamentInstanceId: data.tournamentInstanceId,
 			})
+
+			await revalidateTournamentYearPage(data.systemName)
+
 			return { success: true, data: { id: result[0].insertId } }
 		}
 	} catch (error) {
@@ -246,7 +261,10 @@ export async function saveTournamentLinkAction(
 	}
 }
 
-export async function deleteTournamentLinkAction(id: number): Promise<ActionResult> {
+export async function deleteTournamentLinkAction(
+	id: number,
+	systemName: string,
+): Promise<ActionResult> {
 	const userId = await requireAuth()
 	if (!userId) {
 		return { success: false, error: "Unauthorized" }
@@ -254,6 +272,7 @@ export async function deleteTournamentLinkAction(id: number): Promise<ActionResu
 
 	try {
 		await db.delete(tournamentLink).where(eq(tournamentLink.id, id))
+		await revalidateTournamentYearPage(systemName)
 		return { success: true }
 	} catch (error) {
 		console.error("Failed to delete tournament link:", error)
@@ -307,6 +326,7 @@ interface SaveDocumentInput {
 	documentType: string
 	tournamentId: number
 	year: number
+	systemName: string
 }
 
 export async function saveDocumentAction(
@@ -330,6 +350,9 @@ export async function saveDocumentAction(
 					documentType: data.documentType,
 				})
 				.where(eq(document.id, data.id))
+
+			await revalidateTournamentYearPage(data.systemName)
+
 			return { success: true, data: { id: data.id } }
 		} else {
 			const result = await db.insert(document).values({
@@ -340,6 +363,9 @@ export async function saveDocumentAction(
 				lastUpdate: new Date().toISOString().replace("T", " ").replace("Z", ""),
 				createdBy: userId,
 			})
+
+			await revalidateTournamentYearPage(data.systemName)
+
 			return { success: true, data: { id: result[0].insertId } }
 		}
 	} catch (error) {
@@ -348,7 +374,7 @@ export async function saveDocumentAction(
 	}
 }
 
-export async function deleteDocumentAction(id: number): Promise<ActionResult> {
+export async function deleteDocumentAction(id: number, systemName: string): Promise<ActionResult> {
 	const userId = await requireAuth()
 	if (!userId) {
 		return { success: false, error: "Unauthorized" }
@@ -356,6 +382,7 @@ export async function deleteDocumentAction(id: number): Promise<ActionResult> {
 
 	try {
 		await db.delete(document).where(eq(document.id, id))
+		await revalidateTournamentYearPage(systemName)
 		return { success: true }
 	} catch (error) {
 		console.error("Failed to delete document:", error)
@@ -373,6 +400,7 @@ export async function uploadDocumentFileAction(
 
 	const file = formData.get("file") as File | null
 	const documentId = formData.get("documentId") as string | null
+	const systemName = formData.get("systemName") as string | null
 
 	if (!file || !documentId) {
 		return { success: false, error: "File and document ID are required" }
@@ -396,6 +424,8 @@ export async function uploadDocumentFileAction(
 				lastUpdate: new Date().toISOString().replace("T", " ").replace("Z", ""),
 			})
 			.where(eq(document.id, docId))
+
+		if (systemName) await revalidateTournamentYearPage(systemName)
 
 		return { success: true, data: { file: key } }
 	} catch (error) {

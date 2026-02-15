@@ -21,6 +21,10 @@ export function createDb(config: DatabaseConfig) {
 		connectionLimit: 10,
 		waitForConnections: true,
 		queueLimit: 0,
+		enableKeepAlive: true,
+		keepAliveInitialDelay: 10000,
+		idleTimeout: 60000,
+		maxIdle: 5,
 	})
 
 	return drizzle(pool, { schema, mode: "default" })

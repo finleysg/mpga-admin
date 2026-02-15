@@ -46,6 +46,7 @@ interface DocumentsCardProps {
 	initialDocuments: DocumentData[]
 	tournamentId: number
 	year: number
+	systemName: string
 }
 
 interface EditingDoc {
@@ -55,7 +56,12 @@ interface EditingDoc {
 	file?: File
 }
 
-export function DocumentsCard({ initialDocuments, tournamentId, year }: DocumentsCardProps) {
+export function DocumentsCard({
+	initialDocuments,
+	tournamentId,
+	year,
+	systemName,
+}: DocumentsCardProps) {
 	const [documents, setDocuments] = useState(initialDocuments)
 	const [editing, setEditing] = useState<EditingDoc | null>(null)
 	const [saving, setSaving] = useState(false)
@@ -87,6 +93,7 @@ export function DocumentsCard({ initialDocuments, tournamentId, year }: Document
 				documentType: editing.documentType,
 				tournamentId,
 				year,
+				systemName,
 			})
 
 			if (result.success && result.data) {
@@ -98,6 +105,7 @@ export function DocumentsCard({ initialDocuments, tournamentId, year }: Document
 					const formData = new FormData()
 					formData.append("file", editing.file)
 					formData.append("documentId", docId.toString())
+					formData.append("systemName", systemName)
 					const uploadResult = await uploadDocumentFileAction(formData)
 					if (uploadResult.success && uploadResult.data) {
 						fileKey = uploadResult.data.file
@@ -158,6 +166,7 @@ export function DocumentsCard({ initialDocuments, tournamentId, year }: Document
 			const formData = new FormData()
 			formData.append("file", file)
 			formData.append("documentId", uploadTargetId.toString())
+			formData.append("systemName", systemName)
 
 			const result = await uploadDocumentFileAction(formData)
 			if (result.success && result.data) {
@@ -183,7 +192,7 @@ export function DocumentsCard({ initialDocuments, tournamentId, year }: Document
 		if (deleteId === null) return
 
 		try {
-			const result = await deleteDocumentAction(deleteId)
+			const result = await deleteDocumentAction(deleteId, systemName)
 			if (result.success) {
 				setDocuments((prev) => prev.filter((d) => d.id !== deleteId))
 				toast.success("Document deleted")
