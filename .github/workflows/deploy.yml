@@ -42,22 +42,52 @@ jobs:
             ${{ env.REGISTRY }}/${{ github.repository }}/admin:${{ github.ref_name }}
             ${{ env.REGISTRY }}/${{ github.repository }}/admin:latest
 
-  deploy-public:
+  build-public:
     if: startsWith(github.ref_name, 'v') || startsWith(github.ref_name, 'public-v')
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Create deploy tarball
-        run: tar -cf ./deploy.tar .
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Build and push public image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/public/Dockerfile
+          push: true
+          build-args: |
+            NEXT_PUBLIC_ADMIN_URL=${{ secrets.NEXT_PUBLIC_ADMIN_URL }}
+            DATABASE_HOST=${{ secrets.DATABASE_HOST }}
+            DATABASE_PORT=${{ secrets.DATABASE_PORT }}
+            DATABASE_USER=${{ secrets.DATABASE_USER }}
+            DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}
+            DATABASE_NAME=${{ secrets.DATABASE_NAME }}
+          tags: |
+            ${{ env.REGISTRY }}/${{ github.repository }}/public:${{ github.ref_name }}
+            ${{ env.REGISTRY }}/${{ github.repository }}/public:latest
+
+  deploy-public:
+    needs: build-public
+    if: startsWith(github.ref_name, 'v') || startsWith(github.ref_name, 'public-v')
+    runs-on: ubuntu-latest
+    steps:
       - name: Deploy to CapRover (public)
         uses: caprover/deploy-from-github@v1.1.2
         with:
           server: ${{ secrets.CAPROVER_SERVER }}
           app: ${{ secrets.CAPROVER_APP_PUBLIC }}
           token: ${{ secrets.CAPROVER_TOKEN_PUBLIC }}
+          image: ${{ env.REGISTRY }}/${{ github.repository }}/public:${{ github.ref_name }}
 
   deploy-admin:
     needs: build-admin
