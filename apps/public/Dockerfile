@@ -25,6 +25,7 @@ RUN adduser --system --uid 1001 nextjs
 COPY --from=installer --chown=nextjs:nodejs /app/apps/public/.next/standalone ./
 COPY --from=installer --chown=nextjs:nodejs /app/apps/public/.next/static ./apps/public/.next/static
 COPY --from=installer --chown=nextjs:nodejs /app/apps/public/public ./apps/public/public
+RUN npm install --no-save mysql2
 COPY --chown=nextjs:nodejs apps/public/start.sh ./start.sh
 RUN chmod +x start.sh
 USER nextjs
