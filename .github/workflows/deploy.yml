@@ -38,6 +38,8 @@ jobs:
             NEXT_PUBLIC_BETTER_AUTH_URL=${{ secrets.NEXT_PUBLIC_BETTER_AUTH_URL }}
             NEXT_PUBLIC_APP_URL=${{ secrets.NEXT_PUBLIC_APP_URL }}
             NEXT_PUBLIC_STRIPE_PUBLIC_KEY=${{ secrets.NEXT_PUBLIC_STRIPE_PUBLIC_KEY }}
+            NEXT_PUBLIC_POSTHOG_KEY=${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
+            NEXT_PUBLIC_POSTHOG_HOST=${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
           tags: |
             ${{ env.REGISTRY }}/${{ github.repository }}/admin:${{ github.ref_name }}
             ${{ env.REGISTRY }}/${{ github.repository }}/admin:latest
@@ -67,6 +69,8 @@ jobs:
           push: true
           build-args: |
             NEXT_PUBLIC_ADMIN_URL=${{ secrets.NEXT_PUBLIC_ADMIN_URL }}
+            NEXT_PUBLIC_POSTHOG_KEY=${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
+            NEXT_PUBLIC_POSTHOG_HOST=${{ secrets.NEXT_PUBLIC_POSTHOG_HOST }}
           tags: |
             ${{ env.REGISTRY }}/${{ github.repository }}/public:${{ github.ref_name }}
             ${{ env.REGISTRY }}/${{ github.repository }}/public:latest
