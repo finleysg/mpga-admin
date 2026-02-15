@@ -75,7 +75,7 @@ jobs:
           server: ${{ secrets.CAPROVER_SERVER }}
           app: ${{ secrets.CAPROVER_APP_PUBLIC }}
           token: ${{ secrets.CAPROVER_TOKEN_PUBLIC }}
-          image: ${{ env.REGISTRY }}/${{ github.repository }}/public:latest
+          image: ${{ env.REGISTRY }}/${{ github.repository }}/public:${{ github.ref_name }}
 
   deploy-admin:
     needs: build-admin
@@ -87,4 +87,4 @@ jobs:
           server: ${{ secrets.CAPROVER_SERVER }}
           app: ${{ secrets.CAPROVER_APP_ADMIN }}
           token: ${{ secrets.CAPROVER_TOKEN_ADMIN }}
-          image: ${{ env.REGISTRY }}/${{ github.repository }}/admin:latest
+          image: ${{ env.REGISTRY }}/${{ github.repository }}/admin:${{ github.ref_name }}
