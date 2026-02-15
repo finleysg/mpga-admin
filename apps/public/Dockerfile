@@ -25,7 +25,7 @@ COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 RUN pnpm install --frozen-lockfile
 COPY --from=builder /app/out/full/ .
-RUN pnpm turbo build --filter=@mpga/public
+RUN --network=host pnpm turbo build --filter=@mpga/public
 
 FROM base AS runner
 WORKDIR /app
