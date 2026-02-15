@@ -25,6 +25,7 @@ COPY --from=installer --chown=nextjs:nodejs /app/apps/admin/.next/static ./apps/
 COPY --from=installer --chown=nextjs:nodejs /app/apps/admin/public ./apps/admin/public
 COPY --from=installer --chown=nextjs:nodejs /app/packages/database/drizzle ./packages/database/drizzle
 COPY --from=installer --chown=nextjs:nodejs /app/packages/database/migrate.mjs ./packages/database/migrate.mjs
+RUN npm install --no-save mysql2
 COPY --chown=nextjs:nodejs apps/admin/start.sh ./start.sh
 RUN chmod +x start.sh
 USER nextjs
