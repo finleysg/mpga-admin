@@ -1,25 +1,22 @@
 import nodemailer from "nodemailer"
+import mailgunTransport from "nodemailer-mailgun-transport"
 
 /**
  * Creates an email transporter based on environment configuration.
- * Uses Mailgun SMTP in production (when MAILGUN_API_KEY is set),
+ * Uses Mailgun HTTP API in production (when MAILGUN_API_KEY is set),
  * otherwise falls back to local SMTP (Mailpit for development).
  */
 function createTransporter() {
 	if (process.env.MAILGUN_API_KEY && process.env.MAILGUN_DOMAIN) {
-		// Production: Mailgun SMTP
-		return nodemailer.createTransport({
-			host: "smtp.mailgun.org",
-			port: 587,
-			secure: false,
-			auth: {
-				user: `postmaster@${process.env.MAILGUN_DOMAIN}`,
-				pass: process.env.MAILGUN_API_KEY,
-			},
-			connectionTimeout: 5000,
-			greetingTimeout: 5000,
-			socketTimeout: 10000,
-		})
+		// Production: Mailgun HTTP API (avoids SMTP port blocking in cloud environments)
+		return nodemailer.createTransport(
+			mailgunTransport({
+				auth: {
+					api_key: process.env.MAILGUN_API_KEY,
+					domain: process.env.MAILGUN_DOMAIN,
+				},
+			}),
+		)
 	}
 
 	// Development / testing SMTP (Mailpit, Mailtrap, etc.)

@@ -1,3 +1,4 @@
+import { cn } from "../lib/utils"
 import ReactMarkdown from "react-markdown"
 import rehypeRaw from "rehype-raw"
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize"
@@ -54,7 +55,7 @@ export function preprocessHighlights(markdown: string): string {
 export function Markdown({ content, className }: MarkdownProps) {
 	const processed = preprocessHighlights(content)
 	return (
-		<div className={className ?? "prose"}>
+		<div className={cn("prose", className)}>
 			<ReactMarkdown
 				remarkPlugins={[remarkGfm, remarkDirective, remarkAdmonitions]}
 				rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeSchema]]}
