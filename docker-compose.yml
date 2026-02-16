@@ -12,6 +12,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+      - /app/apps/public/node_modules
       - /app/apps/public/.next
       - ./apps/public/.env.docker:/app/apps/public/.env.local:ro
     depends_on:
@@ -29,6 +30,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+      - /app/apps/admin/node_modules
       - /app/apps/admin/.next
       - ./apps/admin/.env.docker:/app/apps/admin/.env.local:ro
     depends_on:
