@@ -57,8 +57,8 @@ function rewriteUrlOrigin(url: string): string {
  * Wraps email body HTML with consistent branding: MPGA logo, sans-serif font, padding.
  */
 function emailLayout(body: string): string {
-	const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:4100"
-	const logoUrl = `${adminUrl.replace(/\/$/, "")}/images/mpga-logo.png`
+	const publicUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:4000"
+	const logoUrl = `${publicUrl.replace(/\/$/, "")}/images/mpga-logo.png`
 	return `
 		<div style="font-family: Arial, Helvetica, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
 			<div style="margin-bottom: 24px;">
@@ -75,7 +75,7 @@ function emailLayout(body: string): string {
 export async function sendMagicLinkEmail(email: string, url: string): Promise<void> {
 	const link = rewriteUrlOrigin(url)
 	await transporter.sendMail({
-		from: process.env.MAIL_FROM ?? "noreply@mpga.golf",
+		from: process.env.MAIL_FROM ?? "noreply@mpga.net",
 		to: email,
 		subject: "MPGA Club Contact Verification",
 		text: `Verify your identity to access club contact features.\n\nClick the link below to sign in:\n${link}\n\nThis link expires in 10 minutes.`,
@@ -98,7 +98,7 @@ export async function sendDuesPaymentEmail(
 	year: number,
 ): Promise<void> {
 	await transporter.sendMail({
-		from: process.env.MAIL_FROM ?? "noreply@mpga.golf",
+		from: process.env.MAIL_FROM ?? "noreply@mpga.net",
 		to: to.join(", "),
 		subject: `MPGA Dues Payment Confirmation — ${clubName}`,
 		text: `This is a confirmation that ${year} MPGA membership dues have been paid for ${clubName}.\n\nThank you for your continued membership in the Minnesota Public Golf Association.`,
@@ -129,7 +129,7 @@ export async function sendContactNotificationEmail(
 	const courseLine = course ? `Golf Course: ${escapeHtml(course)}` : ""
 
 	await transporter.sendMail({
-		from: process.env.MAIL_FROM ?? "noreply@mpga.golf",
+		from: process.env.MAIL_FROM ?? "noreply@mpga.net",
 		to,
 		replyTo: email,
 		subject: `MPGA Contact Form: ${name}`,
@@ -163,7 +163,7 @@ export async function sendInvitationEmail(email: string, token: string): Promise
 	const acceptLink = `${appUrl}/accept-invitation/${token}`
 
 	await transporter.sendMail({
-		from: process.env.MAIL_FROM ?? "noreply@mpga.golf",
+		from: process.env.MAIL_FROM ?? "noreply@mpga.net",
 		to: email,
 		subject: "You've been invited to MPGA Admin",
 		text: `You've been invited to join the MPGA Administration site.\n\nClick the link below to create your account:\n${acceptLink}\n\nThis invitation expires in 7 days.`,
