@@ -1,6 +1,7 @@
 "use client"
 
 import {
+	Badge,
 	Button,
 	H4,
 	SheetContent,
@@ -40,12 +41,14 @@ function ContactSubCard({
 	contact,
 	isSelected,
 	isStarred,
+	isNewest,
 	onToggle,
 	onStar,
 }: {
 	contact: ContactData
 	isSelected: boolean
 	isStarred: boolean
+	isNewest: boolean
 	onToggle: () => void
 	onStar: () => void
 }) {
@@ -63,6 +66,11 @@ function ContactSubCard({
 			<div className="flex items-center justify-between">
 				<H4 variant="secondary">
 					{contact.firstName} {contact.lastName}
+					{isNewest && (
+						<Badge variant="success" className="ml-2 align-middle font-body text-sm">
+							Newest
+						</Badge>
+					)}
 				</H4>
 				<button
 					type="button"
@@ -121,6 +129,7 @@ export function MergeDrawer({ group, onMerged, onClose }: MergeDrawerProps) {
 		})
 	}
 
+	const newestId = Math.max(...group.contacts.map((c) => c.id))
 	const canMerge = starredId !== null && selectedIds.size >= 2 && selectedIds.has(starredId)
 
 	const handleMerge = async () => {
@@ -158,6 +167,7 @@ export function MergeDrawer({ group, onMerged, onClose }: MergeDrawerProps) {
 						contact={c}
 						isSelected={selectedIds.has(c.id)}
 						isStarred={starredId === c.id}
+						isNewest={c.id === newestId}
 						onToggle={() => toggleContact(c.id)}
 						onStar={() => starContact(c.id)}
 					/>

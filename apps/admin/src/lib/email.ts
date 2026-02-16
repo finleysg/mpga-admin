@@ -16,6 +16,9 @@ function createTransporter() {
 				user: `postmaster@${process.env.MAILGUN_DOMAIN}`,
 				pass: process.env.MAILGUN_API_KEY,
 			},
+			connectionTimeout: 5000,
+			greetingTimeout: 5000,
+			socketTimeout: 10000,
 		})
 	}
 
@@ -29,6 +32,9 @@ function createTransporter() {
 		port: parseInt(process.env.MAIL_PORT ?? "1025", 10),
 		secure: false,
 		...authConfig,
+		connectionTimeout: 5000,
+		greetingTimeout: 5000,
+		socketTimeout: 10000,
 	})
 }
 
@@ -39,21 +45,50 @@ function escapeHtml(s: string): string {
 }
 
 /**
+ * Rewrites a URL's origin to use NEXT_PUBLIC_APP_URL, preserving the path and query.
+ * This is needed because Better Auth constructs URLs using BETTER_AUTH_URL, which
+ * resolves to the Docker-internal hostname in production.
+ */
+function rewriteUrlOrigin(url: string): string {
+	const appUrl = process.env.NEXT_PUBLIC_ADMIN_URL
+	if (!appUrl) return url
+	const parsed = new URL(url)
+	return `${appUrl.replace(/\/$/, "")}${parsed.pathname}${parsed.search}`
+}
+
+/**
+ * Wraps email body HTML with consistent branding: MPGA logo, sans-serif font, padding.
+ */
+function emailLayout(body: string): string {
+	const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:4100"
+	const logoUrl = `${adminUrl.replace(/\/$/, "")}/images/mpga-logo.png`
+	return `
+		<div style="font-family: Arial, Helvetica, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+			<div style="margin-bottom: 24px;">
+				<img src="${logoUrl}" alt="MPGA" style="max-width: 200px; height: auto;" />
+			</div>
+			${body}
+		</div>
+	`
+}
+
+/**
  * Sends a magic link email for club contact verification.
  */
 export async function sendMagicLinkEmail(email: string, url: string): Promise<void> {
+	const link = rewriteUrlOrigin(url)
 	await transporter.sendMail({
 		from: process.env.MAIL_FROM ?? "noreply@mpga.golf",
 		to: email,
 		subject: "MPGA Club Contact Verification",
-		text: `Verify your identity to access club contact features.\n\nClick the link below to sign in:\n${url}\n\nThis link expires in 10 minutes.`,
-		html: `
-      <h1>MPGA Club Contact Verification</h1>
-      <p>Verify your identity to access club contact features.</p>
-      <p><a href="${url}">Click here to sign in</a></p>
-      <p>Or copy this link: ${url}</p>
-      <p><em>This link expires in 10 minutes.</em></p>
-    `,
+		text: `Verify your identity to access club contact features.\n\nClick the link below to sign in:\n${link}\n\nThis link expires in 10 minutes.`,
+		html: emailLayout(`
+			<h1 style="font-size: 22px; color: #333;">Club Contact Verification</h1>
+			<p>Verify your identity to access club contact features.</p>
+			<p><a href="${link}" style="display: inline-block; padding: 10px 20px; background-color: #2563eb; color: #fff; text-decoration: none; border-radius: 4px;">Click here to sign in</a></p>
+			<p style="font-size: 13px; color: #666;">Or copy this link: ${link}</p>
+			<p style="font-size: 13px; color: #999;"><em>This link expires in 10 minutes.</em></p>
+		`),
 	})
 }
 
@@ -70,11 +105,11 @@ export async function sendDuesPaymentEmail(
 		to: to.join(", "),
 		subject: `MPGA Dues Payment Confirmation — ${clubName}`,
 		text: `This is a confirmation that ${year} MPGA membership dues have been paid for ${clubName}.\n\nThank you for your continued membership in the Minnesota Public Golf Association.`,
-		html: `
-      <h1>Dues Payment Confirmation</h1>
-      <p>This is a confirmation that <strong>${year}</strong> MPGA membership dues have been paid for <strong>${escapeHtml(clubName)}</strong>.</p>
-      <p>Thank you for your continued membership in the Minnesota Public Golf Association.</p>
-    `,
+		html: emailLayout(`
+			<h1 style="font-size: 22px; color: #333;">Dues Payment Confirmation</h1>
+			<p>This is a confirmation that <strong>${year}</strong> MPGA membership dues have been paid for <strong>${escapeHtml(clubName)}</strong>.</p>
+			<p>Thank you for your continued membership in the Minnesota Public Golf Association.</p>
+		`),
 	})
 }
 
@@ -111,15 +146,15 @@ export async function sendContactNotificationEmail(
 		]
 			.filter(Boolean)
 			.join("\n"),
-		html: `
-      <h1>MPGA Contact Form Submission</h1>
-      <p><strong>Name:</strong> ${escapeHtml(name)}</p>
-      <p><strong>Email:</strong> ${escapeHtml(email)}</p>
-      ${phone ? `<p><strong>Phone:</strong> ${escapeHtml(phone)}</p>` : ""}
-      ${courseLine ? `<p><strong>${courseLine}</strong></p>` : ""}
-      <hr />
-      <p>${escapeHtml(messageText).replace(/\n/g, "<br />")}</p>
-    `,
+		html: emailLayout(`
+			<h1 style="font-size: 22px; color: #333;">Contact Form Submission</h1>
+			<p><strong>Name:</strong> ${escapeHtml(name)}</p>
+			<p><strong>Email:</strong> ${escapeHtml(email)}</p>
+			${phone ? `<p><strong>Phone:</strong> ${escapeHtml(phone)}</p>` : ""}
+			${courseLine ? `<p><strong>${courseLine}</strong></p>` : ""}
+			<hr style="border: none; border-top: 1px solid #ddd; margin: 16px 0;" />
+			<p>${escapeHtml(messageText).replace(/\n/g, "<br />")}</p>
+		`),
 	})
 }
 
@@ -127,7 +162,7 @@ export async function sendContactNotificationEmail(
  * Sends an invitation email to the specified address with an accept link.
  */
 export async function sendInvitationEmail(email: string, token: string): Promise<void> {
-	const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:4100"
+	const appUrl = process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:4100"
 	const acceptLink = `${appUrl}/accept-invitation/${token}`
 
 	await transporter.sendMail({
@@ -135,12 +170,11 @@ export async function sendInvitationEmail(email: string, token: string): Promise
 		to: email,
 		subject: "You've been invited to MPGA Admin",
 		text: `You've been invited to join the MPGA Administration site.\n\nClick the link below to create your account:\n${acceptLink}\n\nThis invitation expires in 7 days.`,
-		html: `
-      <h1>You've been invited to MPGA Administration</h1>
-      <p>You've been invited to join the MPGA Administration site.</p>
-      <p><a href="${acceptLink}">Click here to create your account</a></p>
-      <p>Or copy this link: ${acceptLink}</p>
-      <p><em>This invitation expires in 7 days.</em></p>
-    `,
+		html: emailLayout(`
+			<p>You've been invited to join the MPGA Administration site.</p>
+			<p><a href="${acceptLink}" style="display: inline-block; padding: 10px 20px; background-color: #2563eb; color: #fff; text-decoration: none; border-radius: 4px;">Click here to create your account</a></p>
+			<p style="font-size: 13px; color: #666;">Or copy this link: ${acceptLink}</p>
+			<p style="font-size: 13px; color: #999;"><em>This invitation expires in 7 days.</em></p>
+		`),
 	})
 }
