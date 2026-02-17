@@ -1,10 +1,11 @@
-import { cn } from "../lib/utils"
 import ReactMarkdown from "react-markdown"
 import rehypeRaw from "rehype-raw"
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize"
 import remarkDirective from "remark-directive"
 import remarkGfm from "remark-gfm"
 import { visit } from "unist-util-visit"
+
+import { cn } from "../lib/utils"
 
 export interface MarkdownProps {
 	content: string

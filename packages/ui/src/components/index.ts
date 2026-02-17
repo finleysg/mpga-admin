@@ -106,6 +106,16 @@ export {
 	SelectTrigger,
 	SelectValue,
 } from "./ui/select"
+export { Popover, PopoverTrigger, PopoverContent } from "./ui/popover"
+export {
+	Command,
+	CommandInput,
+	CommandList,
+	CommandEmpty,
+	CommandGroup,
+	CommandItem,
+} from "./ui/command"
+export { Combobox, type ComboboxProps } from "./ui/combobox"
 export { Textarea } from "./ui/textarea"
 export { Label } from "./ui/label"
 export {

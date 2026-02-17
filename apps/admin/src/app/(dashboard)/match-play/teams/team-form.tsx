@@ -16,21 +16,17 @@ import {
 	CardHeader,
 	CardTitle,
 	Checkbox,
+	Combobox,
 	Field,
 	FieldError,
 	FieldLabel,
 	Input,
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
 	Textarea,
 	toast,
 } from "@mpga/ui"
 import { Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 import { type ClubOption, type TeamData, deleteTeamAction, saveTeamAction } from "./actions"
 
@@ -41,13 +37,10 @@ interface TeamFormProps {
 
 export function TeamForm({ team: existingTeam, clubs }: TeamFormProps) {
 	const router = useRouter()
-	const [mounted, setMounted] = useState(false)
 	const [saving, setSaving] = useState(false)
 	const [deleting, setDeleting] = useState(false)
 	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 	const [error, setError] = useState<string | null>(null)
-
-	useEffect(() => setMounted(true), [])
 
 	const [year, setYear] = useState<string>(
 		existingTeam?.year?.toString() ?? new Date().getFullYear().toString(),
@@ -165,26 +158,13 @@ export function TeamForm({ team: existingTeam, clubs }: TeamFormProps) {
 						<FieldLabel>
 							Club <span className="text-destructive">*</span>
 						</FieldLabel>
-						{mounted ? (
-							<Select
-								value={clubId !== null ? String(clubId) : "none"}
-								onValueChange={(value) => setClubId(value === "none" ? null : parseInt(value, 10))}
-							>
-								<SelectTrigger>
-									<SelectValue />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value="none">Select a club</SelectItem>
-									{clubs.map((c) => (
-										<SelectItem key={c.id} value={String(c.id)}>
-											{c.name}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-						) : (
-							<div className="h-9 rounded-md border bg-transparent" />
-						)}
+						<Combobox
+							options={clubs.map((c) => ({ value: String(c.id), label: c.name }))}
+							value={clubId !== null ? String(clubId) : ""}
+							onValueChange={(value) => setClubId(value === "" ? null : parseInt(value, 10))}
+							placeholder="Select a club"
+							searchPlaceholder="Search clubs..."
+						/>
 					</Field>
 
 					{/* Row 3: Senior */}

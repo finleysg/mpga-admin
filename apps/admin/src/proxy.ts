@@ -1,7 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server"
 
 export async function proxy(request: NextRequest) {
-	const sessionCookie = request.cookies.get("better-auth.session_token")
+	const sessionCookie =
+		request.cookies.get("__Secure-better-auth.session_token") ||
+		request.cookies.get("better-auth.session_token")
 
 	const isPublicRoute =
 		request.nextUrl.pathname.startsWith("/login") ||

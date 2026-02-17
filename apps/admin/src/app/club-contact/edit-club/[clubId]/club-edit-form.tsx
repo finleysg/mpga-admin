@@ -6,19 +6,15 @@ import {
 	CardContent,
 	CardHeader,
 	CardTitle,
+	Combobox,
 	Field,
 	FieldError,
 	FieldLabel,
 	Input,
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
 	Textarea,
 	toast,
 } from "@mpga/ui"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 import { saveClubForContact } from "../../actions"
 import type { ClubContactClubData, GolfCourseOption } from "../../types"
@@ -29,11 +25,8 @@ interface ClubEditFormProps {
 }
 
 export function ClubEditForm({ club, golfCourses }: ClubEditFormProps) {
-	const [mounted, setMounted] = useState(false)
 	const [saving, setSaving] = useState(false)
 	const [error, setError] = useState<string | null>(null)
-
-	useEffect(() => setMounted(true), [])
 
 	const [name, setName] = useState(club.name)
 	const [website, setWebsite] = useState(club.website)
@@ -97,28 +90,21 @@ export function ClubEditForm({ club, golfCourses }: ClubEditFormProps) {
 
 						<Field>
 							<FieldLabel>Golf Course</FieldLabel>
-							{mounted ? (
-								<Select
-									value={golfCourseId !== null ? String(golfCourseId) : "none"}
-									onValueChange={(value) =>
-										setGolfCourseId(value === "none" ? null : parseInt(value, 10))
-									}
-								>
-									<SelectTrigger>
-										<SelectValue />
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem value="none">None</SelectItem>
-										{golfCourses.map((course) => (
-											<SelectItem key={course.id} value={String(course.id)}>
-												{course.name}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-							) : (
-								<div className="h-9 rounded-md border bg-transparent" />
-							)}
+							<Combobox
+								options={[
+									{ value: "none", label: "None" },
+									...golfCourses.map((course) => ({
+										value: String(course.id),
+										label: course.name,
+									})),
+								]}
+								value={golfCourseId !== null ? String(golfCourseId) : "none"}
+								onValueChange={(value) =>
+									setGolfCourseId(value === "none" ? null : parseInt(value, 10))
+								}
+								placeholder="Select course"
+								searchPlaceholder="Search courses..."
+							/>
 						</Field>
 
 						<Field>

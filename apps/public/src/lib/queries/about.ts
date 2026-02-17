@@ -1,4 +1,4 @@
-import { award, awardWinner, club, committee, contact, content } from "@mpga/database"
+import { award, awardWinner, club, committee, contact, content, document } from "@mpga/database"
 import { ContentSystemName } from "@mpga/types"
 import { desc, eq } from "drizzle-orm"
 
@@ -91,6 +91,25 @@ export async function getCommitteeMembers(): Promise<CommitteeMember[]> {
 	} catch (error) {
 		console.error("Failed to fetch committee members:", error)
 		return []
+	}
+}
+
+export async function getByLawsDocument() {
+	try {
+		const results = await db
+			.select({
+				title: document.title,
+				file: document.file,
+			})
+			.from(document)
+			.where(eq(document.documentType, "ByLaws"))
+			.orderBy(desc(document.id))
+			.limit(1)
+
+		return results[0] || null
+	} catch (error) {
+		console.error("Failed to fetch bylaws document:", error)
+		return null
 	}
 }
 

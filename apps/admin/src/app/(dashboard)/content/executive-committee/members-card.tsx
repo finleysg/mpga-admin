@@ -14,6 +14,7 @@ import {
 	CardContent,
 	CardHeader,
 	CardTitle,
+	Combobox,
 	Field,
 	FieldLabel,
 	Input,
@@ -22,11 +23,6 @@ import {
 	ItemContent,
 	ItemDescription,
 	ItemTitle,
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
 	toast,
 } from "@mpga/ui"
 import { Pencil, Plus, Trash2, X } from "lucide-react"
@@ -282,40 +278,24 @@ function EditForm({
 			</Field>
 			<div className="grid grid-cols-2 gap-2">
 				<Field>
-					<FieldLabel htmlFor="member-contact">Contact</FieldLabel>
-					<Select
+					<FieldLabel>Contact</FieldLabel>
+					<Combobox
+						options={contacts.map((c) => ({ value: String(c.id), label: c.name }))}
 						value={editing.contactId}
 						onValueChange={(value) => setEditing({ ...editing, contactId: value })}
-					>
-						<SelectTrigger id="member-contact">
-							<SelectValue placeholder="Select contact" />
-						</SelectTrigger>
-						<SelectContent>
-							{contacts.map((c) => (
-								<SelectItem key={c.id} value={String(c.id)}>
-									{c.name}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
+						placeholder="Select contact"
+						searchPlaceholder="Search contacts..."
+					/>
 				</Field>
 				<Field>
-					<FieldLabel htmlFor="member-club">Home Club</FieldLabel>
-					<Select
+					<FieldLabel>Home Club</FieldLabel>
+					<Combobox
+						options={clubs.map((c) => ({ value: String(c.id), label: c.name }))}
 						value={editing.homeClubId}
 						onValueChange={(value) => setEditing({ ...editing, homeClubId: value })}
-					>
-						<SelectTrigger id="member-club">
-							<SelectValue placeholder="Select club" />
-						</SelectTrigger>
-						<SelectContent>
-							{clubs.map((c) => (
-								<SelectItem key={c.id} value={String(c.id)}>
-									{c.name}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
+						placeholder="Select club"
+						searchPlaceholder="Search clubs..."
+					/>
 				</Field>
 			</div>
 			<div className="flex justify-end gap-2">

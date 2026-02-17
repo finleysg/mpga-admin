@@ -15,7 +15,6 @@ import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
-import { signIn } from "@/lib/auth-client"
 import { signUpWithInvitation } from "../actions"
 
 interface InvitationData {
@@ -77,22 +76,10 @@ export default function AcceptInvitationPage({ params }: AcceptInvitationPagePro
 
 			if (!result.success) {
 				setError(result.error ?? "Account creation failed")
-				return
+			} else {
+				router.push("/")
+				router.refresh()
 			}
-
-			const signInResult = await signIn.email({
-				email: invitation.email,
-				password,
-			})
-
-			if (signInResult.error) {
-				setError("Account created but sign-in failed. Please log in manually.")
-				router.push("/login")
-				return
-			}
-
-			router.push("/")
-			router.refresh()
 		} catch {
 			setError("An unexpected error occurred")
 		} finally {
