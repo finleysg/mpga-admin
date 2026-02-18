@@ -39,5 +39,8 @@ e2e/.auth/
 # MCP
 .mcp.json
 
+# Playwright CLI
+.playwright-cli/
+
 # Misc
 *.tsbuildinfo

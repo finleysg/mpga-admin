@@ -32,6 +32,7 @@ const navGroups = [
 			{ title: "Public Links", url: `/tournaments/${TournamentSystemName.PubLinks}` },
 			{ title: "Combination", url: `/tournaments/${TournamentSystemName.Combo}` },
 			{ title: "Policies", url: "/tournaments/policies" },
+			{ title: "Hard Card", url: "/tournaments/hard-card" },
 		],
 	},
 	{

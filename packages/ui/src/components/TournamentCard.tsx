@@ -29,7 +29,7 @@ export function TournamentCard({
 		<Card className="overflow-hidden">
 			<CardHeader>
 				<div className="flex items-start gap-4">
-					<div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gray-100">
+					<div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white">
 						{logoUrl ? (
 							<Image
 								src={logoUrl}
@@ -49,30 +49,30 @@ export function TournamentCard({
 			</CardHeader>
 			<CardContent>
 				<Markdown content={description} className="prose mb-4 flex-1 line-clamp-3 text-gray-600" />
-				{historyHref && (
-					<Link
-						href={historyHref}
-						className="mb-2 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
-					>
-						<History className="h-4 w-4" />
-						History
-					</Link>
-				)}
 				<div className="mb-4 space-y-2 text-sm text-gray-500">
-					<div className="flex items-center gap-2">
-						<Calendar className="h-4 w-4" />
-						<span>{dates}</span>
-					</div>
 					<div className="flex items-center gap-2">
 						<MapPin className="h-4 w-4" />
 						<span>{location}</span>
 					</div>
+					<div className="flex items-center gap-2">
+						<Calendar className="h-4 w-4" />
+						<span>{dates}</span>
+					</div>
+					{historyHref && (
+						<Link
+							href={historyHref}
+							className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+						>
+							<History className="h-4 w-4" />
+							History
+						</Link>
+					)}
 				</div>
 				<Link
 					href={href}
-					className="inline-flex items-center gap-1 text-secondary-600 hover:text-secondary-700"
+					className="inline-flex items-center gap-1 font-semibold text-primary-500 hover:text-primary-700"
 				>
-					View Details
+					View Details & Register
 					<ArrowRight className="h-4 w-4" />
 				</Link>
 			</CardContent>
