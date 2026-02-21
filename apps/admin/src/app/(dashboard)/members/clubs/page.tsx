@@ -29,11 +29,12 @@ import {
 	getSortedRowModel,
 	useReactTable,
 } from "@tanstack/react-table"
-import { ChevronDown, ChevronUp, ChevronsUpDown } from "lucide-react"
+import ExcelJS from "exceljs"
+import { ChevronDown, ChevronUp, ChevronsUpDown, Download } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
-import { type ClubData, listClubsAction } from "./actions"
+import { type ClubData, exportClubContactsAction, listClubsAction } from "./actions"
 
 const clubGlobalFilterFn: FilterFn<ClubData> = (row, _columnId, filterValue) => {
 	const term = (filterValue as string).toLowerCase()
@@ -157,6 +158,75 @@ export default function ClubsPage() {
 		table.setPageIndex(0)
 	}
 
+	const exportClubsToExcel = async () => {
+		const wb = new ExcelJS.Workbook()
+		const ws = wb.addWorksheet("Clubs")
+		ws.columns = [
+			{ header: "Name", key: "name" },
+			{ header: "Golf Course", key: "golfCourse" },
+			{ header: "Website", key: "website" },
+			{ header: "Size", key: "size" },
+			{ header: "Member", key: "member" },
+		]
+		for (const row of table.getFilteredRowModel().rows) {
+			ws.addRow({
+				name: row.original.name,
+				golfCourse: row.original.golfCourseName ?? "",
+				website: row.original.website,
+				size: row.original.size ?? "",
+				member: row.original.isMember ? "Yes" : "No",
+			})
+		}
+		const buffer = await wb.xlsx.writeBuffer()
+		const blob = new Blob([buffer], {
+			type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+		})
+		const url = URL.createObjectURL(blob)
+		const a = document.createElement("a")
+		a.href = url
+		a.download = "clubs.xlsx"
+		a.click()
+		URL.revokeObjectURL(url)
+	}
+
+	const exportClubContactsToExcel = async () => {
+		const result = await exportClubContactsAction()
+		if (!result.success || !result.data) return
+
+		const wb = new ExcelJS.Workbook()
+		const ws = wb.addWorksheet("Club Contacts")
+		ws.columns = [
+			{ header: "Home Club", key: "clubName" },
+			{ header: "First Name", key: "firstName" },
+			{ header: "Last Name", key: "lastName" },
+			{ header: "Email", key: "email" },
+			{ header: "Phone", key: "phone" },
+			{ header: "Club Url", key: "clubUrl" },
+			{ header: "Roles", key: "roles" },
+		]
+		for (const row of result.data) {
+			ws.addRow({
+				clubName: row.clubName,
+				firstName: row.firstName,
+				lastName: row.lastName,
+				email: row.email ?? "",
+				phone: row.primaryPhone ?? "",
+				clubUrl: row.systemName ? `https://mpga.net/members/${row.systemName}` : "",
+				roles: row.role,
+			})
+		}
+		const buffer = await wb.xlsx.writeBuffer()
+		const blob = new Blob([buffer], {
+			type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+		})
+		const url = URL.createObjectURL(blob)
+		const a = document.createElement("a")
+		a.href = url
+		a.download = "club-contacts.xlsx"
+		a.click()
+		URL.revokeObjectURL(url)
+	}
+
 	const filteredCount = table.getFilteredRowModel().rows.length
 	const showPagination = pageSizeOption !== "all" && table.getPageCount() > 1
 
@@ -195,6 +265,24 @@ export default function ClubsPage() {
 								{filteredCount} {filteredCount === 1 ? "club" : "clubs"}
 								{globalFilter && ` (filtered)`}
 							</p>
+							<Button
+								variant="ghost"
+								size="sm"
+								onClick={exportClubsToExcel}
+								title="Export All Clubs"
+							>
+								<Download className="mr-1 h-4 w-4" />
+								Clubs
+							</Button>
+							<Button
+								variant="ghost"
+								size="sm"
+								onClick={exportClubContactsToExcel}
+								title="Export Club Contacts"
+							>
+								<Download className="mr-1 h-4 w-4" />
+								Club Contacts
+							</Button>
 						</div>
 					</div>
 

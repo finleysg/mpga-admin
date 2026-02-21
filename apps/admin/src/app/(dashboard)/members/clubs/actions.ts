@@ -67,6 +67,16 @@ export interface MembershipData {
 	paymentCode: string
 }
 
+export interface ClubContactExportRow {
+	clubName: string
+	firstName: string
+	lastName: string
+	email: string | null
+	primaryPhone: string | null
+	systemName: string | null
+	role: string
+}
+
 // ── Club CRUD ───────────────────────────────────────────────────────
 
 export async function listClubsAction(): Promise<ActionResult<ClubData[]>> {
@@ -589,5 +599,78 @@ export async function saveClubPaymentAction(data: {
 	} catch (error) {
 		console.error("Failed to save payment:", error)
 		return { success: false, error: "Failed to save payment" }
+	}
+}
+
+// ── Export Club Contacts ────────────────────────────────────────────
+
+export async function exportClubContactsAction(): Promise<ActionResult<ClubContactExportRow[]>> {
+	const userId = await requireAuth()
+	if (!userId) {
+		return { success: false, error: "Unauthorized" }
+	}
+
+	try {
+		const rows = await db
+			.select({
+				clubName: club.name,
+				systemName: club.systemName,
+				firstName: contact.firstName,
+				lastName: contact.lastName,
+				email: contact.email,
+				primaryPhone: contact.primaryPhone,
+				clubContactId: clubContact.id,
+			})
+			.from(club)
+			.innerJoin(clubContact, eq(clubContact.clubId, club.id))
+			.innerJoin(contact, eq(clubContact.contactId, contact.id))
+			.where(eq(club.archived, false))
+			.orderBy(asc(club.name), asc(contact.lastName), asc(contact.firstName))
+
+		const clubContactIds = rows.map((r) => r.clubContactId)
+
+		let roleRows: { role: string; clubContactId: number }[] = []
+		if (clubContactIds.length > 0) {
+			roleRows = await db
+				.select({
+					role: clubContactRole.role,
+					clubContactId: clubContactRole.clubContactId,
+				})
+				.from(clubContactRole)
+				.where(or(...clubContactIds.map((ccId) => eq(clubContactRole.clubContactId, ccId))))
+		}
+
+		const data: ClubContactExportRow[] = []
+		for (const row of rows) {
+			const roles = roleRows.filter((r) => r.clubContactId === row.clubContactId)
+			if (roles.length === 0) {
+				data.push({
+					clubName: row.clubName,
+					firstName: row.firstName,
+					lastName: row.lastName,
+					email: row.email,
+					primaryPhone: row.primaryPhone,
+					systemName: row.systemName,
+					role: "",
+				})
+			} else {
+				for (const r of roles) {
+					data.push({
+						clubName: row.clubName,
+						firstName: row.firstName,
+						lastName: row.lastName,
+						email: row.email,
+						primaryPhone: row.primaryPhone,
+						systemName: row.systemName,
+						role: r.role,
+					})
+				}
+			}
+		}
+
+		return { success: true, data }
+	} catch (error) {
+		console.error("Failed to export club contacts:", error)
+		return { success: false, error: "Failed to export club contacts" }
 	}
 }
