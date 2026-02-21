@@ -12,6 +12,7 @@ export default async function globalSetup() {
 		"http://localhost:4100/accept-invitation/warmup",
 		"http://localhost:4100/",
 		"http://localhost:4100/members/clubs",
+		"http://localhost:4100/members/contacts",
 	]
 
 	console.log("Warming up dev servers...")

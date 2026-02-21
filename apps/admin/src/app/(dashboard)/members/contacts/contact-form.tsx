@@ -31,9 +31,10 @@ import { type ContactData, deleteContactAction, saveContactAction } from "./acti
 
 interface ContactFormProps {
 	contact?: ContactData
+	onRefresh?: () => void
 }
 
-export function ContactForm({ contact }: ContactFormProps) {
+export function ContactForm({ contact, onRefresh }: ContactFormProps) {
 	const router = useRouter()
 	const [saving, setSaving] = useState(false)
 	const [deleting, setDeleting] = useState(false)
@@ -80,8 +81,13 @@ export function ContactForm({ contact }: ContactFormProps) {
 			})
 
 			if (result.success) {
-				toast.success(contact ? "Contact updated" : "Contact created")
-				router.push("/members/contacts")
+				if (contact) {
+					toast.success("Contact updated")
+					onRefresh?.()
+				} else {
+					toast.success("Contact created")
+					router.push(`/members/contacts/${result.data!.id}`)
+				}
 			} else {
 				setError(result.error ?? "Failed to save contact")
 			}
@@ -244,7 +250,7 @@ export function ContactForm({ contact }: ContactFormProps) {
 					{/* Action buttons */}
 					<div className="flex justify-between pt-4">
 						{/* Delete button - only shown when editing */}
-						{contact && (
+						{contact?.id && (
 							<AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
 								<AlertDialogTrigger asChild>
 									<Button type="button" variant="destructive">
@@ -278,7 +284,7 @@ export function ContactForm({ contact }: ContactFormProps) {
 						)}
 
 						{/* Spacer when no delete button */}
-						{!contact && <div />}
+						{!contact?.id && <div />}
 
 						{/* Save/Cancel buttons on the right */}
 						<div className="flex gap-2">
@@ -290,6 +296,19 @@ export function ContactForm({ contact }: ContactFormProps) {
 							</Button>
 						</div>
 					</div>
+					{contact?.updateDate && (
+						<p className="pt-2 text-right text-xs text-gray-400">
+							Last updated{" "}
+							{new Date(contact.updateDate.replace(" ", "T") + "Z").toLocaleString("en-US", {
+								year: "numeric",
+								month: "short",
+								day: "numeric",
+								hour: "numeric",
+								minute: "2-digit",
+							})}
+							{contact.updateBy && ` by ${contact.updateBy}`}
+						</p>
+					)}
 				</form>
 			</CardContent>
 		</Card>

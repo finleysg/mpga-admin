@@ -31,6 +31,8 @@ export interface ClubContactData {
 	primaryPhone: string | null
 	isPrimary: boolean
 	roles: { id: number; role: string }[]
+	updateDate: string | null
+	updateBy: string | null
 }
 
 export interface ContactSearchResult {

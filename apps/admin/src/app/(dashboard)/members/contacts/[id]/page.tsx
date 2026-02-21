@@ -2,31 +2,62 @@
 
 import { H1 } from "@mpga/ui"
 import { useParams, useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 
-import { type ContactData, getContactAction } from "../actions"
+import {
+	type ContactClubData,
+	type ContactData,
+	getContactAction,
+	getContactClubsAction,
+} from "../actions"
 import { ContactForm } from "../contact-form"
+import { ContactClubsSection } from "./contact-clubs-section"
 
 export default function EditContactPage() {
 	const params = useParams()
 	const router = useRouter()
 	const [contact, setContact] = useState<ContactData | null>(null)
+	const [clubs, setClubs] = useState<ContactClubData[]>([])
 	const [loading, setLoading] = useState(true)
+	const contactId = Number(params.id)
+
+	const fetchContact = useCallback(async () => {
+		try {
+			const [contactResult, clubsResult] = await Promise.all([
+				getContactAction(contactId),
+				getContactClubsAction(contactId),
+			])
+			if (contactResult.success && contactResult.data) {
+				setContact(contactResult.data)
+			}
+			if (clubsResult.success && clubsResult.data) {
+				setClubs(clubsResult.data)
+			}
+		} catch (err) {
+			console.error("Failed to fetch contact:", err)
+		}
+	}, [contactId])
 
 	useEffect(() => {
-		async function fetchContact() {
-			const id = Number(params.id)
-			if (isNaN(id)) {
-				router.push("/members/contacts")
-				return
-			}
+		if (isNaN(contactId)) {
+			router.push("/members/contacts")
+			return
+		}
 
+		async function load() {
 			try {
-				const result = await getContactAction(id)
-				if (result.success && result.data) {
-					setContact(result.data)
+				const [contactResult, clubsResult] = await Promise.all([
+					getContactAction(contactId),
+					getContactClubsAction(contactId),
+				])
+				if (contactResult.success && contactResult.data) {
+					setContact(contactResult.data)
 				} else {
 					router.push("/members/contacts")
+					return
+				}
+				if (clubsResult.success && clubsResult.data) {
+					setClubs(clubsResult.data)
 				}
 			} catch (err) {
 				console.error("Failed to fetch contact:", err)
@@ -36,8 +67,8 @@ export default function EditContactPage() {
 			}
 		}
 
-		fetchContact()
-	}, [params.id, router])
+		load()
+	}, [contactId, router])
 
 	if (loading) {
 		return (
@@ -52,11 +83,12 @@ export default function EditContactPage() {
 	}
 
 	return (
-		<div className="mx-auto max-w-4xl">
+		<div className="mx-auto max-w-4xl space-y-6">
 			<H1 variant="secondary" className="mb-6">
 				Edit Contact
 			</H1>
-			<ContactForm contact={contact} />
+			<ContactForm contact={contact} onRefresh={fetchContact} />
+			<ContactClubsSection clubs={clubs} />
 		</div>
 	)
 }

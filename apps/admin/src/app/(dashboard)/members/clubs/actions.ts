@@ -5,7 +5,7 @@ import type { ActionResult } from "@mpga/types"
 import { and, asc, eq, like, or, sql } from "drizzle-orm"
 
 import { db } from "@/lib/db"
-import { requireAuth } from "@/lib/require-auth"
+import { requireAuth, requireAuthEmail } from "@/lib/require-auth"
 import { revalidateClubPage } from "@/lib/revalidate"
 
 // ── Types ───────────────────────────────────────────────────────────
@@ -30,6 +30,8 @@ export interface ClubData {
 	archived: boolean
 	notes: string | null
 	isMember: boolean
+	updateDate: string | null
+	updateBy: string | null
 }
 
 export interface GolfCourseOption {
@@ -46,6 +48,8 @@ export interface ClubContactData {
 	primaryPhone: string | null
 	isPrimary: boolean
 	roles: { id: number; role: string }[]
+	updateDate: string | null
+	updateBy: string | null
 }
 
 export interface ContactSearchResult {
@@ -61,6 +65,16 @@ export interface MembershipData {
 	paymentDate: string
 	paymentType: string
 	paymentCode: string
+}
+
+export interface ClubContactExportRow {
+	clubName: string
+	firstName: string
+	lastName: string
+	email: string | null
+	primaryPhone: string | null
+	systemName: string | null
+	role: string
 }
 
 // ── Club CRUD ───────────────────────────────────────────────────────
@@ -101,6 +115,8 @@ export async function listClubsAction(): Promise<ActionResult<ClubData[]>> {
 			archived: row.archived,
 			notes: row.notes,
 			isMember: row.membershipId !== null,
+			updateDate: null,
+			updateBy: null,
 		}))
 
 		return { success: true, data: results }
@@ -130,6 +146,8 @@ export async function getClubAction(id: number): Promise<ActionResult<ClubData>>
 				archived: club.archived,
 				notes: club.notes,
 				membershipId: membership.id,
+				updateDate: club.updateDate,
+				updateBy: club.updateBy,
 			})
 			.from(club)
 			.leftJoin(golfCourse, eq(club.golfCourseId, golfCourse.id))
@@ -153,6 +171,8 @@ export async function getClubAction(id: number): Promise<ActionResult<ClubData>>
 				archived: row.archived,
 				notes: row.notes,
 				isMember: row.membershipId !== null,
+				updateDate: row.updateDate,
+				updateBy: row.updateBy,
 			},
 		}
 	} catch (error) {
@@ -162,8 +182,8 @@ export async function getClubAction(id: number): Promise<ActionResult<ClubData>>
 }
 
 export async function saveClubAction(data: ClubInput): Promise<ActionResult<{ id: number }>> {
-	const userId = await requireAuth()
-	if (!userId) {
+	const email = await requireAuthEmail()
+	if (!email) {
 		return { success: false, error: "Unauthorized" }
 	}
 
@@ -172,6 +192,8 @@ export async function saveClubAction(data: ClubInput): Promise<ActionResult<{ id
 	if (!name) {
 		return { success: false, error: "Name is required" }
 	}
+
+	const now = new Date().toISOString().replace("T", " ").replace("Z", "")
 
 	try {
 		if (data.id !== undefined) {
@@ -184,6 +206,8 @@ export async function saveClubAction(data: ClubInput): Promise<ActionResult<{ id
 					size: data.size,
 					archived: data.archived,
 					notes: data.notes ?? null,
+					updateDate: now,
+					updateBy: email,
 				})
 				.where(eq(club.id, data.id))
 
@@ -198,6 +222,8 @@ export async function saveClubAction(data: ClubInput): Promise<ActionResult<{ id
 				size: data.size,
 				archived: data.archived,
 				notes: data.notes ?? null,
+				updateDate: now,
+				updateBy: email,
 			})
 
 			return { success: true, data: { id: result[0].insertId } }
@@ -250,6 +276,10 @@ export async function listClubContactsAction(
 				email: contact.email,
 				primaryPhone: contact.primaryPhone,
 				isPrimary: clubContact.isPrimary,
+				updateDate: clubContact.updateDate,
+				updateBy: clubContact.updateBy,
+				contactUpdateDate: contact.updateDate,
+				contactUpdateBy: contact.updateBy,
 			})
 			.from(clubContact)
 			.innerJoin(contact, eq(clubContact.contactId, contact.id))
@@ -270,12 +300,24 @@ export async function listClubContactsAction(
 				.where(or(...clubContactIds.map((ccId) => eq(clubContactRole.clubContactId, ccId))))
 		}
 
-		const data: ClubContactData[] = contactRows.map((row) => ({
-			...row,
-			roles: roleRows
-				.filter((r) => r.clubContactId === row.clubContactId)
-				.map((r) => ({ id: r.id, role: r.role })),
-		}))
+		const data: ClubContactData[] = contactRows.map((row) => {
+			const useContact =
+				row.contactUpdateDate && (!row.updateDate || row.contactUpdateDate > row.updateDate)
+			return {
+				clubContactId: row.clubContactId,
+				contactId: row.contactId,
+				firstName: row.firstName,
+				lastName: row.lastName,
+				email: row.email,
+				primaryPhone: row.primaryPhone,
+				isPrimary: row.isPrimary,
+				updateDate: useContact ? row.contactUpdateDate : row.updateDate,
+				updateBy: useContact ? row.contactUpdateBy : row.updateBy,
+				roles: roleRows
+					.filter((r) => r.clubContactId === row.clubContactId)
+					.map((r) => ({ id: r.id, role: r.role })),
+			}
+		})
 
 		return { success: true, data }
 	} catch (error) {
@@ -288,8 +330,8 @@ export async function addClubContactAction(
 	clubId: number,
 	contactId: number,
 ): Promise<ActionResult<{ id: number }>> {
-	const userId = await requireAuth()
-	if (!userId) {
+	const email = await requireAuthEmail()
+	if (!email) {
 		return { success: false, error: "Unauthorized" }
 	}
 
@@ -303,10 +345,13 @@ export async function addClubContactAction(
 			return { success: false, error: "Contact is already a member of this club" }
 		}
 
+		const now = new Date().toISOString().replace("T", " ").replace("Z", "")
 		const result = await db.insert(clubContact).values({
 			clubId,
 			contactId,
 			isPrimary: false,
+			updateDate: now,
+			updateBy: email,
 		})
 
 		await revalidateClubPage(clubId)
@@ -384,8 +429,8 @@ export async function toggleClubContactPrimaryAction(
 	clubContactId: number,
 	clubId: number,
 ): Promise<ActionResult> {
-	const userId = await requireAuth()
-	if (!userId) {
+	const email = await requireAuthEmail()
+	if (!email) {
 		return { success: false, error: "Unauthorized" }
 	}
 
@@ -400,9 +445,10 @@ export async function toggleClubContactPrimaryAction(
 			return { success: false, error: "Club contact not found" }
 		}
 
+		const now = new Date().toISOString().replace("T", " ").replace("Z", "")
 		await db
 			.update(clubContact)
-			.set({ isPrimary: !row.isPrimary })
+			.set({ isPrimary: !row.isPrimary, updateDate: now, updateBy: email })
 			.where(eq(clubContact.id, clubContactId))
 
 		await revalidateClubPage(clubId)
@@ -421,8 +467,8 @@ export async function addClubContactRoleAction(
 	role: string,
 	clubId: number,
 ): Promise<ActionResult<{ id: number }>> {
-	const userId = await requireAuth()
-	if (!userId) {
+	const email = await requireAuthEmail()
+	if (!email) {
 		return { success: false, error: "Unauthorized" }
 	}
 
@@ -431,6 +477,12 @@ export async function addClubContactRoleAction(
 			clubContactId,
 			role,
 		})
+
+		const now = new Date().toISOString().replace("T", " ").replace("Z", "")
+		await db
+			.update(clubContact)
+			.set({ updateDate: now, updateBy: email })
+			.where(eq(clubContact.id, clubContactId))
 
 		await revalidateClubPage(clubId)
 
@@ -445,13 +497,29 @@ export async function removeClubContactRoleAction(
 	roleId: number,
 	clubId: number,
 ): Promise<ActionResult> {
-	const userId = await requireAuth()
-	if (!userId) {
+	const email = await requireAuthEmail()
+	if (!email) {
 		return { success: false, error: "Unauthorized" }
 	}
 
 	try {
+		const roleRows = await db
+			.select({ clubContactId: clubContactRole.clubContactId })
+			.from(clubContactRole)
+			.where(eq(clubContactRole.id, roleId))
+
+		const clubContactId = roleRows[0]?.clubContactId
+
 		await db.delete(clubContactRole).where(eq(clubContactRole.id, roleId))
+
+		if (clubContactId) {
+			const now = new Date().toISOString().replace("T", " ").replace("Z", "")
+			await db
+				.update(clubContact)
+				.set({ updateDate: now, updateBy: email })
+				.where(eq(clubContact.id, clubContactId))
+		}
+
 		await revalidateClubPage(clubId)
 		return { success: true }
 	} catch (error) {
@@ -531,5 +599,78 @@ export async function saveClubPaymentAction(data: {
 	} catch (error) {
 		console.error("Failed to save payment:", error)
 		return { success: false, error: "Failed to save payment" }
+	}
+}
+
+// ── Export Club Contacts ────────────────────────────────────────────
+
+export async function exportClubContactsAction(): Promise<ActionResult<ClubContactExportRow[]>> {
+	const userId = await requireAuth()
+	if (!userId) {
+		return { success: false, error: "Unauthorized" }
+	}
+
+	try {
+		const rows = await db
+			.select({
+				clubName: club.name,
+				systemName: club.systemName,
+				firstName: contact.firstName,
+				lastName: contact.lastName,
+				email: contact.email,
+				primaryPhone: contact.primaryPhone,
+				clubContactId: clubContact.id,
+			})
+			.from(club)
+			.innerJoin(clubContact, eq(clubContact.clubId, club.id))
+			.innerJoin(contact, eq(clubContact.contactId, contact.id))
+			.where(eq(club.archived, false))
+			.orderBy(asc(club.name), asc(contact.lastName), asc(contact.firstName))
+
+		const clubContactIds = rows.map((r) => r.clubContactId)
+
+		let roleRows: { role: string; clubContactId: number }[] = []
+		if (clubContactIds.length > 0) {
+			roleRows = await db
+				.select({
+					role: clubContactRole.role,
+					clubContactId: clubContactRole.clubContactId,
+				})
+				.from(clubContactRole)
+				.where(or(...clubContactIds.map((ccId) => eq(clubContactRole.clubContactId, ccId))))
+		}
+
+		const data: ClubContactExportRow[] = []
+		for (const row of rows) {
+			const roles = roleRows.filter((r) => r.clubContactId === row.clubContactId)
+			if (roles.length === 0) {
+				data.push({
+					clubName: row.clubName,
+					firstName: row.firstName,
+					lastName: row.lastName,
+					email: row.email,
+					primaryPhone: row.primaryPhone,
+					systemName: row.systemName,
+					role: "",
+				})
+			} else {
+				for (const r of roles) {
+					data.push({
+						clubName: row.clubName,
+						firstName: row.firstName,
+						lastName: row.lastName,
+						email: row.email,
+						primaryPhone: row.primaryPhone,
+						systemName: row.systemName,
+						role: r.role,
+					})
+				}
+			}
+		}
+
+		return { success: true, data }
+	} catch (error) {
+		console.error("Failed to export club contacts:", error)
+		return { success: false, error: "Failed to export club contacts" }
 	}
 }

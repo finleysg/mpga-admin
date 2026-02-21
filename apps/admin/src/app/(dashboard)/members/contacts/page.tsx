@@ -34,6 +34,7 @@ import { ChevronDown, ChevronUp, ChevronsUpDown, Download } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
+import { exportClubContactsAction } from "../clubs/actions"
 import { type ContactData, listContactsAction } from "./actions"
 
 const formatCityState = (city: string | null, state: string | null) => {
@@ -217,6 +218,44 @@ export default function ContactsPage() {
 		URL.revokeObjectURL(url)
 	}
 
+	const exportClubContactsToExcel = async () => {
+		const result = await exportClubContactsAction()
+		if (!result.success || !result.data) return
+
+		const wb = new ExcelJS.Workbook()
+		const ws = wb.addWorksheet("Club Contacts")
+		ws.columns = [
+			{ header: "Home Club", key: "clubName" },
+			{ header: "First Name", key: "firstName" },
+			{ header: "Last Name", key: "lastName" },
+			{ header: "Email", key: "email" },
+			{ header: "Phone", key: "phone" },
+			{ header: "Club Url", key: "clubUrl" },
+			{ header: "Roles", key: "roles" },
+		]
+		for (const row of result.data) {
+			ws.addRow({
+				clubName: row.clubName,
+				firstName: row.firstName,
+				lastName: row.lastName,
+				email: row.email ?? "",
+				phone: row.primaryPhone ?? "",
+				clubUrl: row.systemName ? `https://mpga.net/members/${row.systemName}` : "",
+				roles: row.role,
+			})
+		}
+		const buffer = await wb.xlsx.writeBuffer()
+		const blob = new Blob([buffer], {
+			type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+		})
+		const url = URL.createObjectURL(blob)
+		const a = document.createElement("a")
+		a.href = url
+		a.download = "club-contacts.xlsx"
+		a.click()
+		URL.revokeObjectURL(url)
+	}
+
 	const filteredCount = table.getFilteredRowModel().rows.length
 	const showPagination = pageSizeOption !== "all" && table.getPageCount() > 1
 
@@ -261,9 +300,18 @@ export default function ContactsPage() {
 								{filteredCount} {filteredCount === 1 ? "contact" : "contacts"}
 								{globalFilter && ` (filtered)`}
 							</p>
-							<Button variant="ghost" size="sm" onClick={exportToExcel}>
+							<Button variant="ghost" size="sm" onClick={exportToExcel} title="Export All Contacts">
 								<Download className="mr-1 h-4 w-4" />
-								Export
+								Contacts
+							</Button>
+							<Button
+								variant="ghost"
+								size="sm"
+								onClick={exportClubContactsToExcel}
+								title="Export Club Contacts"
+							>
+								<Download className="mr-1 h-4 w-4" />
+								Club Contacts
 							</Button>
 						</div>
 					</div>

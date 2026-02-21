@@ -1,6 +1,6 @@
 "use server"
 
-import { clubContact, clubContactRole, committee, contact } from "@mpga/database"
+import { club, clubContact, clubContactRole, committee, contact } from "@mpga/database"
 import type { ActionResult } from "@mpga/types"
 import { asc, eq, inArray } from "drizzle-orm"
 
@@ -11,7 +11,7 @@ import {
 	classifyClubContact,
 	classifyCommittee,
 } from "@/lib/merge-contacts"
-import { requireAuth } from "@/lib/require-auth"
+import { requireAuth, requireAuthEmail } from "@/lib/require-auth"
 
 interface ContactInput {
 	id?: number
@@ -41,6 +41,8 @@ export interface ContactData {
 	zip: string | null
 	notes: string | null
 	sendEmail: boolean
+	updateDate: string | null
+	updateBy: string | null
 }
 
 export async function listContactsAction(): Promise<ActionResult<ContactData[]>> {
@@ -64,6 +66,8 @@ export async function listContactsAction(): Promise<ActionResult<ContactData[]>>
 				zip: contact.zip,
 				notes: contact.notes,
 				sendEmail: contact.sendEmail,
+				updateDate: contact.updateDate,
+				updateBy: contact.updateBy,
 			})
 			.from(contact)
 			.orderBy(asc(contact.lastName), asc(contact.firstName))
@@ -96,6 +100,8 @@ export async function getContactAction(id: number): Promise<ActionResult<Contact
 				zip: contact.zip,
 				notes: contact.notes,
 				sendEmail: contact.sendEmail,
+				updateDate: contact.updateDate,
+				updateBy: contact.updateBy,
 			})
 			.from(contact)
 			.where(eq(contact.id, id))
@@ -112,8 +118,8 @@ export async function getContactAction(id: number): Promise<ActionResult<Contact
 }
 
 export async function saveContactAction(data: ContactInput): Promise<ActionResult<{ id: number }>> {
-	const userId = await requireAuth()
-	if (!userId) {
+	const email = await requireAuthEmail()
+	if (!email) {
 		return { success: false, error: "Unauthorized" }
 	}
 
@@ -123,6 +129,8 @@ export async function saveContactAction(data: ContactInput): Promise<ActionResul
 	if (!firstName || !lastName) {
 		return { success: false, error: "First name and last name are required" }
 	}
+
+	const now = new Date().toISOString().replace("T", " ").replace("Z", "")
 
 	try {
 		if (data.id !== undefined) {
@@ -140,6 +148,8 @@ export async function saveContactAction(data: ContactInput): Promise<ActionResul
 					zip: data.zip ?? null,
 					notes: data.notes ?? null,
 					sendEmail: data.sendEmail ?? true,
+					updateDate: now,
+					updateBy: email,
 				})
 				.where(eq(contact.id, data.id))
 
@@ -157,6 +167,8 @@ export async function saveContactAction(data: ContactInput): Promise<ActionResul
 				zip: data.zip ?? null,
 				notes: data.notes ?? null,
 				sendEmail: data.sendEmail ?? true,
+				updateDate: now,
+				updateBy: email,
 			})
 
 			return { success: true, data: { id: result[0].insertId } }
@@ -195,6 +207,8 @@ export async function findDuplicatesAction(): Promise<ActionResult<DuplicateGrou
 				zip: contact.zip,
 				notes: contact.notes,
 				sendEmail: contact.sendEmail,
+				updateDate: contact.updateDate,
+				updateBy: contact.updateBy,
 			})
 			.from(contact)
 			.orderBy(asc(contact.lastName), asc(contact.firstName))
@@ -211,8 +225,8 @@ export async function mergeContactsAction(
 	targetId: number,
 	sourceIds: number[],
 ): Promise<ActionResult> {
-	const userId = await requireAuth()
-	if (!userId) {
+	const email = await requireAuthEmail()
+	if (!email) {
 		return { success: false, error: "Unauthorized" }
 	}
 
@@ -233,10 +247,12 @@ export async function mergeContactsAction(
 			// 2. Fetch source contacts and copy missing data to target
 			const sources = await tx.select().from(contact).where(inArray(contact.id, sourceIds))
 
+			const now = new Date().toISOString().replace("T", " ").replace("Z", "")
 			const updates = buildMergeFieldUpdates(target, sources)
-			if (Object.keys(updates).length > 0) {
-				await tx.update(contact).set(updates).where(eq(contact.id, targetId))
-			}
+			await tx
+				.update(contact)
+				.set({ ...updates, updateDate: now, updateBy: email })
+				.where(eq(contact.id, targetId))
 
 			// 3. Reassign clubContact rows
 			const targetClubContacts = await tx
@@ -258,7 +274,7 @@ export async function mergeContactsAction(
 					} else {
 						await tx
 							.update(clubContact)
-							.set({ contactId: targetId })
+							.set({ contactId: targetId, updateDate: now, updateBy: email })
 							.where(eq(clubContact.id, scc.id))
 						targetClubIds.add(scc.clubId)
 					}
@@ -296,6 +312,59 @@ export async function mergeContactsAction(
 	} catch (error) {
 		console.error("Failed to merge contacts:", error)
 		return { success: false, error: "Failed to merge contacts" }
+	}
+}
+
+export interface ContactClubData {
+	clubId: number
+	clubName: string
+	isPrimary: boolean
+	roles: string[]
+}
+
+export async function getContactClubsAction(
+	contactId: number,
+): Promise<ActionResult<ContactClubData[]>> {
+	const userId = await requireAuth()
+	if (!userId) {
+		return { success: false, error: "Unauthorized" }
+	}
+
+	try {
+		const rows = await db
+			.select({
+				clubId: club.id,
+				clubName: club.name,
+				isPrimary: clubContact.isPrimary,
+				roleName: clubContactRole.role,
+			})
+			.from(clubContact)
+			.innerJoin(club, eq(club.id, clubContact.clubId))
+			.leftJoin(clubContactRole, eq(clubContactRole.clubContactId, clubContact.id))
+			.where(eq(clubContact.contactId, contactId))
+			.orderBy(asc(club.name))
+
+		const clubMap = new Map<number, ContactClubData>()
+		for (const row of rows) {
+			const existing = clubMap.get(row.clubId)
+			if (existing) {
+				if (row.roleName && !existing.roles.includes(row.roleName)) {
+					existing.roles.push(row.roleName)
+				}
+			} else {
+				clubMap.set(row.clubId, {
+					clubId: row.clubId,
+					clubName: row.clubName,
+					isPrimary: row.isPrimary,
+					roles: row.roleName ? [row.roleName] : [],
+				})
+			}
+		}
+
+		return { success: true, data: Array.from(clubMap.values()) }
+	} catch (error) {
+		console.error("Failed to get contact clubs:", error)
+		return { success: false, error: "Failed to get contact clubs" }
 	}
 }
 
