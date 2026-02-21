@@ -1,6 +1,6 @@
 "use server"
 
-import { clubContact, clubContactRole, committee, contact } from "@mpga/database"
+import { club, clubContact, clubContactRole, committee, contact } from "@mpga/database"
 import type { ActionResult } from "@mpga/types"
 import { asc, eq, inArray } from "drizzle-orm"
 
@@ -312,6 +312,59 @@ export async function mergeContactsAction(
 	} catch (error) {
 		console.error("Failed to merge contacts:", error)
 		return { success: false, error: "Failed to merge contacts" }
+	}
+}
+
+export interface ContactClubData {
+	clubId: number
+	clubName: string
+	isPrimary: boolean
+	roles: string[]
+}
+
+export async function getContactClubsAction(
+	contactId: number,
+): Promise<ActionResult<ContactClubData[]>> {
+	const userId = await requireAuth()
+	if (!userId) {
+		return { success: false, error: "Unauthorized" }
+	}
+
+	try {
+		const rows = await db
+			.select({
+				clubId: club.id,
+				clubName: club.name,
+				isPrimary: clubContact.isPrimary,
+				roleName: clubContactRole.role,
+			})
+			.from(clubContact)
+			.innerJoin(club, eq(club.id, clubContact.clubId))
+			.leftJoin(clubContactRole, eq(clubContactRole.clubContactId, clubContact.id))
+			.where(eq(clubContact.contactId, contactId))
+			.orderBy(asc(club.name))
+
+		const clubMap = new Map<number, ContactClubData>()
+		for (const row of rows) {
+			const existing = clubMap.get(row.clubId)
+			if (existing) {
+				if (row.roleName && !existing.roles.includes(row.roleName)) {
+					existing.roles.push(row.roleName)
+				}
+			} else {
+				clubMap.set(row.clubId, {
+					clubId: row.clubId,
+					clubName: row.clubName,
+					isPrimary: row.isPrimary,
+					roles: row.roleName ? [row.roleName] : [],
+				})
+			}
+		}
+
+		return { success: true, data: Array.from(clubMap.values()) }
+	} catch (error) {
+		console.error("Failed to get contact clubs:", error)
+		return { success: false, error: "Failed to get contact clubs" }
 	}
 }
 

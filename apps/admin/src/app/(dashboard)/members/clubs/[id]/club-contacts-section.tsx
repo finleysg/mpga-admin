@@ -29,7 +29,8 @@ import {
 	TableRow,
 	toast,
 } from "@mpga/ui"
-import { Star, Trash2, X } from "lucide-react"
+import { Pencil, Star, Trash2, X } from "lucide-react"
+import Link from "next/link"
 import { useEffect, useState } from "react"
 
 import {
@@ -255,39 +256,46 @@ export function ClubContactsSection({ clubId, contacts, onRefresh }: ClubContact
 											)}
 										</TableCell>
 										<TableCell className="px-4 py-3">
-											<AlertDialog>
-												<AlertDialogTrigger asChild>
-													<Button
-														type="button"
-														variant="ghost"
-														size="sm"
-														disabled={removing === cc.clubContactId}
-													>
-														<Trash2 className="h-4 w-4 text-red-500" />
-													</Button>
-												</AlertDialogTrigger>
-												<AlertDialogContent>
-													<AlertDialogHeader>
-														<AlertDialogTitle>Remove Contact</AlertDialogTitle>
-														<AlertDialogDescription>
-															Remove {cc.firstName} {cc.lastName} from this club? The contact record
-															itself will not be deleted.
-														</AlertDialogDescription>
-													</AlertDialogHeader>
-													<AlertDialogFooter>
-														<AlertDialogCancel>Cancel</AlertDialogCancel>
-														<AlertDialogAction
-															onClick={(e) => {
-																e.preventDefault()
-																handleRemoveContact(cc.clubContactId)
-															}}
-															className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+											<div className="flex items-center">
+												<Button type="button" variant="ghost" size="sm" asChild>
+													<Link href={`/members/contacts/${cc.contactId}`}>
+														<Pencil className="h-4 w-4 text-secondary-500" />
+													</Link>
+												</Button>
+												<AlertDialog>
+													<AlertDialogTrigger asChild>
+														<Button
+															type="button"
+															variant="ghost"
+															size="sm"
+															disabled={removing === cc.clubContactId}
 														>
-															Remove
-														</AlertDialogAction>
-													</AlertDialogFooter>
-												</AlertDialogContent>
-											</AlertDialog>
+															<Trash2 className="h-4 w-4 text-red-500" />
+														</Button>
+													</AlertDialogTrigger>
+													<AlertDialogContent>
+														<AlertDialogHeader>
+															<AlertDialogTitle>Remove Contact</AlertDialogTitle>
+															<AlertDialogDescription>
+																Remove {cc.firstName} {cc.lastName} from this club? The contact
+																record itself will not be deleted.
+															</AlertDialogDescription>
+														</AlertDialogHeader>
+														<AlertDialogFooter>
+															<AlertDialogCancel>Cancel</AlertDialogCancel>
+															<AlertDialogAction
+																onClick={(e) => {
+																	e.preventDefault()
+																	handleRemoveContact(cc.clubContactId)
+																}}
+																className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+															>
+																Remove
+															</AlertDialogAction>
+														</AlertDialogFooter>
+													</AlertDialogContent>
+												</AlertDialog>
+											</div>
 										</TableCell>
 									</TableRow>
 								)
