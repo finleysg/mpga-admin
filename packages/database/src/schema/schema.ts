@@ -61,6 +61,8 @@ export const club = mysqlTable(
 		size: int(),
 		systemName: varchar({ length: 50 }),
 		archived: boolean().notNull(),
+		updateDate: datetime({ mode: "string", fsp: 6 }),
+		updateBy: varchar({ length: 100 }),
 	},
 	(table) => [primaryKey({ columns: [table.id], name: "club_id" })],
 )
@@ -78,6 +80,8 @@ export const clubContact = mysqlTable(
 		isPrimary: boolean().notNull(),
 		notes: varchar({ length: 150 }),
 		userId: int(),
+		updateDate: datetime({ mode: "string", fsp: 6 }),
+		updateBy: varchar({ length: 100 }),
 	},
 	(table) => [primaryKey({ columns: [table.id], name: "clubContact_id" })],
 )
@@ -124,6 +128,8 @@ export const contact = mysqlTable(
 		zip: varchar({ length: 10 }),
 		notes: longtext(),
 		sendEmail: boolean().notNull(),
+		updateDate: datetime({ mode: "string", fsp: 6 }),
+		updateBy: varchar({ length: 100 }),
 	},
 	(table) => [primaryKey({ columns: [table.id], name: "contact_id" })],
 )

@@ -30,6 +30,17 @@ export default function EditClubPage() {
 	const clubId = Number(params.id)
 	const currentYear = new Date().getFullYear()
 
+	const fetchClub = useCallback(async () => {
+		try {
+			const result = await getClubAction(clubId)
+			if (result.success && result.data) {
+				setClub(result.data)
+			}
+		} catch (err) {
+			console.error("Failed to fetch club:", err)
+		}
+	}, [clubId])
+
 	const fetchContacts = useCallback(async () => {
 		try {
 			const result = await listClubContactsAction(clubId)
@@ -102,7 +113,7 @@ export default function EditClubPage() {
 	return (
 		<div className="mx-auto max-w-6xl space-y-6">
 			<H1 variant="secondary">Edit Club</H1>
-			<ClubForm club={club} golfCourses={golfCourses} />
+			<ClubForm club={club} golfCourses={golfCourses} onRefresh={fetchClub} />
 			<ClubContactsSection clubId={clubId} contacts={contacts} onRefresh={fetchContacts} />
 			<ClubPaymentSection
 				clubId={clubId}

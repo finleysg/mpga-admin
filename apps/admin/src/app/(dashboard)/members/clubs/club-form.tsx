@@ -24,9 +24,10 @@ import { type ClubData, type GolfCourseOption, saveClubAction } from "./actions"
 interface ClubFormProps {
 	club?: ClubData
 	golfCourses: GolfCourseOption[]
+	onRefresh?: () => void
 }
 
-export function ClubForm({ club: existingClub, golfCourses }: ClubFormProps) {
+export function ClubForm({ club: existingClub, golfCourses, onRefresh }: ClubFormProps) {
 	const router = useRouter()
 	const [saving, setSaving] = useState(false)
 	const [error, setError] = useState<string | null>(null)
@@ -65,6 +66,7 @@ export function ClubForm({ club: existingClub, golfCourses }: ClubFormProps) {
 			if (result.success && result.data) {
 				if (existingClub) {
 					toast.success("Club updated")
+					onRefresh?.()
 				} else {
 					toast.success("Club created")
 					router.push(`/members/clubs/${result.data.id}`)
@@ -178,6 +180,19 @@ export function ClubForm({ club: existingClub, golfCourses }: ClubFormProps) {
 							</Button>
 						</div>
 					</div>
+					{existingClub?.updateDate && (
+						<p className="pt-2 text-right text-xs text-gray-400">
+							Last updated{" "}
+							{new Date(existingClub.updateDate.replace(" ", "T") + "Z").toLocaleString("en-US", {
+								year: "numeric",
+								month: "short",
+								day: "numeric",
+								hour: "numeric",
+								minute: "2-digit",
+							})}
+							{existingClub.updateBy && ` by ${existingClub.updateBy}`}
+						</p>
+					)}
 				</form>
 			</CardContent>
 		</Card>

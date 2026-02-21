@@ -24,7 +24,7 @@ import { validateClubContact } from "./validate-contact"
 
 async function requireClubContactAuth(
 	clubId: number,
-): Promise<{ authorized: true } | { authorized: false; error: string }> {
+): Promise<{ authorized: true; email: string } | { authorized: false; error: string }> {
 	const session = await auth.api.getSession({ headers: await headers() })
 	if (!session) {
 		return { authorized: false, error: "Not authenticated" }
@@ -33,7 +33,7 @@ async function requireClubContactAuth(
 	if (!isAuthorized) {
 		return { authorized: false, error: "Not authorized" }
 	}
-	return { authorized: true }
+	return { authorized: true, email: session.user.email }
 }
 
 // ── Magic Link ──────────────────────────────────────────────────────
@@ -176,6 +176,8 @@ export async function listClubContactsForContact(
 				email: contact.email,
 				primaryPhone: contact.primaryPhone,
 				isPrimary: clubContact.isPrimary,
+				updateDate: clubContact.updateDate,
+				updateBy: clubContact.updateBy,
 			})
 			.from(clubContact)
 			.innerJoin(contact, eq(clubContact.contactId, contact.id))
@@ -269,10 +271,13 @@ export async function addClubContactForContact(
 			return { success: false, error: "Contact is already a member of this club" }
 		}
 
+		const now = new Date().toISOString().replace("T", " ").replace("Z", "")
 		const result = await db.insert(clubContact).values({
 			clubId,
 			contactId,
 			isPrimary: false,
+			updateDate: now,
+			updateBy: authCheck.email,
 		})
 
 		await revalidateClubPage(clubId)
@@ -336,9 +341,10 @@ export async function toggleClubContactPrimaryForContact(
 			return { success: false, error: "Club contact not found" }
 		}
 
+		const now = new Date().toISOString().replace("T", " ").replace("Z", "")
 		await db
 			.update(clubContact)
-			.set({ isPrimary: !row.isPrimary })
+			.set({ isPrimary: !row.isPrimary, updateDate: now, updateBy: authCheck.email })
 			.where(eq(clubContact.id, clubContactId))
 
 		await revalidateClubPage(clubId)

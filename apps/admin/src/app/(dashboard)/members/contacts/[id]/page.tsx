@@ -2,7 +2,7 @@
 
 import { H1 } from "@mpga/ui"
 import { useParams, useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 
 import { type ContactData, getContactAction } from "../actions"
 import { ContactForm } from "../contact-form"
@@ -12,17 +12,28 @@ export default function EditContactPage() {
 	const router = useRouter()
 	const [contact, setContact] = useState<ContactData | null>(null)
 	const [loading, setLoading] = useState(true)
+	const contactId = Number(params.id)
+
+	const fetchContact = useCallback(async () => {
+		try {
+			const result = await getContactAction(contactId)
+			if (result.success && result.data) {
+				setContact(result.data)
+			}
+		} catch (err) {
+			console.error("Failed to fetch contact:", err)
+		}
+	}, [contactId])
 
 	useEffect(() => {
-		async function fetchContact() {
-			const id = Number(params.id)
-			if (isNaN(id)) {
-				router.push("/members/contacts")
-				return
-			}
+		if (isNaN(contactId)) {
+			router.push("/members/contacts")
+			return
+		}
 
+		async function load() {
 			try {
-				const result = await getContactAction(id)
+				const result = await getContactAction(contactId)
 				if (result.success && result.data) {
 					setContact(result.data)
 				} else {
@@ -36,8 +47,8 @@ export default function EditContactPage() {
 			}
 		}
 
-		fetchContact()
-	}, [params.id, router])
+		load()
+	}, [contactId, router])
 
 	if (loading) {
 		return (
@@ -56,7 +67,7 @@ export default function EditContactPage() {
 			<H1 variant="secondary" className="mb-6">
 				Edit Contact
 			</H1>
-			<ContactForm contact={contact} />
+			<ContactForm contact={contact} onRefresh={fetchContact} />
 		</div>
 	)
 }

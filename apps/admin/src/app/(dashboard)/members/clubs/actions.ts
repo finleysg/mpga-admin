@@ -5,7 +5,7 @@ import type { ActionResult } from "@mpga/types"
 import { and, asc, eq, like, or, sql } from "drizzle-orm"
 
 import { db } from "@/lib/db"
-import { requireAuth } from "@/lib/require-auth"
+import { requireAuth, requireAuthEmail } from "@/lib/require-auth"
 import { revalidateClubPage } from "@/lib/revalidate"
 
 // ── Types ───────────────────────────────────────────────────────────
@@ -30,6 +30,8 @@ export interface ClubData {
 	archived: boolean
 	notes: string | null
 	isMember: boolean
+	updateDate: string | null
+	updateBy: string | null
 }
 
 export interface GolfCourseOption {
@@ -46,6 +48,8 @@ export interface ClubContactData {
 	primaryPhone: string | null
 	isPrimary: boolean
 	roles: { id: number; role: string }[]
+	updateDate: string | null
+	updateBy: string | null
 }
 
 export interface ContactSearchResult {
@@ -101,6 +105,8 @@ export async function listClubsAction(): Promise<ActionResult<ClubData[]>> {
 			archived: row.archived,
 			notes: row.notes,
 			isMember: row.membershipId !== null,
+			updateDate: null,
+			updateBy: null,
 		}))
 
 		return { success: true, data: results }
@@ -130,6 +136,8 @@ export async function getClubAction(id: number): Promise<ActionResult<ClubData>>
 				archived: club.archived,
 				notes: club.notes,
 				membershipId: membership.id,
+				updateDate: club.updateDate,
+				updateBy: club.updateBy,
 			})
 			.from(club)
 			.leftJoin(golfCourse, eq(club.golfCourseId, golfCourse.id))
@@ -153,6 +161,8 @@ export async function getClubAction(id: number): Promise<ActionResult<ClubData>>
 				archived: row.archived,
 				notes: row.notes,
 				isMember: row.membershipId !== null,
+				updateDate: row.updateDate,
+				updateBy: row.updateBy,
 			},
 		}
 	} catch (error) {
@@ -162,8 +172,8 @@ export async function getClubAction(id: number): Promise<ActionResult<ClubData>>
 }
 
 export async function saveClubAction(data: ClubInput): Promise<ActionResult<{ id: number }>> {
-	const userId = await requireAuth()
-	if (!userId) {
+	const email = await requireAuthEmail()
+	if (!email) {
 		return { success: false, error: "Unauthorized" }
 	}
 
@@ -172,6 +182,8 @@ export async function saveClubAction(data: ClubInput): Promise<ActionResult<{ id
 	if (!name) {
 		return { success: false, error: "Name is required" }
 	}
+
+	const now = new Date().toISOString().replace("T", " ").replace("Z", "")
 
 	try {
 		if (data.id !== undefined) {
@@ -184,6 +196,8 @@ export async function saveClubAction(data: ClubInput): Promise<ActionResult<{ id
 					size: data.size,
 					archived: data.archived,
 					notes: data.notes ?? null,
+					updateDate: now,
+					updateBy: email,
 				})
 				.where(eq(club.id, data.id))
 
@@ -198,6 +212,8 @@ export async function saveClubAction(data: ClubInput): Promise<ActionResult<{ id
 				size: data.size,
 				archived: data.archived,
 				notes: data.notes ?? null,
+				updateDate: now,
+				updateBy: email,
 			})
 
 			return { success: true, data: { id: result[0].insertId } }
@@ -250,6 +266,8 @@ export async function listClubContactsAction(
 				email: contact.email,
 				primaryPhone: contact.primaryPhone,
 				isPrimary: clubContact.isPrimary,
+				updateDate: clubContact.updateDate,
+				updateBy: clubContact.updateBy,
 			})
 			.from(clubContact)
 			.innerJoin(contact, eq(clubContact.contactId, contact.id))
@@ -288,8 +306,8 @@ export async function addClubContactAction(
 	clubId: number,
 	contactId: number,
 ): Promise<ActionResult<{ id: number }>> {
-	const userId = await requireAuth()
-	if (!userId) {
+	const email = await requireAuthEmail()
+	if (!email) {
 		return { success: false, error: "Unauthorized" }
 	}
 
@@ -303,10 +321,13 @@ export async function addClubContactAction(
 			return { success: false, error: "Contact is already a member of this club" }
 		}
 
+		const now = new Date().toISOString().replace("T", " ").replace("Z", "")
 		const result = await db.insert(clubContact).values({
 			clubId,
 			contactId,
 			isPrimary: false,
+			updateDate: now,
+			updateBy: email,
 		})
 
 		await revalidateClubPage(clubId)
@@ -384,8 +405,8 @@ export async function toggleClubContactPrimaryAction(
 	clubContactId: number,
 	clubId: number,
 ): Promise<ActionResult> {
-	const userId = await requireAuth()
-	if (!userId) {
+	const email = await requireAuthEmail()
+	if (!email) {
 		return { success: false, error: "Unauthorized" }
 	}
 
@@ -400,9 +421,10 @@ export async function toggleClubContactPrimaryAction(
 			return { success: false, error: "Club contact not found" }
 		}
 
+		const now = new Date().toISOString().replace("T", " ").replace("Z", "")
 		await db
 			.update(clubContact)
-			.set({ isPrimary: !row.isPrimary })
+			.set({ isPrimary: !row.isPrimary, updateDate: now, updateBy: email })
 			.where(eq(clubContact.id, clubContactId))
 
 		await revalidateClubPage(clubId)

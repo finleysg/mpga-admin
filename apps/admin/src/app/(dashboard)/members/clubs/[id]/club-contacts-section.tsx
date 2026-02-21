@@ -166,6 +166,9 @@ export function ClubContactsSection({ clubId, contacts, onRefresh }: ClubContact
 								<TableHead className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-secondary-900">
 									Roles
 								</TableHead>
+								<TableHead className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-secondary-900">
+									Last Updated
+								</TableHead>
 								<TableHead className="w-10" />
 							</TableRow>
 						</TableHeader>
@@ -230,6 +233,24 @@ export function ClubContactsSection({ clubId, contacts, onRefresh }: ClubContact
 													</Select>
 												)}
 											</div>
+										</TableCell>
+										<TableCell className="px-4 py-3 text-xs">
+											{cc.updateDate ? (
+												<div>
+													<div>
+														{new Date(cc.updateDate.replace(" ", "T")).toLocaleDateString("en-US", {
+															year: "numeric",
+															month: "short",
+															day: "numeric",
+														})}
+													</div>
+													{cc.updateBy && (
+														<div className="text-muted-foreground">{cc.updateBy}</div>
+													)}
+												</div>
+											) : (
+												"-"
+											)}
 										</TableCell>
 										<TableCell className="px-4 py-3">
 											<AlertDialog>

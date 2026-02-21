@@ -17,6 +17,8 @@ function makeContact(
 		zip: null,
 		notes: null,
 		sendEmail: true,
+		updateDate: null,
+		updateBy: null,
 		...overrides,
 	}
 }
