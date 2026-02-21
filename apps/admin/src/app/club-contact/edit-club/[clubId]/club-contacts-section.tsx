@@ -260,10 +260,12 @@ export function ClubContactsSection({ clubId, initialContacts }: ClubContactsSec
 									{cc.updateDate && (
 										<p className="text-muted-foreground mt-2 text-xs">
 											Updated{" "}
-											{new Date(cc.updateDate.replace(" ", "T")).toLocaleDateString("en-US", {
+											{new Date(cc.updateDate.replace(" ", "T")).toLocaleString("en-US", {
 												year: "numeric",
 												month: "short",
 												day: "numeric",
+												hour: "numeric",
+												minute: "2-digit",
 											})}
 										</p>
 									)}

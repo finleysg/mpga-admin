@@ -268,6 +268,8 @@ export async function listClubContactsAction(
 				isPrimary: clubContact.isPrimary,
 				updateDate: clubContact.updateDate,
 				updateBy: clubContact.updateBy,
+				contactUpdateDate: contact.updateDate,
+				contactUpdateBy: contact.updateBy,
 			})
 			.from(clubContact)
 			.innerJoin(contact, eq(clubContact.contactId, contact.id))
@@ -288,12 +290,24 @@ export async function listClubContactsAction(
 				.where(or(...clubContactIds.map((ccId) => eq(clubContactRole.clubContactId, ccId))))
 		}
 
-		const data: ClubContactData[] = contactRows.map((row) => ({
-			...row,
-			roles: roleRows
-				.filter((r) => r.clubContactId === row.clubContactId)
-				.map((r) => ({ id: r.id, role: r.role })),
-		}))
+		const data: ClubContactData[] = contactRows.map((row) => {
+			const useContact =
+				row.contactUpdateDate && (!row.updateDate || row.contactUpdateDate > row.updateDate)
+			return {
+				clubContactId: row.clubContactId,
+				contactId: row.contactId,
+				firstName: row.firstName,
+				lastName: row.lastName,
+				email: row.email,
+				primaryPhone: row.primaryPhone,
+				isPrimary: row.isPrimary,
+				updateDate: useContact ? row.contactUpdateDate : row.updateDate,
+				updateBy: useContact ? row.contactUpdateBy : row.updateBy,
+				roles: roleRows
+					.filter((r) => r.clubContactId === row.clubContactId)
+					.map((r) => ({ id: r.id, role: r.role })),
+			}
+		})
 
 		return { success: true, data }
 	} catch (error) {
@@ -443,8 +457,8 @@ export async function addClubContactRoleAction(
 	role: string,
 	clubId: number,
 ): Promise<ActionResult<{ id: number }>> {
-	const userId = await requireAuth()
-	if (!userId) {
+	const email = await requireAuthEmail()
+	if (!email) {
 		return { success: false, error: "Unauthorized" }
 	}
 
@@ -453,6 +467,12 @@ export async function addClubContactRoleAction(
 			clubContactId,
 			role,
 		})
+
+		const now = new Date().toISOString().replace("T", " ").replace("Z", "")
+		await db
+			.update(clubContact)
+			.set({ updateDate: now, updateBy: email })
+			.where(eq(clubContact.id, clubContactId))
 
 		await revalidateClubPage(clubId)
 
@@ -467,13 +487,29 @@ export async function removeClubContactRoleAction(
 	roleId: number,
 	clubId: number,
 ): Promise<ActionResult> {
-	const userId = await requireAuth()
-	if (!userId) {
+	const email = await requireAuthEmail()
+	if (!email) {
 		return { success: false, error: "Unauthorized" }
 	}
 
 	try {
+		const roleRows = await db
+			.select({ clubContactId: clubContactRole.clubContactId })
+			.from(clubContactRole)
+			.where(eq(clubContactRole.id, roleId))
+
+		const clubContactId = roleRows[0]?.clubContactId
+
 		await db.delete(clubContactRole).where(eq(clubContactRole.id, roleId))
+
+		if (clubContactId) {
+			const now = new Date().toISOString().replace("T", " ").replace("Z", "")
+			await db
+				.update(clubContact)
+				.set({ updateDate: now, updateBy: email })
+				.where(eq(clubContact.id, clubContactId))
+		}
+
 		await revalidateClubPage(clubId)
 		return { success: true }
 	} catch (error) {

@@ -178,6 +178,8 @@ export async function listClubContactsForContact(
 				isPrimary: clubContact.isPrimary,
 				updateDate: clubContact.updateDate,
 				updateBy: clubContact.updateBy,
+				contactUpdateDate: contact.updateDate,
+				contactUpdateBy: contact.updateBy,
 			})
 			.from(clubContact)
 			.innerJoin(contact, eq(clubContact.contactId, contact.id))
@@ -198,12 +200,24 @@ export async function listClubContactsForContact(
 				.where(or(...clubContactIds.map((ccId) => eq(clubContactRole.clubContactId, ccId))))
 		}
 
-		const data: ClubContactData[] = contactRows.map((row) => ({
-			...row,
-			roles: roleRows
-				.filter((r) => r.clubContactId === row.clubContactId)
-				.map((r) => ({ id: r.id, role: r.role })),
-		}))
+		const data: ClubContactData[] = contactRows.map((row) => {
+			const useContact =
+				row.contactUpdateDate && (!row.updateDate || row.contactUpdateDate > row.updateDate)
+			return {
+				clubContactId: row.clubContactId,
+				contactId: row.contactId,
+				firstName: row.firstName,
+				lastName: row.lastName,
+				email: row.email,
+				primaryPhone: row.primaryPhone,
+				isPrimary: row.isPrimary,
+				updateDate: useContact ? row.contactUpdateDate : row.updateDate,
+				updateBy: useContact ? row.contactUpdateBy : row.updateBy,
+				roles: roleRows
+					.filter((r) => r.clubContactId === row.clubContactId)
+					.map((r) => ({ id: r.id, role: r.role })),
+			}
+		})
 
 		return { success: true, data }
 	} catch (error) {
@@ -384,6 +398,12 @@ export async function addClubContactRoleForContact(
 			role,
 		})
 
+		const now = new Date().toISOString().replace("T", " ").replace("Z", "")
+		await db
+			.update(clubContact)
+			.set({ updateDate: now, updateBy: authCheck.email })
+			.where(eq(clubContact.id, clubContactId))
+
 		await revalidateClubPage(clubId)
 
 		return { success: true, data: { id: result[0].insertId } }
@@ -405,7 +425,7 @@ export async function removeClubContactRoleForContact(
 	try {
 		// Verify the role belongs to a club contact of this club
 		const rows = await db
-			.select({ id: clubContactRole.id })
+			.select({ id: clubContactRole.id, clubContactId: clubContactRole.clubContactId })
 			.from(clubContactRole)
 			.innerJoin(clubContact, eq(clubContactRole.clubContactId, clubContact.id))
 			.where(and(eq(clubContactRole.id, roleId), eq(clubContact.clubId, clubId)))
@@ -414,7 +434,16 @@ export async function removeClubContactRoleForContact(
 			return { success: false, error: "Role not found" }
 		}
 
+		const clubContactId = rows[0]!.clubContactId
+
 		await db.delete(clubContactRole).where(eq(clubContactRole.id, roleId))
+
+		const now = new Date().toISOString().replace("T", " ").replace("Z", "")
+		await db
+			.update(clubContact)
+			.set({ updateDate: now, updateBy: authCheck.email })
+			.where(eq(clubContact.id, clubContactId))
+
 		await revalidateClubPage(clubId)
 		return { success: true }
 	} catch (error) {

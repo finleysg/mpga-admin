@@ -166,7 +166,7 @@ export function ClubContactsSection({ clubId, contacts, onRefresh }: ClubContact
 								<TableHead className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-secondary-900">
 									Roles
 								</TableHead>
-								<TableHead className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-secondary-900">
+								<TableHead className="min-w-40 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-secondary-900">
 									Last Updated
 								</TableHead>
 								<TableHead className="w-10" />
@@ -238,10 +238,12 @@ export function ClubContactsSection({ clubId, contacts, onRefresh }: ClubContact
 											{cc.updateDate ? (
 												<div>
 													<div>
-														{new Date(cc.updateDate.replace(" ", "T")).toLocaleDateString("en-US", {
+														{new Date(cc.updateDate.replace(" ", "T")).toLocaleString("en-US", {
 															year: "numeric",
 															month: "short",
 															day: "numeric",
+															hour: "numeric",
+															minute: "2-digit",
 														})}
 													</div>
 													{cc.updateBy && (
