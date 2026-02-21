@@ -69,3 +69,47 @@ export async function cleanupTestUser(email: string): Promise<void> {
 
 	await db.execute("DELETE FROM invitation WHERE email = ?", [email])
 }
+
+/**
+ * Seeds a contact + clubContact row so the given email is a club contact for the club.
+ * Returns the inserted contact ID.
+ */
+export async function seedClubContact(clubId: number, email: string): Promise<number> {
+	const db = getPool()
+
+	const [result] = await db.execute<mysql.ResultSetHeader>(
+		`INSERT INTO contact (firstName, lastName, email, sendEmail)
+		 VALUES ('E2E', 'Test', ?, 0)`,
+		[email],
+	)
+	const contactId = result.insertId
+
+	await db.execute(
+		`INSERT INTO clubContact (clubId, contactId, isPrimary)
+		 VALUES (?, ?, 0)`,
+		[clubId, contactId],
+	)
+
+	return contactId
+}
+
+/**
+ * Cleans up seeded club contact data for a given email.
+ */
+export async function cleanupClubContact(email: string): Promise<void> {
+	const db = getPool()
+
+	const [contacts] = await db.execute<mysql.RowDataPacket[]>(
+		"SELECT id FROM contact WHERE email = ? AND firstName = 'E2E' AND lastName = 'Test'",
+		[email],
+	)
+
+	for (const row of contacts) {
+		await db.execute(
+			"DELETE FROM clubContactRole WHERE clubContactId IN (SELECT id FROM clubContact WHERE contactId = ?)",
+			[row.id],
+		)
+		await db.execute("DELETE FROM clubContact WHERE contactId = ?", [row.id])
+		await db.execute("DELETE FROM contact WHERE id = ?", [row.id])
+	}
+}

@@ -15,6 +15,7 @@ import type {
 	ClubContactClubInput,
 	ClubContactData,
 	ClubDuesStatus,
+	ContactEditInput,
 	ContactSearchResult,
 	GolfCourseOption,
 } from "./types"
@@ -74,11 +75,14 @@ export async function getClubForContact(
 			.select({
 				id: club.id,
 				name: club.name,
+				systemName: club.systemName,
 				website: club.website,
 				golfCourseId: club.golfCourseId,
 				golfCourseName: golfCourse.name,
 				size: club.size,
 				notes: club.notes,
+				updateDate: club.updateDate,
+				updateBy: club.updateBy,
 			})
 			.from(club)
 			.leftJoin(golfCourse, eq(club.golfCourseId, golfCourse.id))
@@ -98,7 +102,7 @@ export async function getClubForContact(
 
 export async function saveClubForContact(
 	data: ClubContactClubInput,
-): Promise<ActionResult<{ id: number }>> {
+): Promise<ActionResult<{ id: number; updateDate: string; updateBy: string }>> {
 	const authCheck = await requireClubContactAuth(data.id)
 	if (!authCheck.authorized) {
 		return { success: false, error: authCheck.error }
@@ -109,6 +113,8 @@ export async function saveClubForContact(
 		return { success: false, error: "Name is required" }
 	}
 
+	const now = new Date().toISOString().replace("T", " ").replace("Z", "")
+
 	try {
 		await db
 			.update(club)
@@ -118,12 +124,14 @@ export async function saveClubForContact(
 				golfCourseId: data.golfCourseId,
 				size: data.size,
 				notes: data.notes ?? null,
+				updateDate: now,
+				updateBy: authCheck.email,
 			})
 			.where(eq(club.id, data.id))
 
 		await revalidateClubPage(data.id)
 
-		return { success: true, data: { id: data.id } }
+		return { success: true, data: { id: data.id, updateDate: now, updateBy: authCheck.email } }
 	} catch (error) {
 		console.error("Failed to save club:", error)
 		return { success: false, error: "Failed to save club" }
@@ -263,6 +271,57 @@ export async function searchContactsForContact(
 	} catch (error) {
 		console.error("Failed to search contacts:", error)
 		return { success: false, error: "Failed to search contacts" }
+	}
+}
+
+export async function saveContactForContact(
+	clubId: number,
+	data: ContactEditInput,
+): Promise<ActionResult> {
+	const authCheck = await requireClubContactAuth(clubId)
+	if (!authCheck.authorized) {
+		return { success: false, error: authCheck.error }
+	}
+
+	const firstName = data.firstName?.trim()
+	const lastName = data.lastName?.trim()
+	if (!firstName) {
+		return { success: false, error: "First name is required" }
+	}
+	if (!lastName) {
+		return { success: false, error: "Last name is required" }
+	}
+
+	try {
+		// Verify the contact belongs to this club
+		const rows = await db
+			.select({ id: clubContact.id })
+			.from(clubContact)
+			.where(and(eq(clubContact.clubId, clubId), eq(clubContact.contactId, data.id)))
+
+		if (rows.length === 0) {
+			return { success: false, error: "Contact not found for this club" }
+		}
+
+		const now = new Date().toISOString().replace("T", " ").replace("Z", "")
+		await db
+			.update(contact)
+			.set({
+				firstName,
+				lastName,
+				email: data.email?.trim() || null,
+				primaryPhone: data.primaryPhone?.trim() || null,
+				updateDate: now,
+				updateBy: authCheck.email,
+			})
+			.where(eq(contact.id, data.id))
+
+		await revalidateClubPage(clubId)
+
+		return { success: true }
+	} catch (error) {
+		console.error("Failed to save contact:", error)
+		return { success: false, error: "Failed to save contact" }
 	}
 }
 
@@ -465,7 +524,10 @@ export async function getClubDuesStatusForContact(
 	const currentYear = new Date().getFullYear()
 
 	try {
-		const clubs = await db.select({ name: club.name }).from(club).where(eq(club.id, clubId))
+		const clubs = await db
+			.select({ name: club.name, systemName: club.systemName })
+			.from(club)
+			.where(eq(club.id, clubId))
 
 		const clubRow = clubs[0]
 		if (!clubRow) {
@@ -483,6 +545,7 @@ export async function getClubDuesStatusForContact(
 			success: true,
 			data: {
 				clubName: clubRow.name,
+				systemName: clubRow.systemName,
 				year: currentYear,
 				isPaid: !!existing,
 				paymentDate: existing?.paymentDate ?? null,

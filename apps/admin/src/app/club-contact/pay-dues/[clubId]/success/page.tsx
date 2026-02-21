@@ -10,6 +10,7 @@ import { db } from "@/lib/db"
 import { getStripe } from "@/lib/stripe"
 
 import { ClubContactLoginForm } from "../../../club-contact-login-form"
+import { ClubContactPageLayout } from "../../../club-contact-page-layout"
 import { validateClubContact } from "../../../validate-contact"
 
 export default async function PayDuesSuccessPage({
@@ -33,20 +34,18 @@ export default async function PayDuesSuccessPage({
 
 	if (!isAuthorized) {
 		return (
-			<div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
-				<div className="w-full max-w-md">
-					<Card>
-						<CardHeader className="text-center">
-							<CardTitle className="font-heading text-xl">Not Authorized</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<p className="text-muted-foreground text-center text-sm">
-								Your account is not authorized as a contact for this club.
-							</p>
-						</CardContent>
-					</Card>
-				</div>
-			</div>
+			<ClubContactPageLayout>
+				<Card>
+					<CardHeader className="text-center">
+						<CardTitle className="font-heading text-xl">Not Authorized</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<p className="text-muted-foreground text-center text-sm">
+							Your account is not authorized as a contact for this club.
+						</p>
+					</CardContent>
+				</Card>
+			</ClubContactPageLayout>
 		)
 	}
 
@@ -54,20 +53,18 @@ export default async function PayDuesSuccessPage({
 
 	if (!paymentIntentId) {
 		return (
-			<div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
-				<div className="w-full max-w-md">
-					<Card>
-						<CardHeader className="text-center">
-							<CardTitle className="font-heading text-xl">Invalid Request</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<p className="text-muted-foreground text-center text-sm">
-								No payment information found.
-							</p>
-						</CardContent>
-					</Card>
-				</div>
-			</div>
+			<ClubContactPageLayout>
+				<Card>
+					<CardHeader className="text-center">
+						<CardTitle className="font-heading text-xl">Invalid Request</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<p className="text-muted-foreground text-center text-sm">
+							No payment information found.
+						</p>
+					</CardContent>
+				</Card>
+			</ClubContactPageLayout>
 		)
 	}
 
@@ -78,61 +75,61 @@ export default async function PayDuesSuccessPage({
 		.select({ systemName: clubTable.systemName })
 		.from(clubTable)
 		.where(eq(clubTable.id, clubIdNum))
+
+	const systemName = clubs[0]?.systemName
 	const publicSiteUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:4000"
-	const clubPageUrl = clubs[0]?.systemName
-		? `${publicSiteUrl}/members/${clubs[0].systemName}`
+	const clubPageUrl = systemName
+		? `${publicSiteUrl}/members/${systemName}`
 		: `${publicSiteUrl}/members`
 
 	return (
-		<div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
-			<div className="w-full max-w-md">
-				<Card>
-					<CardHeader className="text-center">
-						<CardTitle className="font-heading text-xl">
-							{status === "succeeded" && "Payment Successful"}
-							{status === "processing" && "Payment Processing"}
-							{status !== "succeeded" && status !== "processing" && "Payment Failed"}
-						</CardTitle>
-					</CardHeader>
-					<CardContent className="flex flex-col items-center gap-4">
-						{status === "succeeded" && (
-							<>
-								<CheckCircle className="text-green-600" size={48} />
-								<p className="text-center text-sm">
-									Your dues payment has been received. A confirmation email will be sent to all club
-									contacts.
-								</p>
-								<Button asChild className="mt-2">
-									<a href={clubPageUrl}>Return to Club Page</a>
-								</Button>
-							</>
-						)}
-						{status === "processing" && (
-							<>
-								<Clock className="text-yellow-600" size={48} />
-								<p className="text-center text-sm">
-									Your payment is being processed. You will receive a confirmation email once it
-									completes.
-								</p>
-								<Button asChild className="mt-2">
-									<a href={clubPageUrl}>Return to Club Page</a>
-								</Button>
-							</>
-						)}
-						{status !== "succeeded" && status !== "processing" && (
-							<>
-								<XCircle className="text-red-600" size={48} />
-								<p className="text-center text-sm">
-									Your payment could not be completed. Please try again.
-								</p>
-								<Button asChild variant="outline" className="mt-2">
-									<Link href={`/club-contact/pay-dues/${clubId}`}>Try Again</Link>
-								</Button>
-							</>
-						)}
-					</CardContent>
-				</Card>
-			</div>
-		</div>
+		<ClubContactPageLayout systemName={systemName}>
+			<Card>
+				<CardHeader className="text-center">
+					<CardTitle className="font-heading text-xl">
+						{status === "succeeded" && "Payment Successful"}
+						{status === "processing" && "Payment Processing"}
+						{status !== "succeeded" && status !== "processing" && "Payment Failed"}
+					</CardTitle>
+				</CardHeader>
+				<CardContent className="flex flex-col items-center gap-4">
+					{status === "succeeded" && (
+						<>
+							<CheckCircle className="text-green-600" size={48} />
+							<p className="text-center text-sm">
+								Your dues payment has been received. A confirmation email will be sent to all club
+								contacts.
+							</p>
+							<Button asChild className="mt-2">
+								<a href={clubPageUrl}>Return to Club Page</a>
+							</Button>
+						</>
+					)}
+					{status === "processing" && (
+						<>
+							<Clock className="text-yellow-600" size={48} />
+							<p className="text-center text-sm">
+								Your payment is being processed. You will receive a confirmation email once it
+								completes.
+							</p>
+							<Button asChild className="mt-2">
+								<a href={clubPageUrl}>Return to Club Page</a>
+							</Button>
+						</>
+					)}
+					{status !== "succeeded" && status !== "processing" && (
+						<>
+							<XCircle className="text-red-600" size={48} />
+							<p className="text-center text-sm">
+								Your payment could not be completed. Please try again.
+							</p>
+							<Button asChild variant="outline" className="mt-2">
+								<Link href={`/club-contact/pay-dues/${clubId}`}>Try Again</Link>
+							</Button>
+						</>
+					)}
+				</CardContent>
+			</Card>
+		</ClubContactPageLayout>
 	)
 }

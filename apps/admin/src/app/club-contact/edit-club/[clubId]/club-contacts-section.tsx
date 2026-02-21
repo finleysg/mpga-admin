@@ -23,9 +23,10 @@ import {
 	SelectValue,
 	toast,
 } from "@mpga/ui"
-import { Star, Trash2, X } from "lucide-react"
+import { Pencil, Star, Trash2, X } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
 
+import { ContactEditDialog } from "./contact-edit-dialog"
 import { ContactSearchDialog } from "./contact-search-dialog"
 import {
 	addClubContactRoleForContact,
@@ -66,6 +67,7 @@ export function ClubContactsSection({ clubId, initialContacts }: ClubContactsSec
 	const [mounted, setMounted] = useState(false)
 	const [contacts, setContacts] = useState<ClubContactData[]>(initialContacts)
 	const [removing, setRemoving] = useState<number | null>(null)
+	const [editingContact, setEditingContact] = useState<ClubContactData | null>(null)
 
 	useEffect(() => setMounted(true), [])
 
@@ -178,9 +180,14 @@ export function ClubContactsSection({ clubId, initialContacts }: ClubContactsSec
 												/>
 											</button>
 											<div>
-												<p className="text-sm font-medium">
+												<button
+													type="button"
+													onClick={() => setEditingContact(cc)}
+													className="flex items-center gap-1 text-sm font-medium hover:underline"
+												>
 													{cc.firstName} {cc.lastName}
-												</p>
+													<Pencil className="h-3 w-3 text-gray-400" />
+												</button>
 												{cc.email && <p className="text-muted-foreground text-xs">{cc.email}</p>}
 												{cc.primaryPhone && (
 													<p className="text-muted-foreground text-xs">{cc.primaryPhone}</p>
@@ -275,6 +282,15 @@ export function ClubContactsSection({ clubId, initialContacts }: ClubContactsSec
 					</div>
 				)}
 			</CardContent>
+			<ContactEditDialog
+				clubId={clubId}
+				contact={editingContact}
+				open={editingContact !== null}
+				onOpenChange={(open) => {
+					if (!open) setEditingContact(null)
+				}}
+				onSaved={refreshContacts}
+			/>
 		</Card>
 	)
 }

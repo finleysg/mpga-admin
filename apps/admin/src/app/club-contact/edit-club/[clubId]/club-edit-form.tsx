@@ -27,6 +27,8 @@ interface ClubEditFormProps {
 export function ClubEditForm({ club, golfCourses }: ClubEditFormProps) {
 	const [saving, setSaving] = useState(false)
 	const [error, setError] = useState<string | null>(null)
+	const [updateDate, setUpdateDate] = useState(club.updateDate)
+	const [updateBy, setUpdateBy] = useState(club.updateBy)
 
 	const [name, setName] = useState(club.name)
 	const [website, setWebsite] = useState(club.website)
@@ -55,7 +57,9 @@ export function ClubEditForm({ club, golfCourses }: ClubEditFormProps) {
 				notes: notes.trim() || null,
 			})
 
-			if (result.success) {
+			if (result.success && result.data) {
+				setUpdateDate(result.data.updateDate)
+				setUpdateBy(result.data.updateBy)
 				toast.success("Club updated")
 			} else {
 				setError(result.error ?? "Failed to save club")
@@ -133,6 +137,19 @@ export function ClubEditForm({ club, golfCourses }: ClubEditFormProps) {
 					<Button type="submit" variant="secondary" className="mt-6 w-full" disabled={saving}>
 						{saving ? "Saving..." : "Save"}
 					</Button>
+					{updateDate && (
+						<p className="pt-2 text-right text-xs text-gray-400">
+							Last updated{" "}
+							{new Date(updateDate.replace(" ", "T") + "Z").toLocaleString("en-US", {
+								year: "numeric",
+								month: "short",
+								day: "numeric",
+								hour: "numeric",
+								minute: "2-digit",
+							})}
+							{updateBy && ` by ${updateBy}`}
+						</p>
+					)}
 				</form>
 			</CardContent>
 		</Card>

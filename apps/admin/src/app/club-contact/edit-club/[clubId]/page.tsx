@@ -11,6 +11,7 @@ import {
 	listGolfCourseOptionsForContact,
 } from "../../actions"
 import { ClubContactLoginForm } from "../../club-contact-login-form"
+import { ClubContactPageLayout } from "../../club-contact-page-layout"
 import { validateClubContact } from "../../validate-contact"
 
 export default async function EditClubPage({ params }: { params: Promise<{ clubId: string }> }) {
@@ -27,22 +28,7 @@ export default async function EditClubPage({ params }: { params: Promise<{ clubI
 	const isAuthorized = await validateClubContact(clubIdNum, session.user.email)
 
 	if (!isAuthorized) {
-		return (
-			<div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
-				<div className="w-full max-w-md">
-					<Card>
-						<CardHeader className="text-center">
-							<CardTitle className="font-heading text-xl">Not Authorized</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<p className="text-muted-foreground text-center text-sm">
-								Your account is not authorized as a contact for this club.
-							</p>
-						</CardContent>
-					</Card>
-				</div>
-			</div>
-		)
+		return <ClubContactLoginForm clubId={clubIdNum} callbackPath={callbackPath} />
 	}
 
 	const [clubResult, coursesResult, contactsResult] = await Promise.all([
@@ -53,20 +39,18 @@ export default async function EditClubPage({ params }: { params: Promise<{ clubI
 
 	if (!clubResult.success || !clubResult.data) {
 		return (
-			<div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
-				<div className="w-full max-w-md">
-					<Card>
-						<CardHeader className="text-center">
-							<CardTitle className="font-heading text-xl">Error</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<p className="text-muted-foreground text-center text-sm">
-								{clubResult.error ?? "Failed to load club data."}
-							</p>
-						</CardContent>
-					</Card>
-				</div>
-			</div>
+			<ClubContactPageLayout>
+				<Card>
+					<CardHeader className="text-center">
+						<CardTitle className="font-heading text-xl">Error</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<p className="text-muted-foreground text-center text-sm">
+							{clubResult.error ?? "Failed to load club data."}
+						</p>
+					</CardContent>
+				</Card>
+			</ClubContactPageLayout>
 		)
 	}
 
@@ -75,12 +59,10 @@ export default async function EditClubPage({ params }: { params: Promise<{ clubI
 	const contacts = contactsResult.success && contactsResult.data ? contactsResult.data : []
 
 	return (
-		<div className="bg-muted min-h-svh p-4 md:p-6">
-			<div className="mx-auto max-w-lg space-y-6">
-				<h1 className="font-heading text-xl font-bold">Edit {clubData.name}</h1>
-				<ClubEditForm club={clubData} golfCourses={golfCourses} />
-				<ClubContactsSection clubId={clubIdNum} initialContacts={contacts} />
-			</div>
-		</div>
+		<ClubContactPageLayout systemName={clubData.systemName} maxWidth="lg">
+			<h1 className="font-heading text-xl font-bold">Edit {clubData.name}</h1>
+			<ClubEditForm club={clubData} golfCourses={golfCourses} />
+			<ClubContactsSection clubId={clubIdNum} initialContacts={contacts} />
+		</ClubContactPageLayout>
 	)
 }

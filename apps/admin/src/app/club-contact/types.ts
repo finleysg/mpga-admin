@@ -1,11 +1,14 @@
 export interface ClubContactClubData {
 	id: number
 	name: string
+	systemName: string | null
 	website: string
 	golfCourseId: number | null
 	golfCourseName: string | null
 	size: number | null
 	notes: string | null
+	updateDate: string | null
+	updateBy: string | null
 }
 
 export interface ClubContactClubInput {
@@ -35,6 +38,14 @@ export interface ClubContactData {
 	updateBy: string | null
 }
 
+export interface ContactEditInput {
+	id: number
+	firstName: string
+	lastName: string
+	email: string | null
+	primaryPhone: string | null
+}
+
 export interface ContactSearchResult {
 	id: number
 	firstName: string
@@ -44,6 +55,7 @@ export interface ContactSearchResult {
 
 export interface ClubDuesStatus {
 	clubName: string
+	systemName: string | null
 	year: number
 	isPaid: boolean
 	paymentDate: string | null

@@ -34,8 +34,8 @@ import { ChevronDown, ChevronUp, ChevronsUpDown, Download } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
-import { exportClubContactsAction } from "../clubs/actions"
 import { type ContactData, listContactsAction } from "./actions"
+import { exportClubContactsAction } from "../clubs/actions"
 
 const formatCityState = (city: string | null, state: string | null) => {
 	if (city && state) return `${city}, ${state}`

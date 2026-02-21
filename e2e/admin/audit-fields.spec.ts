@@ -75,6 +75,8 @@ test.describe("Club contact audit fields", () => {
 
 		await selectRole(page, row, "Owner")
 
+		// Wait for the badge to render, confirming the server action completed
+		await expect(row.getByText("Owner", { exact: true })).toBeVisible({ timeout: 10000 })
 		await assertAuditUpdated(row)
 	})
 
