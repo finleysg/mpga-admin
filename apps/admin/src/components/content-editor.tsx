@@ -139,7 +139,7 @@ export function ContentEditor({
 								<CardTitle>
 									{showTitle ? (
 										<>
-											<FieldLabel htmlFor="content-title">Title (h2)</FieldLabel>
+											<FieldLabel htmlFor="content-title">Title</FieldLabel>
 											<Input
 												id="content-title"
 												value={title}

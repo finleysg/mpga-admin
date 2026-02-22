@@ -12,6 +12,7 @@ import {
 	FieldLabel,
 	Input,
 } from "@mpga/ui"
+import Image from "next/image"
 import { useState } from "react"
 
 import { sendClubContactVerification } from "./actions"
@@ -27,7 +28,7 @@ export function ClubContactLoginForm({ clubId, callbackPath }: ClubContactLoginF
 	const [loading, setLoading] = useState(false)
 	const [sent, setSent] = useState(false)
 
-	const handleSubmit = async (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.SubmitEvent) => {
 		e.preventDefault()
 		setError("")
 		setLoading(true)
@@ -48,11 +49,14 @@ export function ClubContactLoginForm({ clubId, callbackPath }: ClubContactLoginF
 
 	return (
 		<div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
-			<a href="/" className="flex items-center gap-2 self-center font-medium">
-				<div className="bg-secondary text-secondary-foreground flex h-6 w-6 items-center justify-center rounded-md text-sm font-bold">
-					M
-				</div>
-				<span className="font-heading text-xl">MPGA</span>
+			<a href="/" className="relative h-16 w-42 self-center">
+				<Image
+					src="/images/mpga-logo.png"
+					alt="MPGA"
+					fill={true}
+					className="object-contain"
+					priority
+				/>
 			</a>
 			<div className="w-full max-w-sm">
 				<Card>

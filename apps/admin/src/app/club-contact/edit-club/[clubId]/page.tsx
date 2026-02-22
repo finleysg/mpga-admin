@@ -61,6 +61,12 @@ export default async function EditClubPage({ params }: { params: Promise<{ clubI
 	return (
 		<ClubContactPageLayout systemName={clubData.systemName} maxWidth="lg">
 			<h1 className="font-heading text-xl font-bold">Edit {clubData.name}</h1>
+			<p>
+				Thank you for helping us keep our records up to date. You can update your club information
+				below. You can also update contact information for your club if there have been any changes.
+				If you need to add a contact that is not in our system, you will need to send that request
+				to secretary@mpga.net.
+			</p>
 			<ClubEditForm club={clubData} golfCourses={golfCourses} />
 			<ClubContactsSection clubId={clubIdNum} initialContacts={contacts} />
 		</ClubContactPageLayout>

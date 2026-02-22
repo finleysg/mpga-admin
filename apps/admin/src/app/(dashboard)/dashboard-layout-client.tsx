@@ -3,7 +3,6 @@
 import {
 	Breadcrumb,
 	BreadcrumbItem,
-	BreadcrumbLink,
 	BreadcrumbList,
 	BreadcrumbPage,
 	BreadcrumbSeparator,
@@ -39,19 +38,12 @@ export function DashboardLayoutClient({ children }: { children: React.ReactNode 
 						<BreadcrumbList>
 							{segments.map((segment, index) => {
 								const href = "/" + segments.slice(0, index + 1).join("/")
-								const isLast = index === segments.length - 1
 
 								return (
 									<Fragment key={href}>
 										{index > 0 && <BreadcrumbSeparator className="hidden md:block" />}
 										<BreadcrumbItem>
-											{isLast ? (
-												<BreadcrumbPage>{formatSegment(segment)}</BreadcrumbPage>
-											) : (
-												<BreadcrumbLink href={href} className="hidden md:block">
-													{formatSegment(segment)}
-												</BreadcrumbLink>
-											)}
+											<BreadcrumbPage>{formatSegment(segment)}</BreadcrumbPage>
 										</BreadcrumbItem>
 									</Fragment>
 								)
