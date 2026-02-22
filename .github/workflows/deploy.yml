@@ -3,7 +3,6 @@ name: Deploy
 on:
   push:
     tags:
-      - "v*"
       - "public-v*"
       - "admin-v*"
 
@@ -12,7 +11,7 @@ env:
 
 jobs:
   build-admin:
-    if: startsWith(github.ref_name, 'v') || startsWith(github.ref_name, 'admin-v')
+    if: startsWith(github.ref_name, 'admin-v')
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -45,7 +44,7 @@ jobs:
             ${{ env.REGISTRY }}/${{ github.repository }}/admin:latest
 
   build-public:
-    if: startsWith(github.ref_name, 'v') || startsWith(github.ref_name, 'public-v')
+    if: startsWith(github.ref_name, 'public-v')
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -77,7 +76,7 @@ jobs:
 
   deploy-public:
     needs: build-public
-    if: startsWith(github.ref_name, 'v') || startsWith(github.ref_name, 'public-v')
+    if: startsWith(github.ref_name, 'public-v')
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to CapRover (public)
@@ -90,6 +89,7 @@ jobs:
 
   deploy-admin:
     needs: build-admin
+    if: startsWith(github.ref_name, 'admin-v')
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to CapRover (admin)
