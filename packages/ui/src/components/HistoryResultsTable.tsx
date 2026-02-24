@@ -7,6 +7,7 @@ import { Badge } from "./ui/badge"
 import { Button } from "./ui/button"
 import { PageSizeSelect } from "./ui/page-size-select"
 import { Pagination } from "./ui/pagination"
+import { SearchInput } from "./ui/search-input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table"
 
 export interface HistoryResult {
@@ -49,17 +50,32 @@ export function HistoryResultsTable({ results }: HistoryResultsTableProps) {
 	const [currentPage, setCurrentPage] = React.useState(1)
 	const [pageSize, setPageSize] = React.useState<PageSize>(10)
 	const [sortOrder, setSortOrder] = React.useState<SortOrder>("desc")
+	const [searchTerm, setSearchTerm] = React.useState("")
+
+	const filteredResults = React.useMemo(() => {
+		if (!searchTerm.trim()) return results
+		const term = searchTerm.toLowerCase()
+		return results.filter((r) => {
+			return (
+				r.location.toLowerCase().includes(term) ||
+				r.winner.toLowerCase().includes(term) ||
+				r.winnerClub.toLowerCase().includes(term) ||
+				(r.coWinner && r.coWinner.toLowerCase().includes(term)) ||
+				(r.coWinnerClub && r.coWinnerClub.toLowerCase().includes(term))
+			)
+		})
+	}, [results, searchTerm])
 
 	const sortedResults = React.useMemo(() => {
-		return [...results].sort((a, b) => {
+		return [...filteredResults].sort((a, b) => {
 			return sortOrder === "desc" ? b.year - a.year : a.year - b.year
 		})
-	}, [results, sortOrder])
+	}, [filteredResults, sortOrder])
 
 	const totalPages = React.useMemo(() => {
 		if (pageSize === "all") return 1
-		return Math.ceil(results.length / pageSize)
-	}, [results.length, pageSize])
+		return Math.ceil(filteredResults.length / pageSize)
+	}, [filteredResults.length, pageSize])
 
 	const paginatedResults = React.useMemo(() => {
 		if (pageSize === "all") return sortedResults
@@ -69,6 +85,11 @@ export function HistoryResultsTable({ results }: HistoryResultsTableProps) {
 
 	const handlePageSizeChange = (newSize: PageSize) => {
 		setPageSize(newSize)
+		setCurrentPage(1)
+	}
+
+	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setSearchTerm(e.target.value)
 		setCurrentPage(1)
 	}
 
@@ -90,7 +111,12 @@ export function HistoryResultsTable({ results }: HistoryResultsTableProps) {
 	return (
 		<div className="space-y-4">
 			{/* Controls row */}
-			<div className="flex items-center justify-between">
+			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+				<SearchInput
+					placeholder="Search by location or champion..."
+					value={searchTerm}
+					onChange={handleSearchChange}
+				/>
 				<div className="flex items-center gap-2">
 					<PageSizeSelect
 						value={String(pageSize)}
@@ -108,10 +134,11 @@ export function HistoryResultsTable({ results }: HistoryResultsTableProps) {
 						<ArrowDownUp className="mr-1 h-4 w-4" />
 						{sortOrder === "desc" ? "Newest" : "Oldest"}
 					</Button>
+					<p className="text-sm text-gray-600">
+						{filteredResults.length} {filteredResults.length === 1 ? "result" : "results"}
+						{searchTerm && " (filtered)"}
+					</p>
 				</div>
-				<p className="text-sm text-gray-600">
-					{results.length} {results.length === 1 ? "result" : "results"}
-				</p>
 			</div>
 
 			{/* Table (desktop) */}
