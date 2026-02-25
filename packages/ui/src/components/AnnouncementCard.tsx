@@ -55,7 +55,7 @@ export function AnnouncementCard({
 				{truncate && (
 					<Link
 						href={`/news/${id}`}
-						className="inline-flex items-center gap-1 font-semibold text-primary-600 hover:text-primary-700"
+						className="flex items-center gap-1 font-semibold text-primary-600 hover:text-primary-700"
 					>
 						Read More
 						<ArrowRight className="h-4 w-4" />
