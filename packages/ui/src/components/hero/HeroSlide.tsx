@@ -30,47 +30,21 @@ export function HeroSlide({
 }: HeroSlideProps) {
 	if (type === "logo") {
 		return (
-			<>
-				{/* Mobile: centered logo on brand background */}
-				<div className="relative flex h-[360px] w-full flex-col bg-secondary-500 md:hidden">
-					<div className="relative flex-1">
-						<Image
-							src={imageUrl}
-							alt="MPGA"
-							fill
-							className="object-contain p-6"
-							sizes="(max-width: 768px) 100vw, 840px"
-							priority={priority}
-						/>
-					</div>
-					<div className="pb-8 text-center">
-						<h1 className="text-xl font-bold text-white">Minnesota Public Golf Association</h1>
-						<p className="text-secondary-100">Promoting public golf since 1923</p>
-					</div>
+			<div className="relative flex h-[320px] w-full flex-col overflow-hidden rounded-lg bg-secondary-500 md:h-[400px]">
+				<div className="relative flex-1">
+					<Image
+						src={imageUrl}
+						alt="MPGA"
+						fill
+						className="object-contain p-6 md:p-8"
+						sizes="(max-width: 768px) 100vw, 840px"
+						priority={priority}
+					/>
 				</div>
-
-				{/* Desktop: 66/34 layout */}
-				<div className="hidden h-[500px] w-full overflow-hidden rounded-lg md:flex">
-					<div className="relative w-2/3 bg-secondary-500">
-						<Image
-							src={imageUrl}
-							alt="MPGA"
-							fill
-							className="object-contain p-8"
-							sizes="(max-width: 768px) 100vw, 840px"
-							priority={priority}
-						/>
-					</div>
-					<div className="flex w-1/3 flex-col justify-center bg-primary-700 p-6 text-white">
-						<h1 className="mb-4 text-2xl font-bold leading-tight md:text-3xl">
-							Minnesota Public Golf Association
-						</h1>
-						<p className="text-lg text-secondary-100 md:text-xl">
-							Promoting public golf since 1923
-						</p>
-					</div>
+				<div className="pb-6 text-center md:pb-8">
+					<p className="text-secondary-100">Promoting public golf since 1923</p>
 				</div>
-			</>
+			</div>
 		)
 	}
 

@@ -14,20 +14,41 @@ export interface MarkdownProps {
 
 export const ADMONITION_TYPES = new Set(["note", "warning", "tip", "danger"])
 
-/** Remark plugin that converts :::note / :::tip / etc. container directives into div elements. */
+/** Remark plugin that converts :::note / :::tip / etc. container directives into div elements
+ *  and preserves unrecognized text/leaf directives as plain text (e.g. `:30` in "12:30 pm"). */
 function remarkAdmonitions() {
 	return (tree: Parameters<typeof visit>[0]) => {
 		visit(tree, (node) => {
-			if (node.type !== "containerDirective") return
-			const directive = node as { type: string; name: string; data?: Record<string, unknown> }
-			if (!ADMONITION_TYPES.has(directive.name)) return
+			if (node.type === "containerDirective") {
+				const directive = node as {
+					type: string
+					name: string
+					data?: Record<string, unknown>
+				}
+				if (!ADMONITION_TYPES.has(directive.name)) return
 
-			const data = (directive.data ??= {})
-			data.hName = "div"
-			data.hProperties = {
-				dataAdmonition: "",
-				dataType: directive.name,
-				className: `admonition admonition-${directive.name}`,
+				const data = (directive.data ??= {})
+				data.hName = "div"
+				data.hProperties = {
+					dataAdmonition: "",
+					dataType: directive.name,
+					className: `admonition admonition-${directive.name}`,
+				}
+				return
+			}
+
+			if (node.type === "textDirective" || node.type === "leafDirective") {
+				const directive = node as {
+					type: string
+					name: string
+					children: { value: string }[]
+				}
+				const childText = directive.children.map((c) => c.value ?? "").join("")
+				Object.assign(node, {
+					type: "text",
+					value: `:${directive.name}${childText ? `[${childText}]` : ""}`,
+					children: undefined,
+				})
 			}
 		})
 	}

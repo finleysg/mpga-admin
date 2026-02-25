@@ -2,17 +2,14 @@ import { getMediaUrl } from "@mpga/types"
 import {
 	Card,
 	CardContent,
-	ContentCard,
 	DocumentsCard,
 	GolfCourseCard,
 	H1,
 	Markdown,
-	PrintButton,
 	RegistrationCard,
 } from "@mpga/ui"
 import { notFound } from "next/navigation"
 
-import { getTournamentPolicies } from "@/lib/queries/content"
 import {
 	getTournamentInstance,
 	getTournamentLinks,
@@ -42,10 +39,9 @@ export default async function TournamentYearPage({ params }: { params: Params })
 		notFound()
 	}
 
-	const [links, documents, policies] = await Promise.all([
+	const [links, documents] = await Promise.all([
 		getTournamentLinks(instance.instanceId),
 		getTournamentDocuments(instance.tournamentId, yearNum),
-		getTournamentPolicies(),
 	])
 
 	const tournamentLinks = links.map((link) => ({
@@ -74,16 +70,6 @@ export default async function TournamentYearPage({ params }: { params: Params })
 							<Markdown content={instance.instanceDescription} />
 						</CardContent>
 					</Card>
-
-					{policies && (
-						<ContentCard
-							heading="h2"
-							title={policies.title}
-							content={policies.content}
-							className="mt-6"
-							action={<PrintButton />}
-						/>
-					)}
 				</div>
 
 				<div className="flex flex-col gap-6 print:hidden lg:w-[30%]">

@@ -14,7 +14,7 @@ export default async function HomePage() {
 
 	return (
 		<main>
-			<section className="mx-auto max-w-6xl px-4 py-8">
+			<section className="mx-auto max-w-6xl px-4 py-8 md:max-w-4xl">
 				<HeroSlide type="logo" imageUrl="/images/mpga-logo.png" priority />
 			</section>
 			{aboutContent && <AboutSection title={aboutContent.title} content={aboutContent.content} />}

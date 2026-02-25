@@ -128,3 +128,21 @@ export async function getTournamentPolicies(): Promise<Content | null> {
 		return null
 	}
 }
+
+export async function getHardCard(): Promise<Content | null> {
+	try {
+		const results = await db
+			.select({
+				title: content.title,
+				content: content.contentText,
+			})
+			.from(content)
+			.where(eq(content.systemName, ContentSystemName.HardCard))
+			.limit(1)
+
+		return results[0] || null
+	} catch (error) {
+		console.error("Failed to fetch hard card:", error)
+		return null
+	}
+}

@@ -201,8 +201,8 @@ export default function ClubsPage() {
 			{ header: "Last Name", key: "lastName" },
 			{ header: "Email", key: "email" },
 			{ header: "Phone", key: "phone" },
-			{ header: "Club Url", key: "clubUrl" },
 			{ header: "Roles", key: "roles" },
+			{ header: "Notes", key: "notes" },
 		]
 		for (const row of result.data) {
 			ws.addRow({
@@ -211,8 +211,8 @@ export default function ClubsPage() {
 				lastName: row.lastName,
 				email: row.email ?? "",
 				phone: row.primaryPhone ?? "",
-				clubUrl: row.systemName ? `https://mpga.net/members/${row.systemName}` : "",
-				roles: row.role,
+				roles: row.roles,
+				notes: row.notes ?? "",
 			})
 		}
 		const buffer = await wb.xlsx.writeBuffer()

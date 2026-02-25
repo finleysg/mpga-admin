@@ -46,7 +46,7 @@ export function AnnouncementCard({
 						href={externalUrl}
 						target="_blank"
 						rel="noopener noreferrer"
-						className="mb-4 inline-flex items-center gap-1 text-secondary-400 hover:text-secondary-500"
+						className="mb-4 inline-flex items-center gap-1 text-gray-400 hover:text-gray-500"
 					>
 						{externalName || externalUrl}
 						<ExternalLink className="h-4 w-4" />
@@ -55,7 +55,7 @@ export function AnnouncementCard({
 				{truncate && (
 					<Link
 						href={`/news/${id}`}
-						className="inline-flex items-center gap-1 text-secondary-400 hover:text-secondary-500"
+						className="inline-flex items-center gap-1 font-semibold text-primary-600 hover:text-primary-700"
 					>
 						Read More
 						<ArrowRight className="h-4 w-4" />

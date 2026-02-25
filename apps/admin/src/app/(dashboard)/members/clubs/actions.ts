@@ -73,8 +73,8 @@ export interface ClubContactExportRow {
 	lastName: string
 	email: string | null
 	primaryPhone: string | null
-	systemName: string | null
-	role: string
+	notes: string | null
+	roles: string
 }
 
 // ── Club CRUD ───────────────────────────────────────────────────────
@@ -614,11 +614,11 @@ export async function exportClubContactsAction(): Promise<ActionResult<ClubConta
 		const rows = await db
 			.select({
 				clubName: club.name,
-				systemName: club.systemName,
 				firstName: contact.firstName,
 				lastName: contact.lastName,
 				email: contact.email,
 				primaryPhone: contact.primaryPhone,
+				notes: clubContact.notes,
 				clubContactId: clubContact.id,
 			})
 			.from(club)
@@ -640,33 +640,18 @@ export async function exportClubContactsAction(): Promise<ActionResult<ClubConta
 				.where(or(...clubContactIds.map((ccId) => eq(clubContactRole.clubContactId, ccId))))
 		}
 
-		const data: ClubContactExportRow[] = []
-		for (const row of rows) {
-			const roles = roleRows.filter((r) => r.clubContactId === row.clubContactId)
-			if (roles.length === 0) {
-				data.push({
-					clubName: row.clubName,
-					firstName: row.firstName,
-					lastName: row.lastName,
-					email: row.email,
-					primaryPhone: row.primaryPhone,
-					systemName: row.systemName,
-					role: "",
-				})
-			} else {
-				for (const r of roles) {
-					data.push({
-						clubName: row.clubName,
-						firstName: row.firstName,
-						lastName: row.lastName,
-						email: row.email,
-						primaryPhone: row.primaryPhone,
-						systemName: row.systemName,
-						role: r.role,
-					})
-				}
+		const data: ClubContactExportRow[] = rows.map((row) => {
+			const roles = roleRows.filter((r) => r.clubContactId === row.clubContactId).map((r) => r.role)
+			return {
+				clubName: row.clubName,
+				firstName: row.firstName,
+				lastName: row.lastName,
+				email: row.email,
+				primaryPhone: row.primaryPhone,
+				notes: row.notes,
+				roles: roles.join(", "),
 			}
-		}
+		})
 
 		return { success: true, data }
 	} catch (error) {
