@@ -41,6 +41,7 @@ export { TournamentNav } from "./TournamentNav"
 export { CommitteeList, type CommitteeListProps } from "./CommitteeList"
 export { AwardWinnersList, type AwardWinnersListProps } from "./AwardWinnersList"
 export { PrintButton } from "./PrintButton"
+export { ContentSearch, type ContentSearchProps } from "./ContentSearch"
 export { NewsList, type NewsListProps } from "./NewsList"
 export {
 	MatchPlayGroupCards,

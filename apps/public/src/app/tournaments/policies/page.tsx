@@ -1,4 +1,4 @@
-import { ContentCard, PrintButton } from "@mpga/ui"
+import { ContentCard, ContentSearch, PrintButton } from "@mpga/ui"
 import { notFound } from "next/navigation"
 
 import { getTournamentPolicies } from "@/lib/queries/content"
@@ -20,12 +20,13 @@ export default async function TournamentPoliciesPage() {
 				className="hidden print:block mx-auto mb-6"
 				width={200}
 			/>
-			<ContentCard
-				heading="h1"
-				title={policies.title}
-				content={policies.content}
-				action={<PrintButton />}
-			/>
+			<div className="mb-4 flex items-center justify-between gap-3 print:hidden">
+				<ContentSearch containerId="policies-content" />
+				<PrintButton />
+			</div>
+			<div id="policies-content">
+				<ContentCard heading="h1" title={policies.title} content={policies.content} />
+			</div>
 		</main>
 	)
 }
