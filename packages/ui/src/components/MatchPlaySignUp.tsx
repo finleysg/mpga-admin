@@ -32,7 +32,7 @@ export function MatchPlaySignUp({ year, deadline }: MatchPlaySignUpProps) {
 				Note: close of entries is midnight on {deadline}.
 			</p>
 			<Button
-				data-tally-open="mJXq9K"
+				data-tally-open="2EakMj"
 				data-tally-width="432"
 				data-tally-layout="modal"
 				data-tally-overlay="1"
