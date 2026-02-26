@@ -5,6 +5,7 @@ import { NextResponse } from "next/server"
 
 import { db } from "@/lib/db"
 import { sendDuesPaymentEmail } from "@/lib/email"
+import { getPostHogClient } from "@/lib/posthog-server"
 import { getStripe } from "@/lib/stripe"
 
 export async function POST(request: Request) {
@@ -28,57 +29,80 @@ export async function POST(request: Request) {
 		return NextResponse.json({ error: "Invalid signature" }, { status: 400 })
 	}
 
-	if (event.type === "payment_intent.succeeded") {
-		const paymentIntent = event.data.object
+	switch (event.type) {
+		case "payment_intent.succeeded": {
+			const paymentIntent = event.data.object
 
-		if (!paymentIntent.metadata.clubId || !paymentIntent.metadata.year) {
-			console.error("Missing metadata on payment intent", paymentIntent.id)
-			return NextResponse.json({ received: true })
-		}
-
-		const clubId = parseInt(paymentIntent.metadata.clubId, 10)
-		const year = parseInt(paymentIntent.metadata.year, 10)
-
-		try {
-			// Idempotency: check if membership already exists
-			const existing = await db
-				.select({ id: membership.id })
-				.from(membership)
-				.where(and(eq(membership.clubId, clubId), eq(membership.year, year)))
-
-			if (existing.length > 0) {
+			if (!paymentIntent.metadata.clubId || !paymentIntent.metadata.year) {
+				console.error("Missing metadata on payment intent", paymentIntent.id)
 				return NextResponse.json({ received: true })
 			}
 
-			// Create membership record
-			const today = new Date().toISOString().split("T")[0]!
-			await db.insert(membership).values({
-				clubId,
-				year,
-				paymentDate: today,
-				paymentType: "OL",
-				paymentCode: paymentIntent.id,
-				createDate: sql`NOW(6)`,
-			})
+			const clubId = parseInt(paymentIntent.metadata.clubId, 10)
+			const year = parseInt(paymentIntent.metadata.year, 10)
 
-			// Get club name and contact emails
-			const clubs = await db.select({ name: club.name }).from(club).where(eq(club.id, clubId))
-			const clubName = clubs[0]?.name ?? "Unknown Club"
+			try {
+				// Idempotency: check if membership already exists
+				const existing = await db
+					.select({ id: membership.id })
+					.from(membership)
+					.where(and(eq(membership.clubId, clubId), eq(membership.year, year)))
 
-			const contacts = await db
-				.select({ email: contact.email })
-				.from(clubContact)
-				.innerJoin(contact, eq(clubContact.contactId, contact.id))
-				.where(eq(clubContact.clubId, clubId))
+				if (existing.length > 0) {
+					return NextResponse.json({ received: true })
+				}
 
-			const emails = contacts.map((c) => c.email).filter((e): e is string => !!e)
+				// Create membership record
+				const today = new Date().toISOString().split("T")[0]!
+				await db.insert(membership).values({
+					clubId,
+					year,
+					paymentDate: today,
+					paymentType: "OL",
+					paymentCode: paymentIntent.id,
+					createDate: sql`NOW(6)`,
+				})
 
-			if (emails.length > 0) {
-				await sendDuesPaymentEmail(emails, clubName, year)
+				// Get club name and contact emails
+				const clubs = await db.select({ name: club.name }).from(club).where(eq(club.id, clubId))
+				const clubName = clubs[0]?.name ?? "Unknown Club"
+
+				const contacts = await db
+					.select({ email: contact.email })
+					.from(clubContact)
+					.innerJoin(contact, eq(clubContact.contactId, contact.id))
+					.where(eq(clubContact.clubId, clubId))
+
+				const emails = contacts.map((c) => c.email).filter((e): e is string => !!e)
+
+				if (emails.length > 0) {
+					await sendDuesPaymentEmail(emails, clubName, year)
+				}
+			} catch (err) {
+				console.error("Failed to process payment_intent.succeeded:", err)
+				return NextResponse.json({ error: "Processing failed" }, { status: 500 })
 			}
-		} catch (err) {
-			console.error("Failed to process payment_intent.succeeded:", err)
-			return NextResponse.json({ error: "Processing failed" }, { status: 500 })
+			break
+		}
+		case "payment_intent.payment_failed": {
+			const paymentIntent = event.data.object
+			const posthog = getPostHogClient()
+			if (posthog) {
+				posthog.capture({
+					distinctId: "stripe-webhook",
+					event: "stripe_payment_failed",
+					properties: {
+						payment_intent_id: paymentIntent.id,
+						clubId: paymentIntent.metadata.clubId,
+						year: paymentIntent.metadata.year,
+						failure_message: paymentIntent.last_payment_error?.message,
+						failure_code: paymentIntent.last_payment_error?.code,
+						amount: paymentIntent.amount,
+					},
+				})
+				await posthog.flush()
+			}
+			break
 		}
 	}
 
