@@ -96,6 +96,23 @@ export async function seedClubContact(clubId: number, email: string): Promise<nu
 /**
  * Cleans up seeded club contact data for a given email.
  */
+/**
+ * Cleans up test documents by title (safety net for failed test runs).
+ */
+export async function cleanupTestDocument(title: string): Promise<void> {
+	const db = getPool()
+
+	const [docs] = await db.execute<mysql.RowDataPacket[]>(
+		"SELECT id FROM document WHERE title = ?",
+		[title],
+	)
+
+	for (const row of docs) {
+		await db.execute("DELETE FROM documentTag WHERE documentId = ?", [row.id])
+		await db.execute("DELETE FROM document WHERE id = ?", [row.id])
+	}
+}
+
 export async function cleanupClubContact(email: string): Promise<void> {
 	const db = getPool()
 

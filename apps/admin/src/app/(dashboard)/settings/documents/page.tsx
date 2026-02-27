@@ -34,9 +34,11 @@ import { ChevronDown, ChevronUp, ChevronsUpDown, ExternalLink } from "lucide-rea
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
-import { type DocumentData, listAllDocumentsAction } from "./actions"
+import type { DocumentDataFull } from "@/lib/documents"
 
-const globalFilterFn: FilterFn<DocumentData> = (row, _columnId, filterValue) => {
+import { listAllDocumentsAction } from "./actions"
+
+const globalFilterFn: FilterFn<DocumentDataFull> = (row, _columnId, filterValue) => {
 	const term = (filterValue as string).toLowerCase()
 	if (!term) return true
 
@@ -48,7 +50,7 @@ const globalFilterFn: FilterFn<DocumentData> = (row, _columnId, filterValue) => 
 	)
 }
 
-const columns: ColumnDef<DocumentData>[] = [
+const columns: ColumnDef<DocumentDataFull>[] = [
 	{
 		accessorKey: "title",
 		header: "Title",
@@ -101,7 +103,7 @@ const columns: ColumnDef<DocumentData>[] = [
 	},
 ]
 
-function SortIcon({ column }: { column: Column<DocumentData> }) {
+function SortIcon({ column }: { column: Column<DocumentDataFull> }) {
 	const sorted = column.getIsSorted()
 	if (!sorted) {
 		return <ChevronsUpDown className="ml-1 inline h-4 w-4 opacity-50" />
@@ -115,7 +117,7 @@ function SortIcon({ column }: { column: Column<DocumentData> }) {
 
 export default function DocumentsPage() {
 	const router = useRouter()
-	const [documents, setDocuments] = useState<DocumentData[]>([])
+	const [documents, setDocuments] = useState<DocumentDataFull[]>([])
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
 	const [globalFilter, setGlobalFilter] = useState("")

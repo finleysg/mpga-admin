@@ -5,10 +5,10 @@ import { notFound } from "next/navigation"
 
 import {
 	getTournamentInstanceAction,
-	listDocumentsAction,
 	listGolfCoursesAction,
 	listTournamentLinksAction,
 } from "./actions"
+import { listDocumentsAction } from "./document-actions"
 import { DocumentsCard } from "./documents-card"
 import { InstanceForm } from "./instance-form"
 import { LinksCard } from "./links-card"

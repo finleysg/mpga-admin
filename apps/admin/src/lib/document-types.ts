@@ -1,0 +1,17 @@
+export const documentTypes = [
+	"Agenda",
+	"ByLaws",
+	"Club Registration",
+	"Financial",
+	"Hard Card",
+	"Match Play",
+	"Match Play Brackets",
+	"Minutes",
+	"Pairings",
+	"Past Presidents",
+	"Registration",
+	"Results",
+	"Standing Orders",
+	"Tee Times",
+	"Other",
+]

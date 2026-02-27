@@ -27,22 +27,23 @@ import {
 	SelectValue,
 	toast,
 } from "@mpga/ui"
-import { ExternalLink, Upload } from "lucide-react"
+import { ExternalLink } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
+
+import { FileDropZone } from "@/components/file-drop-zone"
+import { documentTypes as baseDocumentTypes } from "@/lib/document-types"
+import type { DocumentDataFull } from "@/lib/documents"
 
 import {
-	type DocumentData,
 	type TournamentOption,
 	deleteDocumentAction,
 	saveDocumentAction,
 	uploadDocumentFileAction,
 } from "./actions"
 
-const baseDocumentTypes = ["Tee Times", "Results", "Pairings", "Match Play", "Other"]
-
 interface DocumentFormProps {
-	document?: DocumentData
+	document?: DocumentDataFull
 	tournaments: TournamentOption[]
 }
 
@@ -56,8 +57,6 @@ export function DocumentForm({ document: existing, tournaments }: DocumentFormPr
 	const [saving, setSaving] = useState(false)
 	const [error, setError] = useState<string | null>(null)
 	const [deleteOpen, setDeleteOpen] = useState(false)
-	const fileInputRef = useRef<HTMLInputElement>(null)
-	const [dragOver, setDragOver] = useState(false)
 
 	useEffect(() => setMounted(true), [])
 
@@ -236,55 +235,7 @@ export function DocumentForm({ document: existing, tournaments }: DocumentFormPr
 								View current file
 							</a>
 						)}
-						<input
-							ref={fileInputRef}
-							type="file"
-							className="hidden"
-							onChange={(e) => {
-								const f = e.target.files?.[0]
-								setFile(f ?? undefined)
-							}}
-						/>
-						<div
-							role="button"
-							tabIndex={0}
-							className={`flex cursor-pointer flex-col items-center gap-1 rounded-md border-2 border-dashed p-4 transition-colors ${
-								dragOver
-									? "border-secondary-500 bg-secondary-50"
-									: "border-muted-foreground/25 hover:border-secondary-300"
-							}`}
-							onClick={() => fileInputRef.current?.click()}
-							onKeyDown={(e) => {
-								if (e.key === "Enter" || e.key === " ") {
-									e.preventDefault()
-									fileInputRef.current?.click()
-								}
-							}}
-							onDragOver={(e) => {
-								e.preventDefault()
-								setDragOver(true)
-							}}
-							onDragLeave={() => setDragOver(false)}
-							onDrop={(e) => {
-								e.preventDefault()
-								setDragOver(false)
-								const f = e.dataTransfer.files[0]
-								if (f) {
-									setFile(f)
-								}
-							}}
-						>
-							{file ? (
-								<span className="text-sm text-foreground">{file.name}</span>
-							) : (
-								<>
-									<Upload className="h-5 w-5 text-muted-foreground" />
-									<span className="text-sm text-muted-foreground">
-										Drag and drop a file here, or click to browse
-									</span>
-								</>
-							)}
-						</div>
+						<FileDropZone file={file} onFileChange={(f) => setFile(f)} />
 					</Field>
 
 					{error && <FieldError>{error}</FieldError>}

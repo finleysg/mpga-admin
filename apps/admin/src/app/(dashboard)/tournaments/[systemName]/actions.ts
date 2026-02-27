@@ -1,19 +1,12 @@
 "use server"
 
-import {
-	document,
-	golfCourse,
-	tournament,
-	tournamentInstance,
-	tournamentLink,
-} from "@mpga/database"
+import { golfCourse, tournament, tournamentInstance, tournamentLink } from "@mpga/database"
 import type { ActionResult } from "@mpga/types"
 import { and, asc, eq, like } from "drizzle-orm"
 
 import { db } from "@/lib/db"
 import { requireAuth } from "@/lib/require-auth"
 import { revalidatePublicSite } from "@/lib/revalidate"
-import { uploadToS3 } from "@/lib/s3"
 
 function revalidateTournamentYearPage(systemName: string) {
 	return revalidatePublicSite(`/tournaments/${systemName}/${new Date().getFullYear()}`)
@@ -277,159 +270,5 @@ export async function deleteTournamentLinkAction(
 	} catch (error) {
 		console.error("Failed to delete tournament link:", error)
 		return { success: false, error: "Failed to delete tournament link" }
-	}
-}
-
-// ---------- Documents ----------
-
-export interface DocumentData {
-	id: number
-	title: string
-	documentType: string
-	file: string | null
-	year: number | null
-	tournamentId: number | null
-}
-
-export async function listDocumentsAction(
-	tournamentId: number,
-	year: number,
-): Promise<ActionResult<DocumentData[]>> {
-	const userId = await requireAuth()
-	if (!userId) {
-		return { success: false, error: "Unauthorized" }
-	}
-
-	try {
-		const results = await db
-			.select({
-				id: document.id,
-				title: document.title,
-				documentType: document.documentType,
-				file: document.file,
-				year: document.year,
-				tournamentId: document.tournamentId,
-			})
-			.from(document)
-			.where(and(eq(document.tournamentId, tournamentId), eq(document.year, year)))
-
-		return { success: true, data: results }
-	} catch (error) {
-		console.error("Failed to list documents:", error)
-		return { success: false, error: "Failed to list documents" }
-	}
-}
-
-interface SaveDocumentInput {
-	id?: number
-	title: string
-	documentType: string
-	tournamentId: number
-	year: number
-	systemName: string
-}
-
-export async function saveDocumentAction(
-	data: SaveDocumentInput,
-): Promise<ActionResult<{ id: number }>> {
-	const userId = await requireAuth()
-	if (!userId) {
-		return { success: false, error: "Unauthorized" }
-	}
-
-	if (!data.title.trim()) {
-		return { success: false, error: "Title is required" }
-	}
-
-	try {
-		if (data.id !== undefined) {
-			await db
-				.update(document)
-				.set({
-					title: data.title.trim(),
-					documentType: data.documentType,
-				})
-				.where(eq(document.id, data.id))
-
-			await revalidateTournamentYearPage(data.systemName)
-
-			return { success: true, data: { id: data.id } }
-		} else {
-			const result = await db.insert(document).values({
-				title: data.title.trim(),
-				documentType: data.documentType,
-				tournamentId: data.tournamentId,
-				year: data.year,
-				lastUpdate: new Date().toISOString().replace("T", " ").replace("Z", ""),
-				createdBy: userId,
-			})
-
-			await revalidateTournamentYearPage(data.systemName)
-
-			return { success: true, data: { id: result[0].insertId } }
-		}
-	} catch (error) {
-		console.error("Failed to save document:", error)
-		return { success: false, error: "Failed to save document" }
-	}
-}
-
-export async function deleteDocumentAction(id: number, systemName: string): Promise<ActionResult> {
-	const userId = await requireAuth()
-	if (!userId) {
-		return { success: false, error: "Unauthorized" }
-	}
-
-	try {
-		await db.delete(document).where(eq(document.id, id))
-		await revalidateTournamentYearPage(systemName)
-		return { success: true }
-	} catch (error) {
-		console.error("Failed to delete document:", error)
-		return { success: false, error: "Failed to delete document" }
-	}
-}
-
-export async function uploadDocumentFileAction(
-	formData: FormData,
-): Promise<ActionResult<{ file: string }>> {
-	const userId = await requireAuth()
-	if (!userId) {
-		return { success: false, error: "Unauthorized" }
-	}
-
-	const file = formData.get("file") as File | null
-	const documentId = formData.get("documentId") as string | null
-	const systemName = formData.get("systemName") as string | null
-
-	if (!file || !documentId) {
-		return { success: false, error: "File and document ID are required" }
-	}
-
-	try {
-		const buffer = Buffer.from(await file.arrayBuffer())
-		const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_")
-		const key = `documents/${Date.now()}-${safeName}`
-		await uploadToS3(buffer, key, file.type)
-
-		const docId = parseInt(documentId, 10)
-		if (isNaN(docId)) {
-			return { success: false, error: "Invalid document ID" }
-		}
-
-		await db
-			.update(document)
-			.set({
-				file: key,
-				lastUpdate: new Date().toISOString().replace("T", " ").replace("Z", ""),
-			})
-			.where(eq(document.id, docId))
-
-		if (systemName) await revalidateTournamentYearPage(systemName)
-
-		return { success: true, data: { file: key } }
-	} catch (error) {
-		console.error("Failed to upload document file:", error)
-		return { success: false, error: "Failed to upload file" }
 	}
 }

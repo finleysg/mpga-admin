@@ -13,6 +13,8 @@ export default async function globalSetup() {
 		"http://localhost:4100/",
 		"http://localhost:4100/members/clubs",
 		"http://localhost:4100/members/contacts",
+		"http://localhost:4100/tournaments/four-ball",
+		"http://localhost:4000/tournaments/four-ball/2026",
 	]
 
 	console.log("Warming up dev servers...")

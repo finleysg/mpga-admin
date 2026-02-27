@@ -1,43 +1,29 @@
 "use server"
 
-import { document, documentTag, tournament } from "@mpga/database"
+import { document, tournament } from "@mpga/database"
 import type { ActionResult } from "@mpga/types"
 import { asc, eq } from "drizzle-orm"
 
 import { db } from "@/lib/db"
+import {
+	deleteDocument,
+	type DocumentDataFull,
+	saveDocument,
+	type SaveDocumentInput,
+	uploadDocumentFile,
+} from "@/lib/documents"
 import { requireAuth } from "@/lib/require-auth"
-import { uploadToS3 } from "@/lib/s3"
 
 // ── Types ───────────────────────────────────────────────────────────
-
-export interface DocumentData {
-	id: number
-	title: string
-	documentType: string
-	file: string | null
-	year: number | null
-	tournamentId: number | null
-	tournamentName: string | null
-	lastUpdate: string
-	createdBy: string
-}
 
 export interface TournamentOption {
 	id: number
 	name: string
 }
 
-interface SaveDocumentInput {
-	id?: number
-	title: string
-	documentType: string
-	year: number | null
-	tournamentId: number | null
-}
-
 // ── List All Documents ──────────────────────────────────────────────
 
-export async function listAllDocumentsAction(): Promise<ActionResult<DocumentData[]>> {
+export async function listAllDocumentsAction(): Promise<ActionResult<DocumentDataFull[]>> {
 	const userId = await requireAuth()
 	if (!userId) {
 		return { success: false, error: "Unauthorized" }
@@ -69,7 +55,7 @@ export async function listAllDocumentsAction(): Promise<ActionResult<DocumentDat
 
 // ── Get Single Document ─────────────────────────────────────────────
 
-export async function getDocumentAction(id: number): Promise<ActionResult<DocumentData>> {
+export async function getDocumentAction(id: number): Promise<ActionResult<DocumentDataFull>> {
 	const userId = await requireAuth()
 	if (!userId) {
 		return { success: false, error: "Unauthorized" }
@@ -119,29 +105,8 @@ export async function saveDocumentAction(
 	}
 
 	try {
-		if (data.id !== undefined) {
-			await db
-				.update(document)
-				.set({
-					title: data.title.trim(),
-					documentType: data.documentType,
-					year: data.year,
-					tournamentId: data.tournamentId,
-					lastUpdate: new Date().toISOString().replace("T", " ").replace("Z", ""),
-				})
-				.where(eq(document.id, data.id))
-			return { success: true, data: { id: data.id } }
-		} else {
-			const result = await db.insert(document).values({
-				title: data.title.trim(),
-				documentType: data.documentType,
-				year: data.year,
-				tournamentId: data.tournamentId,
-				lastUpdate: new Date().toISOString().replace("T", " ").replace("Z", ""),
-				createdBy: userId,
-			})
-			return { success: true, data: { id: result[0].insertId } }
-		}
+		const id = await saveDocument(data, userId)
+		return { success: true, data: { id } }
 	} catch (error) {
 		console.error("Failed to save document:", error)
 		return { success: false, error: "Failed to save document" }
@@ -157,10 +122,7 @@ export async function deleteDocumentAction(id: number): Promise<ActionResult> {
 	}
 
 	try {
-		await db.transaction(async (tx) => {
-			await tx.delete(documentTag).where(eq(documentTag.documentId, id))
-			await tx.delete(document).where(eq(document.id, id))
-		})
+		await deleteDocument(id)
 		return { success: true }
 	} catch (error) {
 		console.error("Failed to delete document:", error)
@@ -185,25 +147,13 @@ export async function uploadDocumentFileAction(
 		return { success: false, error: "File and document ID are required" }
 	}
 
+	const docId = parseInt(documentId, 10)
+	if (isNaN(docId)) {
+		return { success: false, error: "Invalid document ID" }
+	}
+
 	try {
-		const buffer = Buffer.from(await file.arrayBuffer())
-		const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_")
-		const key = `documents/${Date.now()}-${safeName}`
-		await uploadToS3(buffer, key, file.type)
-
-		const docId = parseInt(documentId, 10)
-		if (isNaN(docId)) {
-			return { success: false, error: "Invalid document ID" }
-		}
-
-		await db
-			.update(document)
-			.set({
-				file: key,
-				lastUpdate: new Date().toISOString().replace("T", " ").replace("Z", ""),
-			})
-			.where(eq(document.id, docId))
-
+		const key = await uploadDocumentFile(file, docId)
 		return { success: true, data: { file: key } }
 	} catch (error) {
 		console.error("Failed to upload document file:", error)

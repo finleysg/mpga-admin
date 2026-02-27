@@ -4,18 +4,15 @@ import { EmptyState, H1 } from "@mpga/ui"
 import { useParams, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
-import {
-	type DocumentData,
-	type TournamentOption,
-	getDocumentAction,
-	listTournamentOptionsAction,
-} from "../actions"
+import type { DocumentDataFull } from "@/lib/documents"
+
+import { type TournamentOption, getDocumentAction, listTournamentOptionsAction } from "../actions"
 import { DocumentForm } from "../document-form"
 
 export default function EditDocumentPage() {
 	const params = useParams()
 	const router = useRouter()
-	const [document, setDocument] = useState<DocumentData | null>(null)
+	const [document, setDocument] = useState<DocumentDataFull | null>(null)
 	const [tournaments, setTournaments] = useState<TournamentOption[]>([])
 	const [loading, setLoading] = useState(true)
 
