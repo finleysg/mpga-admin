@@ -112,37 +112,27 @@ export async function getSeniorMatchPlayRules(): Promise<Content | null> {
 }
 
 export async function getTournamentPolicies(): Promise<Content | null> {
-	try {
-		const results = await db
-			.select({
-				title: content.title,
-				content: content.contentText,
-			})
-			.from(content)
-			.where(eq(content.systemName, ContentSystemName.TournamentPolicies))
-			.limit(1)
+	const results = await db
+		.select({
+			title: content.title,
+			content: content.contentText,
+		})
+		.from(content)
+		.where(eq(content.systemName, ContentSystemName.TournamentPolicies))
+		.limit(1)
 
-		return results[0] || null
-	} catch (error) {
-		console.error("Failed to fetch tournament policies:", error)
-		return null
-	}
+	return results[0] || null
 }
 
 export async function getHardCard(): Promise<Content | null> {
-	try {
-		const results = await db
-			.select({
-				title: content.title,
-				content: content.contentText,
-			})
-			.from(content)
-			.where(eq(content.systemName, ContentSystemName.HardCard))
-			.limit(1)
+	const results = await db
+		.select({
+			title: content.title,
+			content: content.contentText,
+		})
+		.from(content)
+		.where(eq(content.systemName, ContentSystemName.HardCard))
+		.limit(1)
 
-		return results[0] || null
-	} catch (error) {
-		console.error("Failed to fetch hard card:", error)
-		return null
-	}
+	return results[0] || null
 }

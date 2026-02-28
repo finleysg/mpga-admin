@@ -3,7 +3,7 @@ import { notFound } from "next/navigation"
 
 import { getHardCard } from "@/lib/queries/content"
 
-export const revalidate = 86400
+export const dynamic = "force-dynamic"
 
 export default async function HardCardPage() {
 	const hardCard = await getHardCard()
