@@ -4,6 +4,7 @@ import { headers } from "next/headers"
 import { auth } from "@/lib/auth"
 
 import { ClubContactsSection } from "./club-contacts-section"
+import { listRolesForContact } from "../../actions"
 import { ClubEditForm } from "./club-edit-form"
 import {
 	getClubForContact,
@@ -31,10 +32,11 @@ export default async function EditClubPage({ params }: { params: Promise<{ clubI
 		return <ClubContactLoginForm clubId={clubIdNum} callbackPath={callbackPath} />
 	}
 
-	const [clubResult, coursesResult, contactsResult] = await Promise.all([
+	const [clubResult, coursesResult, contactsResult, rolesResult] = await Promise.all([
 		getClubForContact(clubIdNum),
 		listGolfCourseOptionsForContact(clubIdNum),
 		listClubContactsForContact(clubIdNum),
+		listRolesForContact(clubIdNum),
 	])
 
 	if (!clubResult.success || !clubResult.data) {
@@ -57,6 +59,7 @@ export default async function EditClubPage({ params }: { params: Promise<{ clubI
 	const clubData = clubResult.data
 	const golfCourses = coursesResult.success && coursesResult.data ? coursesResult.data : []
 	const contacts = contactsResult.success && contactsResult.data ? contactsResult.data : []
+	const roles = rolesResult.success && rolesResult.data ? rolesResult.data : []
 
 	return (
 		<ClubContactPageLayout systemName={clubData.systemName} maxWidth="lg">
@@ -68,7 +71,7 @@ export default async function EditClubPage({ params }: { params: Promise<{ clubI
 				to secretary@mpga.net.
 			</p>
 			<ClubEditForm club={clubData} golfCourses={golfCourses} />
-			<ClubContactsSection clubId={clubIdNum} initialContacts={contacts} />
+			<ClubContactsSection clubId={clubIdNum} initialContacts={contacts} availableRoles={roles} />
 		</ClubContactPageLayout>
 	)
 }

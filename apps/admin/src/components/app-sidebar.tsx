@@ -78,6 +78,7 @@ const navGroups = [
 			{ title: "Match Play Groups", url: "/settings/match-play-groups" },
 			{ title: "Membership", url: "/settings/membership" },
 			{ title: "Documents", url: "/settings/documents" },
+			{ title: "Roles", url: "/settings/roles" },
 		],
 	},
 ]

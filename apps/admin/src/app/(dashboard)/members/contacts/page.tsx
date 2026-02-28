@@ -34,7 +34,7 @@ import { ChevronDown, ChevronUp, ChevronsUpDown, Download } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
-import { type ContactData, listContactsAction } from "./actions"
+import { type ContactData, listContactsAction, exportGGAction } from "./actions"
 import { exportClubContactsAction } from "../clubs/actions"
 
 const formatCityState = (city: string | null, state: string | null) => {
@@ -256,6 +256,42 @@ export default function ContactsPage() {
 		URL.revokeObjectURL(url)
 	}
 
+	const exportGGToExcel = async () => {
+		const result = await exportGGAction()
+		if (!result.success || !result.data) return
+
+		const wb = new ExcelJS.Workbook()
+		const ws = wb.addWorksheet("GG Export")
+		ws.columns = [
+			{ header: "Handle", key: "handle" },
+			{ header: "Email", key: "email" },
+			{ header: "Affiliation", key: "affiliation" },
+			{ header: "Role 1", key: "role1" },
+			{ header: "Role 2", key: "role2" },
+			{ header: "Role 3", key: "role3" },
+		]
+		for (const row of result.data) {
+			ws.addRow({
+				handle: row.handle,
+				email: row.email ?? "",
+				affiliation: row.affiliation,
+				role1: row.roles[0] ?? "",
+				role2: row.roles[1] ?? "",
+				role3: row.roles[2] ?? "",
+			})
+		}
+		const buffer = await wb.xlsx.writeBuffer()
+		const blob = new Blob([buffer], {
+			type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+		})
+		const url = URL.createObjectURL(blob)
+		const a = document.createElement("a")
+		a.href = url
+		a.download = "gg-export.xlsx"
+		a.click()
+		URL.revokeObjectURL(url)
+	}
+
 	const filteredCount = table.getFilteredRowModel().rows.length
 	const showPagination = pageSizeOption !== "all" && table.getPageCount() > 1
 
@@ -312,6 +348,10 @@ export default function ContactsPage() {
 							>
 								<Download className="mr-1 h-4 w-4" />
 								Club Contacts
+							</Button>
+							<Button variant="ghost" size="sm" onClick={exportGGToExcel} title="GG Export">
+								<Download className="mr-1 h-4 w-4" />
+								GG Export
 							</Button>
 						</div>
 					</div>

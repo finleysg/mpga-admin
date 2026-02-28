@@ -14,8 +14,9 @@ import {
 	listClubContactsAction,
 	listGolfCourseOptionsAction,
 } from "../actions"
+import { listRolesAction } from "@/app/(dashboard)/settings/roles/actions"
 import { ClubForm } from "../club-form"
-import { ClubContactsSection } from "./club-contacts-section"
+import { ClubContactsSection, type RoleOption } from "./club-contacts-section"
 import { ClubPaymentSection } from "./club-payment-section"
 
 export default function EditClubPage() {
@@ -24,6 +25,7 @@ export default function EditClubPage() {
 	const [club, setClub] = useState<ClubData | null>(null)
 	const [golfCourses, setGolfCourses] = useState<GolfCourseOption[]>([])
 	const [contacts, setContacts] = useState<ClubContactData[]>([])
+	const [availableRoles, setAvailableRoles] = useState<RoleOption[]>([])
 	const [membershipData, setMembershipData] = useState<MembershipData | null>(null)
 	const [loading, setLoading] = useState(true)
 
@@ -71,9 +73,10 @@ export default function EditClubPage() {
 
 		async function fetchAll() {
 			try {
-				const [clubResult, coursesResult] = await Promise.all([
+				const [clubResult, coursesResult, rolesResult] = await Promise.all([
 					getClubAction(clubId),
 					listGolfCourseOptionsAction(),
+					listRolesAction(),
 				])
 
 				if (!clubResult.success || !clubResult.data) {
@@ -84,6 +87,9 @@ export default function EditClubPage() {
 				setClub(clubResult.data)
 				if (coursesResult.success && coursesResult.data) {
 					setGolfCourses(coursesResult.data)
+				}
+				if (rolesResult.success && rolesResult.data) {
+					setAvailableRoles(rolesResult.data)
 				}
 
 				await Promise.all([fetchContacts(), fetchMembership()])
@@ -114,7 +120,12 @@ export default function EditClubPage() {
 		<div className="mx-auto max-w-6xl space-y-6">
 			<H1 variant="secondary">Edit Club</H1>
 			<ClubForm club={club} golfCourses={golfCourses} onRefresh={fetchClub} />
-			<ClubContactsSection clubId={clubId} contacts={contacts} onRefresh={fetchContacts} />
+			<ClubContactsSection
+				clubId={clubId}
+				contacts={contacts}
+				availableRoles={availableRoles}
+				onRefresh={fetchContacts}
+			/>
 			<ClubPaymentSection
 				clubId={clubId}
 				year={currentYear}

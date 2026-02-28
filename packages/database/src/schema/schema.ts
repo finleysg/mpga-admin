@@ -86,11 +86,21 @@ export const clubContact = mysqlTable(
 	(table) => [primaryKey({ columns: [table.id], name: "clubContact_id" })],
 )
 
+export const role = mysqlTable(
+	"role",
+	{
+		id: int().autoincrement().notNull(),
+		name: varchar({ length: 30 }).notNull(),
+	},
+	(table) => [primaryKey({ columns: [table.id], name: "role_id" })],
+)
+
 export const clubContactRole = mysqlTable(
 	"clubContactRole",
 	{
 		id: int().autoincrement().notNull(),
-		role: varchar({ length: 30 }).notNull(),
+		role: varchar({ length: 30 }),
+		roleId: int().references(() => role.id),
 		clubContactId: int()
 			.notNull()
 			.references(() => clubContact.id),

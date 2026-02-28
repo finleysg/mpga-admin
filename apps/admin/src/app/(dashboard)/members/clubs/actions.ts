@@ -1,6 +1,14 @@
 "use server"
 
-import { club, clubContact, clubContactRole, contact, golfCourse, membership } from "@mpga/database"
+import {
+	club,
+	clubContact,
+	clubContactRole,
+	contact,
+	golfCourse,
+	membership,
+	role,
+} from "@mpga/database"
 import type { ActionResult } from "@mpga/types"
 import { and, asc, eq, like, or, sql } from "drizzle-orm"
 
@@ -288,15 +296,16 @@ export async function listClubContactsAction(
 
 		const clubContactIds = contactRows.map((r) => r.clubContactId)
 
-		let roleRows: { id: number; role: string; clubContactId: number }[] = []
+		let roleRows: { id: number; roleName: string; clubContactId: number }[] = []
 		if (clubContactIds.length > 0) {
 			roleRows = await db
 				.select({
 					id: clubContactRole.id,
-					role: clubContactRole.role,
+					roleName: role.name,
 					clubContactId: clubContactRole.clubContactId,
 				})
 				.from(clubContactRole)
+				.innerJoin(role, eq(clubContactRole.roleId, role.id))
 				.where(or(...clubContactIds.map((ccId) => eq(clubContactRole.clubContactId, ccId))))
 		}
 
@@ -315,7 +324,7 @@ export async function listClubContactsAction(
 				updateBy: useContact ? row.contactUpdateBy : row.updateBy,
 				roles: roleRows
 					.filter((r) => r.clubContactId === row.clubContactId)
-					.map((r) => ({ id: r.id, role: r.role })),
+					.map((r) => ({ id: r.id, role: r.roleName })),
 			}
 		})
 
@@ -464,7 +473,7 @@ export async function toggleClubContactPrimaryAction(
 
 export async function addClubContactRoleAction(
 	clubContactId: number,
-	role: string,
+	roleId: number,
 	clubId: number,
 ): Promise<ActionResult<{ id: number }>> {
 	const email = await requireAuthEmail()
@@ -475,7 +484,7 @@ export async function addClubContactRoleAction(
 	try {
 		const result = await db.insert(clubContactRole).values({
 			clubContactId,
-			role,
+			roleId,
 		})
 
 		const now = new Date().toISOString().replace("T", " ").replace("Z", "")
@@ -629,19 +638,22 @@ export async function exportClubContactsAction(): Promise<ActionResult<ClubConta
 
 		const clubContactIds = rows.map((r) => r.clubContactId)
 
-		let roleRows: { role: string; clubContactId: number }[] = []
+		let roleRows: { roleName: string; clubContactId: number }[] = []
 		if (clubContactIds.length > 0) {
 			roleRows = await db
 				.select({
-					role: clubContactRole.role,
+					roleName: role.name,
 					clubContactId: clubContactRole.clubContactId,
 				})
 				.from(clubContactRole)
+				.innerJoin(role, eq(clubContactRole.roleId, role.id))
 				.where(or(...clubContactIds.map((ccId) => eq(clubContactRole.clubContactId, ccId))))
 		}
 
 		const data: ClubContactExportRow[] = rows.map((row) => {
-			const roles = roleRows.filter((r) => r.clubContactId === row.clubContactId).map((r) => r.role)
+			const roles = roleRows
+				.filter((r) => r.clubContactId === row.clubContactId)
+				.map((r) => r.roleName)
 			return {
 				clubName: row.clubName,
 				firstName: row.firstName,

@@ -1,6 +1,14 @@
 "use server"
 
-import { club, clubContact, clubContactRole, contact, golfCourse, membership } from "@mpga/database"
+import {
+	club,
+	clubContact,
+	clubContactRole,
+	contact,
+	golfCourse,
+	membership,
+	role,
+} from "@mpga/database"
 import type { ActionResult } from "@mpga/types"
 import { and, asc, eq, like, or } from "drizzle-orm"
 import { headers } from "next/headers"
@@ -196,15 +204,16 @@ export async function listClubContactsForContact(
 
 		const clubContactIds = contactRows.map((r) => r.clubContactId)
 
-		let roleRows: { id: number; role: string; clubContactId: number }[] = []
+		let roleRows: { id: number; roleName: string; clubContactId: number }[] = []
 		if (clubContactIds.length > 0) {
 			roleRows = await db
 				.select({
 					id: clubContactRole.id,
-					role: clubContactRole.role,
+					roleName: role.name,
 					clubContactId: clubContactRole.clubContactId,
 				})
 				.from(clubContactRole)
+				.innerJoin(role, eq(clubContactRole.roleId, role.id))
 				.where(or(...clubContactIds.map((ccId) => eq(clubContactRole.clubContactId, ccId))))
 		}
 
@@ -223,7 +232,7 @@ export async function listClubContactsForContact(
 				updateBy: useContact ? row.contactUpdateBy : row.updateBy,
 				roles: roleRows
 					.filter((r) => r.clubContactId === row.clubContactId)
-					.map((r) => ({ id: r.id, role: r.role })),
+					.map((r) => ({ id: r.id, role: r.roleName })),
 			}
 		})
 
@@ -434,7 +443,7 @@ export async function toggleClubContactPrimaryForContact(
 export async function addClubContactRoleForContact(
 	clubId: number,
 	clubContactId: number,
-	role: string,
+	roleId: number,
 ): Promise<ActionResult<{ id: number }>> {
 	const authCheck = await requireClubContactAuth(clubId)
 	if (!authCheck.authorized) {
@@ -454,7 +463,7 @@ export async function addClubContactRoleForContact(
 
 		const result = await db.insert(clubContactRole).values({
 			clubContactId,
-			role,
+			roleId,
 		})
 
 		const now = new Date().toISOString().replace("T", " ").replace("Z", "")
@@ -508,6 +517,29 @@ export async function removeClubContactRoleForContact(
 	} catch (error) {
 		console.error("Failed to remove role:", error)
 		return { success: false, error: "Failed to remove role" }
+	}
+}
+
+// ── Roles ───────────────────────────────────────────────────────────
+
+export async function listRolesForContact(
+	clubId: number,
+): Promise<ActionResult<{ id: number; name: string }[]>> {
+	const authCheck = await requireClubContactAuth(clubId)
+	if (!authCheck.authorized) {
+		return { success: false, error: authCheck.error }
+	}
+
+	try {
+		const results = await db
+			.select({ id: role.id, name: role.name })
+			.from(role)
+			.orderBy(asc(role.name))
+
+		return { success: true, data: results }
+	} catch (error) {
+		console.error("Failed to list roles:", error)
+		return { success: false, error: "Failed to list roles" }
 	}
 }
 

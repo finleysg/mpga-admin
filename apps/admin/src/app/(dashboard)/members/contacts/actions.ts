@@ -1,8 +1,8 @@
 "use server"
 
-import { club, clubContact, clubContactRole, committee, contact } from "@mpga/database"
+import { club, clubContact, clubContactRole, committee, contact, role } from "@mpga/database"
 import type { ActionResult } from "@mpga/types"
-import { asc, eq, inArray } from "drizzle-orm"
+import { asc, eq, inArray, or } from "drizzle-orm"
 
 import { db } from "@/lib/db"
 import { findDuplicateGroups } from "@/lib/find-duplicates"
@@ -336,11 +336,12 @@ export async function getContactClubsAction(
 				clubId: club.id,
 				clubName: club.name,
 				isPrimary: clubContact.isPrimary,
-				roleName: clubContactRole.role,
+				roleName: role.name,
 			})
 			.from(clubContact)
 			.innerJoin(club, eq(club.id, clubContact.clubId))
 			.leftJoin(clubContactRole, eq(clubContactRole.clubContactId, clubContact.id))
+			.leftJoin(role, eq(clubContactRole.roleId, role.id))
 			.where(eq(clubContact.contactId, contactId))
 			.orderBy(asc(club.name))
 
@@ -388,5 +389,103 @@ export async function deleteContactAction(id: number): Promise<ActionResult> {
 		}
 
 		return { success: false, error: "Failed to delete contact" }
+	}
+}
+
+// ── GG Export ────────────────────────────────────────────────────────
+
+export interface GGExportRow {
+	handle: string
+	email: string | null
+	affiliation: string
+	roles: string[]
+}
+
+export async function exportGGAction(): Promise<ActionResult<GGExportRow[]>> {
+	const userId = await requireAuth()
+	if (!userId) {
+		return { success: false, error: "Unauthorized" }
+	}
+
+	try {
+		// Fetch all contacts with their club associations
+		const rows = await db
+			.select({
+				contactId: contact.id,
+				firstName: contact.firstName,
+				lastName: contact.lastName,
+				email: contact.email,
+				clubName: club.name,
+				isPrimary: clubContact.isPrimary,
+				clubContactId: clubContact.id,
+			})
+			.from(contact)
+			.leftJoin(clubContact, eq(clubContact.contactId, contact.id))
+			.leftJoin(club, eq(club.id, clubContact.clubId))
+			.orderBy(asc(contact.lastName), asc(contact.firstName))
+
+		// Collect all clubContact IDs to fetch roles
+		const clubContactIds = rows
+			.map((r) => r.clubContactId)
+			.filter((id): id is number => id !== null)
+
+		let roleRows: { roleName: string; clubContactId: number }[] = []
+		if (clubContactIds.length > 0) {
+			roleRows = await db
+				.select({
+					roleName: role.name,
+					clubContactId: clubContactRole.clubContactId,
+				})
+				.from(clubContactRole)
+				.innerJoin(role, eq(clubContactRole.roleId, role.id))
+				.where(or(...clubContactIds.map((ccId) => eq(clubContactRole.clubContactId, ccId))))
+		}
+
+		// Group rows by contact, picking the best club (isPrimary first, else first found)
+		const contactMap = new Map<
+			number,
+			{
+				firstName: string
+				lastName: string
+				email: string | null
+				clubName: string
+				clubContactId: number | null
+			}
+		>()
+
+		for (const row of rows) {
+			const existing = contactMap.get(row.contactId)
+			if (!existing) {
+				contactMap.set(row.contactId, {
+					firstName: row.firstName,
+					lastName: row.lastName,
+					email: row.email,
+					clubName: row.clubName ?? "",
+					clubContactId: row.clubContactId,
+				})
+			} else if (row.isPrimary && row.clubName) {
+				// Prefer the primary club
+				existing.clubName = row.clubName
+				existing.clubContactId = row.clubContactId
+			}
+		}
+
+		const data: GGExportRow[] = Array.from(contactMap.values()).map((c) => {
+			const roles =
+				c.clubContactId !== null
+					? roleRows.filter((r) => r.clubContactId === c.clubContactId).map((r) => r.roleName)
+					: []
+			return {
+				handle: `${c.lastName}, ${c.firstName}`,
+				email: c.email,
+				affiliation: c.clubName,
+				roles,
+			}
+		})
+
+		return { success: true, data }
+	} catch (error) {
+		console.error("Failed to export GG data:", error)
+		return { success: false, error: "Failed to export GG data" }
 	}
 }

@@ -7,6 +7,7 @@ import {
 	document,
 	golfCourse,
 	membership,
+	role,
 } from "@mpga/database"
 import { ContentSystemName } from "@mpga/types"
 import { eq, and, desc } from "drizzle-orm"
@@ -172,11 +173,12 @@ export async function getClubOfficers(clubId: number): Promise<ClubOfficer[]> {
 				lastName: contact.lastName,
 				email: contact.email,
 				isPrimary: clubContact.isPrimary,
-				role: clubContactRole.role,
+				role: role.name,
 			})
 			.from(clubContact)
 			.innerJoin(contact, eq(clubContact.contactId, contact.id))
 			.leftJoin(clubContactRole, eq(clubContactRole.clubContactId, clubContact.id))
+			.leftJoin(role, eq(clubContactRole.roleId, role.id))
 			.where(eq(clubContact.clubId, clubId))
 
 		// Group by clubContact to aggregate roles

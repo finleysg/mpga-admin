@@ -5,6 +5,7 @@ import type {
 	club,
 	clubContact,
 	clubContactRole,
+	role,
 	committee,
 	contact,
 	content,
@@ -44,6 +45,9 @@ export type NewClubContact = InferInsertModel<typeof clubContact>
 
 export type ClubContactRole = InferSelectModel<typeof clubContactRole>
 export type NewClubContactRole = InferInsertModel<typeof clubContactRole>
+
+export type Role = InferSelectModel<typeof role>
+export type NewRole = InferInsertModel<typeof role>
 
 // Committee types
 export type Committee = InferSelectModel<typeof committee>

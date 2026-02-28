@@ -15,11 +15,23 @@ ARG NEXT_PUBLIC_POSTHOG_KEY
 ENV NEXT_PUBLIC_POSTHOG_KEY=$NEXT_PUBLIC_POSTHOG_KEY
 ARG NEXT_PUBLIC_POSTHOG_HOST
 ENV NEXT_PUBLIC_POSTHOG_HOST=$NEXT_PUBLIC_POSTHOG_HOST
+ARG POSTHOG_PERSONAL_API_KEY
+ARG POSTHOG_PROJECT_ID
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 RUN pnpm install --frozen-lockfile
 COPY --from=builder /app/out/full/ .
 RUN pnpm turbo build --filter=@mpga/public
+RUN if [ -n "$POSTHOG_PERSONAL_API_KEY" ]; then \
+      POSTHOG_CLI_API_KEY=$POSTHOG_PERSONAL_API_KEY \
+      POSTHOG_CLI_PROJECT_ID=$POSTHOG_PROJECT_ID \
+      POSTHOG_CLI_HOST=${NEXT_PUBLIC_POSTHOG_HOST:-https://us.i.posthog.com} \
+      npx --yes @posthog/cli@latest sourcemap inject --directory ./apps/public/.next/static && \
+      POSTHOG_CLI_API_KEY=$POSTHOG_PERSONAL_API_KEY \
+      POSTHOG_CLI_PROJECT_ID=$POSTHOG_PROJECT_ID \
+      POSTHOG_CLI_HOST=${NEXT_PUBLIC_POSTHOG_HOST:-https://us.i.posthog.com} \
+      npx --yes @posthog/cli@latest sourcemap upload --directory ./apps/public/.next/static --release-name mpga-public; \
+    fi
 
 FROM base AS runner
 WORKDIR /app

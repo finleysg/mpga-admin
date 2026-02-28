@@ -12,6 +12,7 @@ import {
 	clubContact,
 	contact,
 	clubContactRole,
+	role,
 	committee,
 	tournament,
 	documentTag,
@@ -106,6 +107,14 @@ export const clubContactRoleRelations = relations(clubContactRole, ({ one }) => 
 		fields: [clubContactRole.clubContactId],
 		references: [clubContact.id],
 	}),
+	role: one(role, {
+		fields: [clubContactRole.roleId],
+		references: [role.id],
+	}),
+}))
+
+export const roleRelations = relations(role, ({ many }) => ({
+	clubContactRoles: many(clubContactRole),
 }))
 
 export const committeeRelations = relations(committee, ({ one }) => ({

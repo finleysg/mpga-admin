@@ -42,34 +42,24 @@ import {
 } from "../actions"
 import { ContactSearchDialog } from "./contact-search-dialog"
 
-const PREDEFINED_ROLES = [
-	"Clubhouse Manager",
-	"Director of Golf",
-	"Event Director",
-	"General Manager",
-	"Handicap Chair",
-	"Manager",
-	"Match Play Captain",
-	"Men's Club Contact",
-	"Men's Club President",
-	"Men's Club Secretary",
-	"Men's Club Tournament Chair",
-	"Men's Club Treasurer",
-	"Men's Club VP",
-	"Owner",
-	"PGA Professional",
-	"Pro Shop Manager",
-	"Sr. Match Play Captain",
-	"Superintendent",
-]
+export interface RoleOption {
+	id: number
+	name: string
+}
 
 interface ClubContactsSectionProps {
 	clubId: number
 	contacts: ClubContactData[]
+	availableRoles: RoleOption[]
 	onRefresh: () => Promise<void>
 }
 
-export function ClubContactsSection({ clubId, contacts, onRefresh }: ClubContactsSectionProps) {
+export function ClubContactsSection({
+	clubId,
+	contacts,
+	availableRoles,
+	onRefresh,
+}: ClubContactsSectionProps) {
 	const [mounted, setMounted] = useState(false)
 	const [removing, setRemoving] = useState<number | null>(null)
 
@@ -93,9 +83,9 @@ export function ClubContactsSection({ clubId, contacts, onRefresh }: ClubContact
 		}
 	}
 
-	const handleAddRole = async (clubContactId: number, role: string) => {
+	const handleAddRole = async (clubContactId: number, roleId: number) => {
 		try {
-			const result = await addClubContactRoleAction(clubContactId, role, clubId)
+			const result = await addClubContactRoleAction(clubContactId, roleId, clubId)
 			if (result.success) {
 				await onRefresh()
 			} else {
@@ -175,8 +165,10 @@ export function ClubContactsSection({ clubId, contacts, onRefresh }: ClubContact
 						</TableHeader>
 						<TableBody className="divide-y divide-gray-100 bg-white">
 							{contacts.map((cc) => {
-								const assignedRoles = cc.roles.map((r) => r.role)
-								const availableRoles = PREDEFINED_ROLES.filter((r) => !assignedRoles.includes(r))
+								const assignedRoleIds = cc.roles.map((r) => r.role)
+								const unassignedRoles = availableRoles.filter(
+									(r) => !assignedRoleIds.includes(r.name),
+								)
 
 								return (
 									<TableRow key={cc.clubContactId} className="hover:bg-gray-50">
@@ -216,18 +208,20 @@ export function ClubContactsSection({ clubId, contacts, onRefresh }: ClubContact
 														</button>
 													</Badge>
 												))}
-												{availableRoles.length > 0 && mounted && (
+												{unassignedRoles.length > 0 && mounted && (
 													<Select
 														value=""
-														onValueChange={(value) => handleAddRole(cc.clubContactId, value)}
+														onValueChange={(value) =>
+															handleAddRole(cc.clubContactId, Number(value))
+														}
 													>
 														<SelectTrigger className="h-7 w-35 text-xs">
 															<SelectValue placeholder="Add role..." />
 														</SelectTrigger>
 														<SelectContent>
-															{availableRoles.map((role) => (
-																<SelectItem key={role} value={role}>
-																	{role}
+															{unassignedRoles.map((r) => (
+																<SelectItem key={r.id} value={String(r.id)}>
+																	{r.name}
 																</SelectItem>
 															))}
 														</SelectContent>

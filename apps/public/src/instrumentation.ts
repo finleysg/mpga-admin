@@ -19,6 +19,8 @@ export async function onRequestError(
 			| undefined
 	},
 ) {
+	if (error.message?.includes("Failed to find Server Action")) return
+
 	const posthog = getPostHogClient()
 	if (!posthog) return
 

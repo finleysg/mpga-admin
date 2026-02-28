@@ -29,6 +29,13 @@
       "when": 1771772110557,
       "tag": "0003_thin_quicksilver",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1772237999988,
+      "tag": "0004_greedy_stone_men",
+      "breakpoints": true
     }
   ]
 }
