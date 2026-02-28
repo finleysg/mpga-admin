@@ -4,6 +4,7 @@ import { Button } from "@mpga/ui"
 import { PaymentElement, Elements, useStripe, useElements } from "@stripe/react-stripe-js"
 import { loadStripe } from "@stripe/stripe-js"
 import { Loader2 } from "lucide-react"
+import posthog from "posthog-js"
 import { useState } from "react"
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!)
@@ -22,22 +23,32 @@ function CheckoutForm({ clubId }: { clubId: number }) {
 		setProcessing(true)
 		setError(null)
 
-		const { error: submitError } = await elements.submit()
-		if (submitError) {
-			setError(submitError.message ?? "Validation failed")
-			setProcessing(false)
-			return
-		}
+		try {
+			const { error: submitError } = await elements.submit()
+			if (submitError) {
+				setError(submitError.message ?? "Validation failed")
+				setProcessing(false)
+				return
+			}
 
-		const { error: confirmError } = await stripe.confirmPayment({
-			elements,
-			confirmParams: {
-				return_url: `${window.location.origin}/club-contact/pay-dues/${clubId}/success`,
-			},
-		})
+			const { error: confirmError } = await stripe.confirmPayment({
+				elements,
+				confirmParams: {
+					return_url: `${window.location.origin}/club-contact/pay-dues/${clubId}/success`,
+				},
+			})
 
-		if (confirmError) {
-			setError(confirmError.message ?? "Payment failed")
+			if (confirmError) {
+				setError(confirmError.message ?? "Payment failed")
+				setProcessing(false)
+			}
+		} catch (err) {
+			posthog.captureException(err instanceof Error ? err : new Error(String(err)), {
+				tags: { context: "stripe-payment" },
+			})
+			setError(
+				"Something went wrong processing your payment. Please refresh the page and try again.",
+			)
 			setProcessing(false)
 		}
 	}
