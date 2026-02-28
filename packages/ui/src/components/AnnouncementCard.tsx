@@ -33,7 +33,7 @@ export function AnnouncementCard({
 	truncate = true,
 }: AnnouncementCardProps) {
 	return (
-		<Card>
+		<Card id={`announcement-${id}`}>
 			<CardContent>
 				<div className="mb-3 flex items-center gap-2 text-sm text-gray-500">
 					<Calendar className="h-4 w-4" />
@@ -54,7 +54,7 @@ export function AnnouncementCard({
 				)}
 				{truncate && (
 					<Link
-						href={`/news/${id}`}
+						href={`/news#announcement-${id}`}
 						className="flex items-center gap-1 font-semibold text-primary-600 hover:text-primary-700"
 					>
 						Read More
