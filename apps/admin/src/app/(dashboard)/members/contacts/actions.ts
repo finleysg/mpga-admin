@@ -420,8 +420,8 @@ export async function exportGGAction(): Promise<ActionResult<GGExportRow[]>> {
 				clubContactId: clubContact.id,
 			})
 			.from(contact)
-			.leftJoin(clubContact, eq(clubContact.contactId, contact.id))
-			.leftJoin(club, eq(club.id, clubContact.clubId))
+			.innerJoin(clubContact, eq(clubContact.contactId, contact.id))
+			.innerJoin(club, eq(club.id, clubContact.clubId))
 			.orderBy(asc(contact.lastName), asc(contact.firstName))
 
 		// Collect all clubContact IDs to fetch roles
@@ -449,7 +449,7 @@ export async function exportGGAction(): Promise<ActionResult<GGExportRow[]>> {
 				lastName: string
 				email: string | null
 				clubName: string
-				clubContactId: number | null
+				clubContactId: number
 			}
 		>()
 
@@ -460,10 +460,10 @@ export async function exportGGAction(): Promise<ActionResult<GGExportRow[]>> {
 					firstName: row.firstName,
 					lastName: row.lastName,
 					email: row.email,
-					clubName: row.clubName ?? "",
+					clubName: row.clubName,
 					clubContactId: row.clubContactId,
 				})
-			} else if (row.isPrimary && row.clubName) {
+			} else if (row.isPrimary) {
 				// Prefer the primary club
 				existing.clubName = row.clubName
 				existing.clubContactId = row.clubContactId
@@ -471,10 +471,9 @@ export async function exportGGAction(): Promise<ActionResult<GGExportRow[]>> {
 		}
 
 		const data: GGExportRow[] = Array.from(contactMap.values()).map((c) => {
-			const roles =
-				c.clubContactId !== null
-					? roleRows.filter((r) => r.clubContactId === c.clubContactId).map((r) => r.roleName)
-					: []
+			const roles = roleRows
+				.filter((r) => r.clubContactId === c.clubContactId)
+				.map((r) => r.roleName)
 			return {
 				handle: `${c.lastName}, ${c.firstName}`,
 				email: c.email,
