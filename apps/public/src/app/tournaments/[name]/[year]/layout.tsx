@@ -1,9 +1,11 @@
-import { TournamentNav } from "@mpga/ui"
+import { TournamentPoliciesBanner } from "@mpga/ui"
 
 export default function TournamentYearLayout({ children }: { children: React.ReactNode }) {
 	return (
 		<>
-			<TournamentNav />
+			<div className="py-4">
+				<TournamentPoliciesBanner />
+			</div>
 			{children}
 		</>
 	)
