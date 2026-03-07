@@ -10,7 +10,7 @@ import {
 	role,
 } from "@mpga/database"
 import type { ActionResult } from "@mpga/types"
-import { and, asc, eq, like, or, sql } from "drizzle-orm"
+import { and, asc, eq, like, ne, or, sql } from "drizzle-orm"
 
 import { db } from "@/lib/db"
 import { requireAuth, requireAuthEmail } from "@/lib/require-auth"
@@ -21,6 +21,7 @@ import { revalidateClubPage } from "@/lib/revalidate"
 interface ClubInput {
 	id?: number
 	name: string
+	systemName: string
 	website: string
 	golfCourseId: number | null
 	size: number | null
@@ -31,6 +32,7 @@ interface ClubInput {
 export interface ClubData {
 	id: number
 	name: string
+	systemName: string | null
 	website: string
 	golfCourseId: number | null
 	golfCourseName: string | null
@@ -100,6 +102,7 @@ export async function listClubsAction(): Promise<ActionResult<ClubData[]>> {
 			.select({
 				id: club.id,
 				name: club.name,
+				systemName: club.systemName,
 				website: club.website,
 				golfCourseId: club.golfCourseId,
 				golfCourseName: golfCourse.name,
@@ -116,6 +119,7 @@ export async function listClubsAction(): Promise<ActionResult<ClubData[]>> {
 		const results: ClubData[] = rows.map((row) => ({
 			id: row.id,
 			name: row.name,
+			systemName: row.systemName,
 			website: row.website,
 			golfCourseId: row.golfCourseId,
 			golfCourseName: row.golfCourseName,
@@ -147,6 +151,7 @@ export async function getClubAction(id: number): Promise<ActionResult<ClubData>>
 			.select({
 				id: club.id,
 				name: club.name,
+				systemName: club.systemName,
 				website: club.website,
 				golfCourseId: club.golfCourseId,
 				golfCourseName: golfCourse.name,
@@ -172,6 +177,7 @@ export async function getClubAction(id: number): Promise<ActionResult<ClubData>>
 			data: {
 				id: row.id,
 				name: row.name,
+				systemName: row.systemName,
 				website: row.website,
 				golfCourseId: row.golfCourseId,
 				golfCourseName: row.golfCourseName,
@@ -196,19 +202,41 @@ export async function saveClubAction(data: ClubInput): Promise<ActionResult<{ id
 	}
 
 	const name = data.name?.trim()
+	const systemName = data.systemName?.trim()
 
 	if (!name) {
 		return { success: false, error: "Name is required" }
 	}
 
+	if (!systemName) {
+		return { success: false, error: "System name is required" }
+	}
+
+	if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(systemName)) {
+		return { success: false, error: "System name must be kebab-case (e.g. my-club-name)" }
+	}
+
 	const now = new Date().toISOString().replace("T", " ").replace("Z", "")
 
 	try {
+		const duplicateConditions = [eq(club.systemName, systemName)]
+		if (data.id !== undefined) {
+			duplicateConditions.push(ne(club.id, data.id))
+		}
+		const existing = await db
+			.select({ id: club.id })
+			.from(club)
+			.where(and(...duplicateConditions))
+		if (existing.length > 0) {
+			return { success: false, error: "A club with this system name already exists" }
+		}
+
 		if (data.id !== undefined) {
 			await db
 				.update(club)
 				.set({
 					name,
+					systemName,
 					website: data.website,
 					golfCourseId: data.golfCourseId,
 					size: data.size,
@@ -225,6 +253,7 @@ export async function saveClubAction(data: ClubInput): Promise<ActionResult<{ id
 		} else {
 			const result = await db.insert(club).values({
 				name,
+				systemName,
 				website: data.website,
 				golfCourseId: data.golfCourseId,
 				size: data.size,

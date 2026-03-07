@@ -10,7 +10,9 @@ import {
 	EmptyState,
 	toast,
 } from "@mpga/ui"
-import { Trash2 } from "lucide-react"
+import { addClubContactAction } from "@/app/(dashboard)/members/clubs/actions"
+import { CreateContactDialog } from "@/components/create-contact-dialog"
+import { Plus, Trash2 } from "lucide-react"
 import { useEffect, useState } from "react"
 
 import {
@@ -32,6 +34,7 @@ export function CaptainList({ teamId, clubId }: CaptainListProps) {
 	const [clubContacts, setClubContacts] = useState<ClubContactOption[]>([])
 	const [loading, setLoading] = useState(true)
 	const [selectedContactId, setSelectedContactId] = useState("")
+	const [showCreate, setShowCreate] = useState(false)
 
 	const fetchCaptains = async () => {
 		try {
@@ -157,7 +160,37 @@ export function CaptainList({ teamId, clubId }: CaptainListProps) {
 					<Button variant="secondary" disabled={!selectedContactId} onClick={handleAdd}>
 						Add Captain
 					</Button>
+					<Button
+						variant="secondaryoutline"
+						size="icon"
+						onClick={() => setShowCreate(true)}
+						title="Create new contact"
+					>
+						<Plus className="h-4 w-4" />
+					</Button>
 				</div>
+
+				<CreateContactDialog
+					open={showCreate}
+					onOpenChange={setShowCreate}
+					onContactCreated={async (newContact) => {
+						const result = await addClubContactAction(clubId, newContact.id)
+						if (!result.success) {
+							toast.error(result.error ?? "Failed to add contact to club")
+							return
+						}
+						setClubContacts((prev) => [
+							...prev,
+							{
+								id: newContact.id,
+								firstName: newContact.firstName,
+								lastName: newContact.lastName,
+								email: newContact.email,
+							},
+						])
+						setSelectedContactId(String(newContact.id))
+					}}
+				/>
 			</CardContent>
 		</Card>
 	)

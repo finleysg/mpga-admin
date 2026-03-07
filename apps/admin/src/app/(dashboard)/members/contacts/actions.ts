@@ -404,6 +404,64 @@ export async function getContactClubsAction(
 	}
 }
 
+// ── Inline Contact Creation ──────────────────────────────────────────
+
+export interface InlineContactResult {
+	id: number
+	firstName: string
+	lastName: string
+	email: string | null
+}
+
+export async function createContactInlineAction(data: {
+	firstName: string
+	lastName: string
+	email?: string | null
+	primaryPhone?: string | null
+}): Promise<ActionResult<InlineContactResult>> {
+	const authEmail = await requireAuthEmail()
+	if (!authEmail) {
+		return { success: false, error: "Unauthorized" }
+	}
+
+	const firstName = data.firstName?.trim()
+	const lastName = data.lastName?.trim()
+
+	if (!firstName || !lastName) {
+		return { success: false, error: "First name and last name are required" }
+	}
+
+	const now = new Date().toISOString().replace("T", " ").replace("Z", "")
+
+	const trimmedEmail = data.email?.trim() || null
+	const trimmedPhone = data.primaryPhone?.trim() || null
+
+	try {
+		const result = await db.insert(contact).values({
+			firstName,
+			lastName,
+			email: trimmedEmail,
+			primaryPhone: trimmedPhone,
+			sendEmail: true,
+			updateDate: now,
+			updateBy: authEmail,
+		})
+
+		return {
+			success: true,
+			data: {
+				id: result[0].insertId,
+				firstName,
+				lastName,
+				email: trimmedEmail,
+			},
+		}
+	} catch (error) {
+		console.error("Failed to create contact:", error)
+		return { success: false, error: "Failed to create contact" }
+	}
+}
+
 export async function deleteContactAction(id: number): Promise<ActionResult> {
 	const userId = await requireAuth()
 	if (!userId) {

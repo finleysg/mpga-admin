@@ -25,6 +25,8 @@ import {
 	ItemTitle,
 	toast,
 } from "@mpga/ui"
+import type { InlineContactResult } from "@/app/(dashboard)/members/contacts/actions"
+import { CreateContactDialog } from "@/components/create-contact-dialog"
 import { Pencil, Plus, Trash2, X } from "lucide-react"
 import { useState } from "react"
 
@@ -49,11 +51,27 @@ interface EditingMember {
 	homeClubId: string
 }
 
-export function MembersCard({ initialMembers, contacts, clubs }: MembersCardProps) {
+export function MembersCard({
+	initialMembers,
+	contacts: initialContacts,
+	clubs,
+}: MembersCardProps) {
 	const [members, setMembers] = useState(initialMembers)
+	const [contacts, setContacts] = useState(initialContacts)
 	const [editing, setEditing] = useState<EditingMember | null>(null)
 	const [saving, setSaving] = useState(false)
 	const [deleteId, setDeleteId] = useState<number | null>(null)
+
+	const handleContactCreated = (newContact: InlineContactResult) => {
+		const option: ContactOption = {
+			id: newContact.id,
+			name: `${newContact.firstName} ${newContact.lastName}`,
+		}
+		setContacts((prev) => [...prev, option].sort((a, b) => a.name.localeCompare(b.name)))
+		if (editing) {
+			setEditing({ ...editing, contactId: String(newContact.id) })
+		}
+	}
 
 	const handleAdd = () => {
 		setEditing({ role: "", contactId: "", homeClubId: "" })
@@ -182,6 +200,7 @@ export function MembersCard({ initialMembers, contacts, clubs }: MembersCardProp
 						clubs={clubs}
 						onSave={handleSave}
 						onCancel={handleCancel}
+						onContactCreated={handleContactCreated}
 						saving={saving}
 					/>
 				)}
@@ -196,6 +215,7 @@ export function MembersCard({ initialMembers, contacts, clubs }: MembersCardProp
 							clubs={clubs}
 							onSave={handleSave}
 							onCancel={handleCancel}
+							onContactCreated={handleContactCreated}
 							saving={saving}
 						/>
 					) : (
@@ -255,6 +275,7 @@ function EditForm({
 	clubs,
 	onSave,
 	onCancel,
+	onContactCreated,
 	saving,
 }: {
 	editing: EditingMember
@@ -263,8 +284,11 @@ function EditForm({
 	clubs: ClubOption[]
 	onSave: () => void
 	onCancel: () => void
+	onContactCreated: (contact: InlineContactResult) => void
 	saving: boolean
 }) {
+	const [showCreate, setShowCreate] = useState(false)
+
 	return (
 		<div className="space-y-2 rounded-md border border-secondary-200 p-3">
 			<Field>
@@ -279,12 +303,31 @@ function EditForm({
 			<div className="grid grid-cols-2 gap-2">
 				<Field>
 					<FieldLabel>Contact</FieldLabel>
-					<Combobox
-						options={contacts.map((c) => ({ value: String(c.id), label: c.name }))}
-						value={editing.contactId}
-						onValueChange={(value) => setEditing({ ...editing, contactId: value })}
-						placeholder="Select contact"
-						searchPlaceholder="Search contacts..."
+					<div className="flex gap-1">
+						<div className="flex-1">
+							<Combobox
+								options={contacts.map((c) => ({ value: String(c.id), label: c.name }))}
+								value={editing.contactId}
+								onValueChange={(value) => setEditing({ ...editing, contactId: value })}
+								placeholder="Select contact"
+								searchPlaceholder="Search contacts..."
+							/>
+						</div>
+						<Button
+							type="button"
+							variant="secondaryoutline"
+							size="icon"
+							className="h-10 w-10 shrink-0"
+							onClick={() => setShowCreate(true)}
+							title="Create new contact"
+						>
+							<Plus className="h-4 w-4" />
+						</Button>
+					</div>
+					<CreateContactDialog
+						open={showCreate}
+						onOpenChange={setShowCreate}
+						onContactCreated={onContactCreated}
 					/>
 				</Field>
 				<Field>

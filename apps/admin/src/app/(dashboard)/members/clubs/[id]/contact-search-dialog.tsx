@@ -15,6 +15,8 @@ import {
 import { Plus } from "lucide-react"
 import { useCallback, useEffect, useRef, useState } from "react"
 
+import { CreateContactDialog } from "@/components/create-contact-dialog"
+
 import { type ContactSearchResult, addClubContactAction, searchContactsAction } from "../actions"
 
 interface ContactSearchDialogProps {
@@ -34,6 +36,7 @@ export function ContactSearchDialog({
 	const [searching, setSearching] = useState(false)
 	const [adding, setAdding] = useState(false)
 	const [error, setError] = useState<string | null>(null)
+	const [showCreate, setShowCreate] = useState(false)
 	const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
 	const doSearch = useCallback(
@@ -88,55 +91,77 @@ export function ContactSearchDialog({
 	}
 
 	return (
-		<AlertDialog open={open} onOpenChange={setOpen}>
-			<AlertDialogTrigger asChild>
-				<Button type="button" variant="secondary" size="sm">
-					<Plus className="mr-1 h-4 w-4" />
-					Add Contact
-				</Button>
-			</AlertDialogTrigger>
-			<AlertDialogContent className="max-w-md">
-				<AlertDialogHeader>
-					<AlertDialogTitle className="font-heading">Search Contacts</AlertDialogTitle>
-					<AlertDialogDescription>
-						Search by name or email to add a contact to this club.
-					</AlertDialogDescription>
-				</AlertDialogHeader>
+		<>
+			<AlertDialog open={open} onOpenChange={setOpen}>
+				<AlertDialogTrigger asChild>
+					<Button type="button" variant="secondary" size="sm">
+						<Plus className="mr-1 h-4 w-4" />
+						Add Contact
+					</Button>
+				</AlertDialogTrigger>
+				<AlertDialogContent className="max-w-md">
+					<AlertDialogHeader>
+						<AlertDialogTitle className="font-heading">Search Contacts</AlertDialogTitle>
+						<AlertDialogDescription>
+							Search by name or email to add a contact to this club.
+						</AlertDialogDescription>
+					</AlertDialogHeader>
 
-				<Input
-					placeholder="Search contacts..."
-					value={search}
-					onChange={(e) => setSearch(e.target.value)}
-					autoFocus
-				/>
+					<Input
+						placeholder="Search contacts..."
+						value={search}
+						onChange={(e) => setSearch(e.target.value)}
+						autoFocus
+					/>
 
-				{error && <p className="text-sm text-destructive">{error}</p>}
+					{error && <p className="text-sm text-destructive">{error}</p>}
 
-				<div className="max-h-60 overflow-y-auto">
-					{searching && <p className="py-2 text-center text-sm text-gray-500">Searching...</p>}
-					{!searching && search.trim() && results.length === 0 && (
-						<p className="py-2 text-center text-sm text-gray-500">No contacts found</p>
-					)}
-					{results.map((c) => (
-						<button
-							key={c.id}
-							type="button"
-							disabled={adding}
-							onClick={() => handleAdd(c.id)}
-							className="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-gray-100 disabled:opacity-50"
-						>
-							<span className="font-medium">
-								{c.firstName} {c.lastName}
-							</span>
-							{c.email && <span className="ml-2 text-gray-500">{c.email}</span>}
-						</button>
-					))}
-				</div>
+					<div className="max-h-60 overflow-y-auto">
+						{searching && <p className="py-2 text-center text-sm text-gray-500">Searching...</p>}
+						{!searching && search.trim() && results.length === 0 && (
+							<div className="py-2 text-center">
+								<p className="text-sm text-gray-500">No contacts found</p>
+								<Button
+									type="button"
+									variant="link"
+									size="sm"
+									className="mt-1"
+									onClick={() => setShowCreate(true)}
+								>
+									<Plus className="mr-1 h-3 w-3" />
+									Create New Contact
+								</Button>
+							</div>
+						)}
+						{results.map((c) => (
+							<button
+								key={c.id}
+								type="button"
+								disabled={adding}
+								onClick={() => handleAdd(c.id)}
+								className="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-gray-100 disabled:opacity-50"
+							>
+								<span className="font-medium">
+									{c.firstName} {c.lastName}
+								</span>
+								{c.email && <span className="ml-2 text-gray-500">{c.email}</span>}
+							</button>
+						))}
+					</div>
 
-				<AlertDialogFooter>
-					<AlertDialogCancel>Close</AlertDialogCancel>
-				</AlertDialogFooter>
-			</AlertDialogContent>
-		</AlertDialog>
+					<AlertDialogFooter>
+						<AlertDialogCancel>Close</AlertDialogCancel>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
+
+			<CreateContactDialog
+				open={showCreate}
+				onOpenChange={setShowCreate}
+				onContactCreated={async (newContact) => {
+					await handleAdd(newContact.id)
+				}}
+			/>
+		</>
 	)
 }

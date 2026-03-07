@@ -15,7 +15,7 @@ import {
 	toast,
 } from "@mpga/ui"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useRef, useState } from "react"
 
 import { MarkdownEditor } from "@/components/markdown-editor"
 
@@ -27,12 +27,22 @@ interface ClubFormProps {
 	onRefresh?: () => void
 }
 
+function toKebabCase(str: string) {
+	return str
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, "-")
+		.replace(/-+/g, "-")
+		.replace(/^-|-$/g, "")
+}
+
 export function ClubForm({ club: existingClub, golfCourses, onRefresh }: ClubFormProps) {
 	const router = useRouter()
 	const [saving, setSaving] = useState(false)
 	const [error, setError] = useState<string | null>(null)
+	const systemNameTouched = useRef(!!existingClub?.systemName)
 
 	const [name, setName] = useState(existingClub?.name ?? "")
+	const [systemName, setSystemName] = useState(existingClub?.systemName ?? "")
 	const [website, setWebsite] = useState(existingClub?.website ?? "")
 	const [golfCourseId, setGolfCourseId] = useState<number | null>(
 		existingClub?.golfCourseId ?? null,
@@ -41,11 +51,28 @@ export function ClubForm({ club: existingClub, golfCourses, onRefresh }: ClubFor
 	const [archived, setArchived] = useState(existingClub?.archived ?? false)
 	const [notes, setNotes] = useState(existingClub?.notes ?? "")
 
+	const handleNameChange = (value: string) => {
+		setName(value)
+		if (!systemNameTouched.current) {
+			setSystemName(toKebabCase(value))
+		}
+	}
+
+	const handleSystemNameChange = (value: string) => {
+		setSystemName(value)
+		systemNameTouched.current = systemNameTouched.current || value.length > 0
+	}
+
 	const handleSave = async (e: React.FormEvent) => {
 		e.preventDefault()
 
 		if (!name.trim()) {
 			setError("Name is required")
+			return
+		}
+
+		if (!systemName.trim()) {
+			setError("System name is required")
 			return
 		}
 
@@ -56,6 +83,7 @@ export function ClubForm({ club: existingClub, golfCourses, onRefresh }: ClubFor
 			const result = await saveClubAction({
 				id: existingClub?.id,
 				name: name.trim(),
+				systemName: systemName.trim(),
 				website: website.trim(),
 				golfCourseId,
 				size: size ? (Number.isNaN(parseInt(size, 10)) ? null : parseInt(size, 10)) : null,
@@ -101,7 +129,28 @@ export function ClubForm({ club: existingClub, golfCourses, onRefresh }: ClubFor
 								<FieldLabel htmlFor="name">
 									Name <span className="text-destructive">*</span>
 								</FieldLabel>
-								<Input id="name" value={name} onChange={(e) => setName(e.target.value)} required />
+								<Input
+									id="name"
+									value={name}
+									onChange={(e) => handleNameChange(e.target.value)}
+									required
+								/>
+							</Field>
+
+							{/* System Name */}
+							<Field>
+								<FieldLabel htmlFor="systemName">
+									System Name <span className="text-destructive">*</span>
+								</FieldLabel>
+								<Input
+									id="systemName"
+									value={systemName}
+									onChange={(e) => handleSystemNameChange(e.target.value)}
+									required
+								/>
+								<p className="text-xs text-muted-foreground">
+									Used in the public URL. Must be kebab-case.
+								</p>
 							</Field>
 
 							{/* Website */}
