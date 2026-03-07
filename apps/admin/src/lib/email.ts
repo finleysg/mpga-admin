@@ -156,6 +156,66 @@ export async function sendContactNotificationEmail(
 }
 
 /**
+ * Sends captain contact information for a match play group to the requesting captain.
+ */
+export async function sendCaptainContactsEmail(
+	to: string,
+	groupName: string,
+	year: number,
+	captains: Array<{
+		firstName: string
+		lastName: string
+		email: string | null
+		primaryPhone: string | null
+		alternatePhone: string | null
+		clubName: string
+	}>,
+): Promise<void> {
+	const captainRows = captains
+		.map((c) => {
+			const phones = [c.primaryPhone, c.alternatePhone].filter(Boolean).join(" / ")
+			return `
+				<tr>
+					<td style="padding: 8px; border-bottom: 1px solid #eee;">${escapeHtml(c.clubName)}</td>
+					<td style="padding: 8px; border-bottom: 1px solid #eee;">${escapeHtml(c.firstName)} ${escapeHtml(c.lastName)}</td>
+					<td style="padding: 8px; border-bottom: 1px solid #eee;">${c.email ? escapeHtml(c.email) : ""}</td>
+					<td style="padding: 8px; border-bottom: 1px solid #eee;">${phones ? escapeHtml(phones) : ""}</td>
+				</tr>
+			`
+		})
+		.join("")
+
+	const captainText = captains
+		.map((c) => {
+			const phones = [c.primaryPhone, c.alternatePhone].filter(Boolean).join(" / ")
+			return `${c.clubName}: ${c.firstName} ${c.lastName} | ${c.email ?? "N/A"} | ${phones || "N/A"}`
+		})
+		.join("\n")
+
+	await transporter.sendMail({
+		from: process.env.MAIL_FROM ?? "noreply@mpga.net",
+		to,
+		subject: `MPGA ${year} Match Play Captain Contacts — ${groupName}`,
+		text: `Here are the captain contacts for ${groupName} (${year}):\n\n${captainText}`,
+		html: emailLayout(`
+			<h1 style="font-size: 22px; color: #333;">${year} Match Play Captain Contacts</h1>
+			<p>Here are the captain contacts for <strong>${escapeHtml(groupName)}</strong>:</p>
+			<table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
+				<thead>
+					<tr style="background-color: #f5f5f5;">
+						<th style="padding: 8px; text-align: left;">Club</th>
+						<th style="padding: 8px; text-align: left;">Captain</th>
+						<th style="padding: 8px; text-align: left;">Email</th>
+						<th style="padding: 8px; text-align: left;">Phone</th>
+					</tr>
+				</thead>
+				<tbody>${captainRows}</tbody>
+			</table>
+		`),
+	})
+}
+
+/**
  * Sends an invitation email to the specified address with an accept link.
  */
 export async function sendInvitationEmail(email: string, token: string): Promise<void> {

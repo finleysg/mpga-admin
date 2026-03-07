@@ -1,7 +1,9 @@
-import { H1, MatchPlayGroupCards } from "@mpga/ui"
+import { H1 } from "@mpga/ui"
 
 import { getTeamsForYear } from "@/lib/queries/match-play"
 import { getCurrentSeason } from "@/lib/season"
+
+import { TeamsClient } from "./teams-client"
 
 export const dynamic = "force-dynamic"
 
@@ -12,7 +14,7 @@ export default async function MatchPlayTeamsPage() {
 	return (
 		<div className="mx-auto max-w-6xl px-4 py-8">
 			<H1 className="mb-4">{currentYear} Match Play Teams</H1>
-			<MatchPlayGroupCards teams={teams} year={currentYear} />
+			<TeamsClient teams={teams} year={currentYear} />
 		</div>
 	)
 }

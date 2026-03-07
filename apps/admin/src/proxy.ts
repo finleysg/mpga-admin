@@ -14,7 +14,8 @@ export async function proxy(request: NextRequest) {
 		request.nextUrl.pathname.startsWith("/accept-invitation") ||
 		request.nextUrl.pathname.startsWith("/club-contact") ||
 		request.nextUrl.pathname.startsWith("/stripe/webhook") ||
-		request.nextUrl.pathname.startsWith("/api/messages")
+		request.nextUrl.pathname.startsWith("/api/messages") ||
+		request.nextUrl.pathname.startsWith("/api/captain-contacts")
 
 	if (isPublicRoute) {
 		return NextResponse.next()

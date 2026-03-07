@@ -45,13 +45,27 @@ import {
 interface DocumentFormProps {
 	document?: DocumentDataFull
 	tournaments: TournamentOption[]
+	allowedDocumentTypes?: string[]
+	basePath?: string
+	saveAction?: typeof saveDocumentAction
+	deleteAction?: typeof deleteDocumentAction
+	uploadAction?: typeof uploadDocumentFileAction
 }
 
-export function DocumentForm({ document: existing, tournaments }: DocumentFormProps) {
+export function DocumentForm({
+	document: existing,
+	tournaments,
+	allowedDocumentTypes,
+	basePath = "/settings/documents",
+	saveAction = saveDocumentAction,
+	deleteAction = deleteDocumentAction,
+	uploadAction = uploadDocumentFileAction,
+}: DocumentFormProps) {
+	const typeList = allowedDocumentTypes ?? baseDocumentTypes
 	const documentTypes =
-		existing && !baseDocumentTypes.includes(existing.documentType)
-			? [...baseDocumentTypes, existing.documentType]
-			: baseDocumentTypes
+		existing && !typeList.includes(existing.documentType)
+			? [...typeList, existing.documentType]
+			: typeList
 	const router = useRouter()
 	const [mounted, setMounted] = useState(false)
 	const [saving, setSaving] = useState(false)
@@ -86,7 +100,7 @@ export function DocumentForm({ document: existing, tournaments }: DocumentFormPr
 				return
 			}
 
-			const result = await saveDocumentAction({
+			const result = await saveAction({
 				id: existing?.id,
 				title: title.trim(),
 				documentType,
@@ -101,7 +115,7 @@ export function DocumentForm({ document: existing, tournaments }: DocumentFormPr
 					const formData = new FormData()
 					formData.append("file", file)
 					formData.append("documentId", docId.toString())
-					const uploadResult = await uploadDocumentFileAction(formData)
+					const uploadResult = await uploadAction(formData)
 					if (uploadResult.success && uploadResult.data) {
 						setExistingFile(uploadResult.data.file)
 					} else {
@@ -113,7 +127,7 @@ export function DocumentForm({ document: existing, tournaments }: DocumentFormPr
 					toast.success("Document updated")
 				} else {
 					toast.success("Document created")
-					router.push(`/settings/documents/${docId}`)
+					router.push(`${basePath}/${docId}`)
 				}
 			} else {
 				setError(result.error ?? "Failed to save document")
@@ -130,10 +144,10 @@ export function DocumentForm({ document: existing, tournaments }: DocumentFormPr
 		if (!existing) return
 
 		try {
-			const result = await deleteDocumentAction(existing.id)
+			const result = await deleteAction(existing.id)
 			if (result.success) {
 				toast.success("Document deleted")
-				router.push("/settings/documents")
+				router.push(basePath)
 			} else {
 				setError(result.error ?? "Failed to delete document")
 			}
@@ -146,7 +160,7 @@ export function DocumentForm({ document: existing, tournaments }: DocumentFormPr
 	}
 
 	const handleCancel = () => {
-		router.push("/settings/documents")
+		router.push(basePath)
 	}
 
 	return (

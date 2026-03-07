@@ -109,6 +109,12 @@ export default function TeamSetupPage() {
 				</div>
 			) : (
 				<div className="space-y-4">
+					<p className="text-sm font-medium">
+						Create your groups for the {year} season if you haven&apos;t already, then use this page
+						to populate each group with teams. The captains from {year - 1} will automatically be
+						copied forward. Make changes to your captains after setting up the groups on the main
+						Match Play admin page.
+					</p>
 					{groups.map((group) => (
 						<GroupCard
 							key={group.id}

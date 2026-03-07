@@ -219,6 +219,18 @@ export {
 export { Toaster } from "./ui/sonner"
 export { toast } from "sonner"
 export {
+	Dialog,
+	DialogPortal,
+	DialogOverlay,
+	DialogClose,
+	DialogTrigger,
+	DialogContent,
+	DialogHeader,
+	DialogFooter,
+	DialogTitle,
+	DialogDescription,
+} from "./ui/dialog"
+export {
 	AlertDialog,
 	AlertDialogPortal,
 	AlertDialogOverlay,
