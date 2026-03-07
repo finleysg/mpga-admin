@@ -260,7 +260,8 @@ export default function ContactsPage() {
 		const wb = new ExcelJS.Workbook()
 		const ws = wb.addWorksheet("GG Export")
 		ws.columns = [
-			{ header: "Handle", key: "handle" },
+			{ header: "First Name", key: "firstName" },
+			{ header: "Last Name", key: "lastName" },
 			{ header: "Email", key: "email" },
 			{ header: "Affiliation", key: "affiliation" },
 			{ header: "Role 1", key: "role1" },
@@ -269,7 +270,8 @@ export default function ContactsPage() {
 		]
 		for (const row of result.data) {
 			ws.addRow({
-				handle: row.handle,
+				firstName: row.firstName,
+				lastName: row.lastName,
 				email: row.email ?? "",
 				affiliation: row.affiliation,
 				role1: row.roles[0] ?? "",

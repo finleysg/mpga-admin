@@ -488,7 +488,8 @@ export async function deleteContactAction(id: number): Promise<ActionResult> {
 // ── GG Export ────────────────────────────────────────────────────────
 
 export interface GGExportRow {
-	handle: string
+	firstName: string
+	lastName: string
 	email: string | null
 	affiliation: string
 	roles: string[]
@@ -568,7 +569,8 @@ export async function exportGGAction(): Promise<ActionResult<GGExportRow[]>> {
 				.filter((r) => r.clubContactId === c.clubContactId)
 				.map((r) => r.roleName)
 			return {
-				handle: `${c.lastName}, ${c.firstName}`,
+				firstName: c.firstName,
+				lastName: c.lastName,
 				email: c.email,
 				affiliation: c.clubName,
 				roles,
