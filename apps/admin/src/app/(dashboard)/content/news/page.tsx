@@ -19,8 +19,6 @@ import {
 	type Column,
 	type ColumnDef,
 	type FilterFn,
-	type PaginationState,
-	type SortingState,
 	flexRender,
 	getCoreRowModel,
 	getFilteredRowModel,
@@ -31,6 +29,8 @@ import {
 import { ChevronDown, ChevronUp, ChevronsUpDown } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+
+import { useTableSearchParams } from "@/hooks/use-table-search-params"
 
 import { type AnnouncementData, listAnnouncementsAction } from "./actions"
 
@@ -90,13 +90,16 @@ export default function NewsPage() {
 	const [announcements, setAnnouncements] = useState<AnnouncementData[]>([])
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
-	const [globalFilter, setGlobalFilter] = useState("")
-	const [sorting, setSorting] = useState<SortingState>([{ id: "createDate", desc: true }])
-	const [pagination, setPagination] = useState<PaginationState>({
-		pageIndex: 0,
-		pageSize: 25,
-	})
-	const [pageSizeOption, setPageSizeOption] = useState<string>("25")
+	const {
+		globalFilter,
+		setGlobalFilter,
+		sorting,
+		setSorting,
+		pagination,
+		setPagination,
+		pageSizeOption,
+		setPageSizeOption,
+	} = useTableSearchParams({ defaultSort: [{ id: "createDate", desc: true }] })
 
 	useEffect(() => {
 		async function fetchAnnouncements() {
@@ -131,7 +134,7 @@ export default function NewsPage() {
 		onGlobalFilterChange: setGlobalFilter,
 		onPaginationChange: setPagination,
 		globalFilterFn: announcementGlobalFilterFn,
-		autoResetPageIndex: true,
+		autoResetPageIndex: false,
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		getSortedRowModel: getSortedRowModel(),
@@ -140,12 +143,6 @@ export default function NewsPage() {
 
 	const handlePageSizeChange = (value: string) => {
 		setPageSizeOption(value)
-		if (value === "all") {
-			table.setPageSize(announcements.length || 1)
-		} else {
-			table.setPageSize(Number(value))
-		}
-		table.setPageIndex(0)
 	}
 
 	const filteredCount = table.getFilteredRowModel().rows.length

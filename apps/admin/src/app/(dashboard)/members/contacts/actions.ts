@@ -1,6 +1,14 @@
 "use server"
 
-import { club, clubContact, clubContactRole, committee, contact, role } from "@mpga/database"
+import {
+	club,
+	clubContact,
+	clubContactRole,
+	committee,
+	contact,
+	role,
+	teamCaptain,
+} from "@mpga/database"
 import type { ActionResult } from "@mpga/types"
 import { asc, eq, inArray, or } from "drizzle-orm"
 
@@ -10,6 +18,7 @@ import {
 	buildMergeFieldUpdates,
 	classifyClubContact,
 	classifyCommittee,
+	classifyTeamCaptain,
 } from "@/lib/merge-contacts"
 import { requireAuth, requireAuthEmail } from "@/lib/require-auth"
 
@@ -304,7 +313,33 @@ export async function mergeContactsAction(
 				}
 			}
 
-			// 5. Delete source contacts
+			// 5. Reassign teamCaptain rows
+			const targetCaptains = await tx
+				.select()
+				.from(teamCaptain)
+				.where(eq(teamCaptain.contactId, targetId))
+			const targetTeamIds = new Set(targetCaptains.map((tc) => tc.teamId))
+
+			for (const sourceId of sourceIds) {
+				const sourceCaptains = await tx
+					.select()
+					.from(teamCaptain)
+					.where(eq(teamCaptain.contactId, sourceId))
+
+				for (const sc of sourceCaptains) {
+					if (classifyTeamCaptain(sc.teamId, targetTeamIds) === "delete") {
+						await tx.delete(teamCaptain).where(eq(teamCaptain.id, sc.id))
+					} else {
+						await tx
+							.update(teamCaptain)
+							.set({ contactId: targetId })
+							.where(eq(teamCaptain.id, sc.id))
+						targetTeamIds.add(sc.teamId)
+					}
+				}
+			}
+
+			// 6. Delete source contacts
 			await tx.delete(contact).where(inArray(contact.id, sourceIds))
 		})
 

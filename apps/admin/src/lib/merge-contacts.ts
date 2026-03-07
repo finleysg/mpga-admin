@@ -55,3 +55,14 @@ export function classifyCommittee(
 	const key = `${role}|${homeClubId}`
 	return targetKeys.has(key) ? "delete" : "reassign"
 }
+
+/**
+ * Decides whether a source contact's team-captain row should be reassigned
+ * to the target or deleted (because the target is already a captain on that team).
+ */
+export function classifyTeamCaptain(
+	teamId: number,
+	targetTeamIds: Set<number>,
+): "reassign" | "delete" {
+	return targetTeamIds.has(teamId) ? "delete" : "reassign"
+}

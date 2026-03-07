@@ -4,7 +4,13 @@ import { H1 } from "@mpga/ui"
 import { useParams, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
-import { type ClubOption, type TeamData, getTeamAction, listClubOptionsAction } from "../actions"
+import {
+	type ClubOption,
+	type TeamData,
+	getTeamAction,
+	listClubOptionsAction,
+	listGroupNamesAction,
+} from "../actions"
 import { TeamForm } from "../team-form"
 
 export default function EditTeamPage() {
@@ -12,6 +18,7 @@ export default function EditTeamPage() {
 	const router = useRouter()
 	const [team, setTeam] = useState<TeamData | null>(null)
 	const [clubs, setClubs] = useState<ClubOption[]>([])
+	const [groupNames, setGroupNames] = useState<string[]>([])
 	const [loading, setLoading] = useState(true)
 
 	useEffect(() => {
@@ -30,6 +37,11 @@ export default function EditTeamPage() {
 
 				if (teamResult.success && teamResult.data) {
 					setTeam(teamResult.data)
+
+					const groupNamesResult = await listGroupNamesAction(teamResult.data.year)
+					if (groupNamesResult.success && groupNamesResult.data) {
+						setGroupNames(groupNamesResult.data)
+					}
 				} else {
 					router.push("/match-play/teams")
 					return
@@ -66,7 +78,7 @@ export default function EditTeamPage() {
 			<H1 variant="secondary" className="mb-6">
 				Edit Team
 			</H1>
-			<TeamForm team={team} clubs={clubs} />
+			<TeamForm team={team} clubs={clubs} groupNames={groupNames} />
 		</div>
 	)
 }

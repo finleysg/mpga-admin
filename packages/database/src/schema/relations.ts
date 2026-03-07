@@ -19,6 +19,7 @@ import {
 	team,
 	matchPlayResult,
 	membership,
+	teamCaptain,
 	photo,
 	phototag,
 	tournamentHistory,
@@ -100,6 +101,7 @@ export const clubContactRelations = relations(clubContact, ({ one, many }) => ({
 export const contactRelations = relations(contact, ({ many }) => ({
 	clubContacts: many(clubContact),
 	committees: many(committee),
+	teamCaptains: many(teamCaptain),
 }))
 
 export const clubContactRoleRelations = relations(clubContactRole, ({ one }) => ({
@@ -166,6 +168,7 @@ export const teamRelations = relations(team, ({ one, many }) => ({
 		fields: [team.clubId],
 		references: [club.id],
 	}),
+	teamCaptains: many(teamCaptain),
 }))
 
 export const membershipRelations = relations(membership, ({ one }) => ({
@@ -201,6 +204,17 @@ export const tournamentLinkRelations = relations(tournamentLink, ({ one }) => ({
 	tournamentInstance: one(tournamentInstance, {
 		fields: [tournamentLink.tournamentInstanceId],
 		references: [tournamentInstance.id],
+	}),
+}))
+
+export const teamCaptainRelations = relations(teamCaptain, ({ one }) => ({
+	team: one(team, {
+		fields: [teamCaptain.teamId],
+		references: [team.id],
+	}),
+	contact: one(contact, {
+		fields: [teamCaptain.contactId],
+		references: [contact.id],
 	}),
 }))
 

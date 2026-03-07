@@ -24,8 +24,6 @@ import {
 	type Column,
 	type ColumnDef,
 	type FilterFn,
-	type PaginationState,
-	type SortingState,
 	flexRender,
 	getCoreRowModel,
 	getFilteredRowModel,
@@ -36,6 +34,8 @@ import {
 import { ChevronDown, ChevronUp, ChevronsUpDown } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+
+import { useTableSearchParams, useYearSearchParam } from "@/hooks/use-table-search-params"
 
 import { type ResultData, listResultsAction } from "./actions"
 
@@ -110,18 +110,21 @@ const yearOptions = Array.from({ length: 7 }, (_, i) => currentYear - 5 + i)
 
 export default function MatchPlayResultsPage() {
 	const router = useRouter()
-	const [mounted, setMounted] = useState(false)
 	const [results, setResults] = useState<ResultData[]>([])
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
-	const [year, setYear] = useState(currentYear)
-	const [globalFilter, setGlobalFilter] = useState("")
-	const [sorting, setSorting] = useState<SortingState>([{ id: "groupName", desc: false }])
-	const [pagination, setPagination] = useState<PaginationState>({
-		pageIndex: 0,
-		pageSize: 25,
-	})
-	const [pageSizeOption, setPageSizeOption] = useState<string>("25")
+	const [year, setYear] = useYearSearchParam(currentYear)
+	const {
+		globalFilter,
+		setGlobalFilter,
+		sorting,
+		setSorting,
+		pagination,
+		setPagination,
+		pageSizeOption,
+		setPageSizeOption,
+	} = useTableSearchParams({ defaultSort: [{ id: "groupName", desc: false }] })
+	const [mounted, setMounted] = useState(false)
 
 	useEffect(() => setMounted(true), [])
 
@@ -158,7 +161,7 @@ export default function MatchPlayResultsPage() {
 		onGlobalFilterChange: setGlobalFilter,
 		onPaginationChange: setPagination,
 		globalFilterFn: resultGlobalFilterFn,
-		autoResetPageIndex: true,
+		autoResetPageIndex: false,
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		getSortedRowModel: getSortedRowModel(),
@@ -167,12 +170,6 @@ export default function MatchPlayResultsPage() {
 
 	const handlePageSizeChange = (value: string) => {
 		setPageSizeOption(value)
-		if (value === "all") {
-			table.setPageSize(results.length || 1)
-		} else {
-			table.setPageSize(Number(value))
-		}
-		table.setPageIndex(0)
 	}
 
 	const filteredCount = table.getFilteredRowModel().rows.length

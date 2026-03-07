@@ -44,6 +44,7 @@ const navGroups = [
 			{ title: "Rules", url: "/match-play/rules" },
 			{ title: "Senior Rules", url: "/match-play/senior-rules" },
 			{ title: "Documents", url: "/match-play/documents" },
+			{ title: "Groups", url: "/match-play/groups" },
 		],
 	},
 	{
@@ -75,7 +76,6 @@ const navGroups = [
 		title: "MPGA Data",
 		items: [
 			{ title: "Tournaments", url: "/settings/tournaments" },
-			{ title: "Match Play Groups", url: "/settings/match-play-groups" },
 			{ title: "Membership", url: "/settings/membership" },
 			{ title: "Documents", url: "/settings/documents" },
 			{ title: "Roles", url: "/settings/roles" },

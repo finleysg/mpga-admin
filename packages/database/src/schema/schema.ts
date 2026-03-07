@@ -8,6 +8,7 @@ import {
 	date,
 	decimal,
 	boolean,
+	unique,
 } from "drizzle-orm/mysql-core"
 
 export const announcement = mysqlTable(
@@ -362,4 +363,31 @@ export const tournamentLink = mysqlTable(
 		title: varchar({ length: 60 }).notNull(),
 	},
 	(table) => [primaryKey({ columns: [table.id], name: "tournamentLink_id" })],
+)
+
+export const teamCaptain = mysqlTable(
+	"teamCaptain",
+	{
+		id: int().autoincrement().notNull(),
+		teamId: int()
+			.notNull()
+			.references(() => team.id),
+		contactId: int()
+			.notNull()
+			.references(() => contact.id),
+	},
+	(table) => [primaryKey({ columns: [table.id], name: "teamCaptain_id" })],
+)
+
+export const matchPlayGroup = mysqlTable(
+	"matchPlayGroup",
+	{
+		id: int().autoincrement().notNull(),
+		year: int().notNull(),
+		groupName: varchar({ length: 20 }).notNull(),
+	},
+	(table) => [
+		primaryKey({ columns: [table.id], name: "matchPlayGroup_id" }),
+		unique("matchPlayGroup_year_groupName").on(table.year, table.groupName),
+	],
 )

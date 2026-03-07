@@ -1,6 +1,6 @@
 "use server"
 
-import { club, team } from "@mpga/database"
+import { club, clubContact, contact, matchPlayGroup, team, teamCaptain } from "@mpga/database"
 import type { ActionResult } from "@mpga/types"
 import { asc, eq } from "drizzle-orm"
 
@@ -162,6 +162,26 @@ export async function deleteTeamAction(id: number): Promise<ActionResult> {
 	}
 }
 
+export async function listGroupNamesAction(year: number): Promise<ActionResult<string[]>> {
+	const userId = await requireAuth()
+	if (!userId) {
+		return { success: false, error: "Unauthorized" }
+	}
+
+	try {
+		const results = await db
+			.select({ groupName: matchPlayGroup.groupName })
+			.from(matchPlayGroup)
+			.where(eq(matchPlayGroup.year, year))
+			.orderBy(asc(matchPlayGroup.groupName))
+
+		return { success: true, data: results.map((r) => r.groupName) }
+	} catch (error) {
+		console.error("Failed to list group names:", error)
+		return { success: false, error: "Failed to list group names" }
+	}
+}
+
 export async function listClubOptionsAction(): Promise<ActionResult<ClubOption[]>> {
 	const userId = await requireAuth()
 	if (!userId) {
@@ -182,5 +202,164 @@ export async function listClubOptionsAction(): Promise<ActionResult<ClubOption[]
 	} catch (error) {
 		console.error("Failed to list clubs:", error)
 		return { success: false, error: "Failed to list clubs" }
+	}
+}
+
+export interface CaptainData {
+	id: number
+	contactId: number
+	firstName: string
+	lastName: string
+	email: string | null
+	primaryPhone: string | null
+}
+
+export interface ClubContactOption {
+	id: number
+	firstName: string
+	lastName: string
+	email: string | null
+}
+
+export async function listTeamCaptainsAction(teamId: number): Promise<ActionResult<CaptainData[]>> {
+	const userId = await requireAuth()
+	if (!userId) {
+		return { success: false, error: "Unauthorized" }
+	}
+
+	try {
+		const results = await db
+			.select({
+				id: teamCaptain.id,
+				contactId: teamCaptain.contactId,
+				firstName: contact.firstName,
+				lastName: contact.lastName,
+				email: contact.email,
+				primaryPhone: contact.primaryPhone,
+			})
+			.from(teamCaptain)
+			.innerJoin(contact, eq(teamCaptain.contactId, contact.id))
+			.where(eq(teamCaptain.teamId, teamId))
+			.orderBy(asc(contact.lastName), asc(contact.firstName))
+
+		return { success: true, data: results }
+	} catch (error) {
+		console.error("Failed to list team captains:", error)
+		return { success: false, error: "Failed to list team captains" }
+	}
+}
+
+export async function addTeamCaptainAction(
+	teamId: number,
+	contactId: number,
+): Promise<ActionResult<{ id: number }>> {
+	const userId = await requireAuth()
+	if (!userId) {
+		return { success: false, error: "Unauthorized" }
+	}
+
+	try {
+		const result = await db.insert(teamCaptain).values({ teamId, contactId })
+		return { success: true, data: { id: result[0].insertId } }
+	} catch (error) {
+		console.error("Failed to add team captain:", error)
+		return { success: false, error: "Failed to add team captain" }
+	}
+}
+
+export async function removeTeamCaptainAction(id: number): Promise<ActionResult> {
+	const userId = await requireAuth()
+	if (!userId) {
+		return { success: false, error: "Unauthorized" }
+	}
+
+	try {
+		await db.delete(teamCaptain).where(eq(teamCaptain.id, id))
+		return { success: true }
+	} catch (error) {
+		console.error("Failed to remove team captain:", error)
+		return { success: false, error: "Failed to remove team captain" }
+	}
+}
+
+export async function listClubContactsAction(
+	clubId: number,
+): Promise<ActionResult<ClubContactOption[]>> {
+	const userId = await requireAuth()
+	if (!userId) {
+		return { success: false, error: "Unauthorized" }
+	}
+
+	try {
+		const results = await db
+			.select({
+				id: contact.id,
+				firstName: contact.firstName,
+				lastName: contact.lastName,
+				email: contact.email,
+			})
+			.from(clubContact)
+			.innerJoin(contact, eq(clubContact.contactId, contact.id))
+			.where(eq(clubContact.clubId, clubId))
+			.orderBy(asc(contact.lastName), asc(contact.firstName))
+
+		return { success: true, data: results }
+	} catch (error) {
+		console.error("Failed to list club contacts:", error)
+		return { success: false, error: "Failed to list club contacts" }
+	}
+}
+
+export interface CaptainExportRow {
+	year: number
+	groupName: string
+	clubName: string
+	isSenior: boolean
+	captainName: string
+	email: string
+	phone: string
+}
+
+export async function listTeamCaptainsForExportAction(
+	year: number,
+): Promise<ActionResult<CaptainExportRow[]>> {
+	const userId = await requireAuth()
+	if (!userId) {
+		return { success: false, error: "Unauthorized" }
+	}
+
+	try {
+		const results = await db
+			.select({
+				year: team.year,
+				groupName: team.groupName,
+				clubName: club.name,
+				isSenior: team.isSenior,
+				firstName: contact.firstName,
+				lastName: contact.lastName,
+				email: contact.email,
+				primaryPhone: contact.primaryPhone,
+			})
+			.from(teamCaptain)
+			.innerJoin(team, eq(teamCaptain.teamId, team.id))
+			.innerJoin(club, eq(team.clubId, club.id))
+			.innerJoin(contact, eq(teamCaptain.contactId, contact.id))
+			.where(eq(team.year, year))
+			.orderBy(asc(team.groupName), asc(club.name), asc(contact.lastName))
+
+		const rows: CaptainExportRow[] = results.map((r) => ({
+			year: r.year,
+			groupName: r.groupName,
+			clubName: r.clubName,
+			isSenior: r.isSenior,
+			captainName: `${r.firstName} ${r.lastName}`,
+			email: r.email ?? "",
+			phone: r.primaryPhone ?? "",
+		}))
+
+		return { success: true, data: rows }
+	} catch (error) {
+		console.error("Failed to export captains:", error)
+		return { success: false, error: "Failed to export captains" }
 	}
 }

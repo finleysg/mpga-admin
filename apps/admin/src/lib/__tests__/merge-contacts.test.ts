@@ -2,7 +2,12 @@ import { describe, expect, it } from "vitest"
 
 import type { ContactData } from "@/app/(dashboard)/members/contacts/actions"
 
-import { buildMergeFieldUpdates, classifyClubContact, classifyCommittee } from "../merge-contacts"
+import {
+	buildMergeFieldUpdates,
+	classifyClubContact,
+	classifyCommittee,
+	classifyTeamCaptain,
+} from "../merge-contacts"
 
 function makeContact(
 	overrides: Partial<ContactData> & { id: number; firstName: string; lastName: string },
@@ -162,5 +167,22 @@ describe("classifyCommittee", () => {
 	it("returns 'reassign' when target has no committees", () => {
 		const targetKeys = new Set<string>()
 		expect(classifyCommittee("President", 10, targetKeys)).toBe("reassign")
+	})
+})
+
+describe("classifyTeamCaptain", () => {
+	it("returns 'delete' when target is already captain on that team", () => {
+		const targetTeamIds = new Set([1, 2, 3])
+		expect(classifyTeamCaptain(2, targetTeamIds)).toBe("delete")
+	})
+
+	it("returns 'reassign' when target is not captain on that team", () => {
+		const targetTeamIds = new Set([1, 2, 3])
+		expect(classifyTeamCaptain(4, targetTeamIds)).toBe("reassign")
+	})
+
+	it("returns 'reassign' when target has no teams", () => {
+		const targetTeamIds = new Set<number>()
+		expect(classifyTeamCaptain(1, targetTeamIds)).toBe("reassign")
 	})
 })

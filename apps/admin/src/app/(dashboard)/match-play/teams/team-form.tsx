@@ -26,16 +26,24 @@ import {
 } from "@mpga/ui"
 import { Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
-import { type ClubOption, type TeamData, deleteTeamAction, saveTeamAction } from "./actions"
+import {
+	type ClubOption,
+	type TeamData,
+	deleteTeamAction,
+	listGroupNamesAction,
+	saveTeamAction,
+} from "./actions"
+import { CaptainList } from "./captain-list"
 
 interface TeamFormProps {
 	team?: TeamData
 	clubs: ClubOption[]
+	groupNames?: string[]
 }
 
-export function TeamForm({ team: existingTeam, clubs }: TeamFormProps) {
+export function TeamForm({ team: existingTeam, clubs, groupNames }: TeamFormProps) {
 	const router = useRouter()
 	const [saving, setSaving] = useState(false)
 	const [deleting, setDeleting] = useState(false)
@@ -49,6 +57,20 @@ export function TeamForm({ team: existingTeam, clubs }: TeamFormProps) {
 	const [clubId, setClubId] = useState<number | null>(existingTeam?.clubId ?? null)
 	const [isSenior, setIsSenior] = useState(existingTeam?.isSenior ?? false)
 	const [notes, setNotes] = useState(existingTeam?.notes ?? "")
+	const [groupNameOptions, setGroupNameOptions] = useState<string[]>(groupNames ?? [])
+
+	// Fetch group names when year changes
+	useEffect(() => {
+		async function fetchGroupNames() {
+			const yearNum = parseInt(year, 10)
+			if (isNaN(yearNum)) return
+			const result = await listGroupNamesAction(yearNum)
+			if (result.success && result.data) {
+				setGroupNameOptions(result.data)
+			}
+		}
+		fetchGroupNames()
+	}, [year])
 
 	const handleSave = async (e: React.FormEvent) => {
 		e.preventDefault()
@@ -120,130 +142,134 @@ export function TeamForm({ team: existingTeam, clubs }: TeamFormProps) {
 	}
 
 	return (
-		<Card>
-			<CardHeader>
-				<CardTitle className="font-heading">Team Information</CardTitle>
-			</CardHeader>
-			<CardContent>
-				<form onSubmit={handleSave} className="space-y-4">
-					{/* Row 1: Year and Group Name */}
-					<div className="grid grid-cols-2 gap-4">
-						<Field>
-							<FieldLabel htmlFor="year">
-								Year <span className="text-destructive">*</span>
-							</FieldLabel>
-							<Input
-								id="year"
-								type="number"
-								value={year}
-								onChange={(e) => setYear(e.target.value)}
-								required
-							/>
-						</Field>
-						<Field>
-							<FieldLabel htmlFor="groupName">
-								Group Name <span className="text-destructive">*</span>
-							</FieldLabel>
-							<Input
-								id="groupName"
-								value={groupName}
-								onChange={(e) => setGroupName(e.target.value)}
-								required
-							/>
-						</Field>
-					</div>
-
-					{/* Row 2: Club */}
-					<Field>
-						<FieldLabel>
-							Club <span className="text-destructive">*</span>
-						</FieldLabel>
-						<Combobox
-							options={clubs.map((c) => ({ value: String(c.id), label: c.name }))}
-							value={clubId !== null ? String(clubId) : ""}
-							onValueChange={(value) => setClubId(value === "" ? null : parseInt(value, 10))}
-							placeholder="Select a club"
-							searchPlaceholder="Search clubs..."
-						/>
-					</Field>
-
-					{/* Row 3: Senior */}
-					<Field orientation="horizontal">
-						<Checkbox
-							id="isSenior"
-							checked={isSenior}
-							onCheckedChange={(checked) => setIsSenior(checked === true)}
-						/>
-						<FieldLabel htmlFor="isSenior" className="mb-0">
-							Senior Team
-						</FieldLabel>
-					</Field>
-
-					{/* Row 4: Notes */}
-					<Field>
-						<FieldLabel htmlFor="notes">Notes</FieldLabel>
-						<Textarea
-							id="notes"
-							value={notes}
-							onChange={(e) => setNotes(e.target.value)}
-							rows={4}
-						/>
-					</Field>
-
-					{/* Error message */}
-					{error && <FieldError>{error}</FieldError>}
-
-					{/* Action buttons */}
-					<div className="flex justify-between pt-4">
-						{/* Delete button - only shown when editing */}
-						{existingTeam && (
-							<AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-								<AlertDialogTrigger asChild>
-									<Button type="button" variant="destructive">
-										<Trash2 className="mr-2 h-4 w-4" />
-										Delete
-									</Button>
-								</AlertDialogTrigger>
-								<AlertDialogContent>
-									<AlertDialogHeader>
-										<AlertDialogTitle>Delete Team</AlertDialogTitle>
-										<AlertDialogDescription>
-											Are you sure you want to delete the {existingTeam.clubName} team from{" "}
-											{existingTeam.groupName}? This action cannot be undone.
-										</AlertDialogDescription>
-									</AlertDialogHeader>
-									<AlertDialogFooter>
-										<AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
-										<AlertDialogAction
-											onClick={(e) => {
-												e.preventDefault()
-												handleDelete()
-											}}
-											disabled={deleting}
-											className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
-										>
-											{deleting ? "Deleting..." : "Delete"}
-										</AlertDialogAction>
-									</AlertDialogFooter>
-								</AlertDialogContent>
-							</AlertDialog>
-						)}
-
-						{/* Spacer when no delete button */}
-						{!existingTeam && <div />}
-
-						{/* Save/Cancel buttons on the right */}
-						<div className="flex gap-2">
-							<Button type="button" variant="secondaryoutline" onClick={handleCancel}>
-								Cancel
-							</Button>
-							<Button type="submit" variant="secondary" disabled={saving}>
-								{saving ? "Saving..." : "Save"}
-							</Button>
+		<>
+			<Card>
+				<CardHeader>
+					<CardTitle className="font-heading">Team Information</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<form onSubmit={handleSave} className="space-y-4">
+						{/* Row 1: Year and Group Name */}
+						<div className="grid grid-cols-2 gap-4">
+							<Field>
+								<FieldLabel htmlFor="year">
+									Year <span className="text-destructive">*</span>
+								</FieldLabel>
+								<Input
+									id="year"
+									type="number"
+									value={year}
+									onChange={(e) => setYear(e.target.value)}
+									required
+								/>
+							</Field>
+							<Field>
+								<FieldLabel htmlFor="groupName">
+									Group Name <span className="text-destructive">*</span>
+								</FieldLabel>
+								<Combobox
+									options={groupNameOptions.map((g) => ({ value: g, label: g }))}
+									value={groupName}
+									onValueChange={setGroupName}
+									placeholder="Select a group"
+									searchPlaceholder="Search groups..."
+								/>
+							</Field>
 						</div>
-					</div>
-				</form>
-			</CardContent>
-		</Card>
+
+						{/* Row 2: Club */}
+						<Field>
+							<FieldLabel>
+								Club <span className="text-destructive">*</span>
+							</FieldLabel>
+							<Combobox
+								options={clubs.map((c) => ({ value: String(c.id), label: c.name }))}
+								value={clubId !== null ? String(clubId) : ""}
+								onValueChange={(value) => setClubId(value === "" ? null : parseInt(value, 10))}
+								placeholder="Select a club"
+								searchPlaceholder="Search clubs..."
+							/>
+						</Field>
+
+						{/* Row 3: Senior */}
+						<Field orientation="horizontal">
+							<Checkbox
+								id="isSenior"
+								checked={isSenior}
+								onCheckedChange={(checked) => setIsSenior(checked === true)}
+							/>
+							<FieldLabel htmlFor="isSenior" className="mb-0">
+								Senior Team
+							</FieldLabel>
+						</Field>
+
+						{/* Row 4: Notes */}
+						<Field>
+							<FieldLabel htmlFor="notes">Notes</FieldLabel>
+							<Textarea
+								id="notes"
+								value={notes}
+								onChange={(e) => setNotes(e.target.value)}
+								rows={4}
+							/>
+						</Field>
+
+						{/* Error message */}
+						{error && <FieldError>{error}</FieldError>}
+
+						{/* Action buttons */}
+						<div className="flex justify-between pt-4">
+							{/* Delete button - only shown when editing */}
+							{existingTeam && (
+								<AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+									<AlertDialogTrigger asChild>
+										<Button type="button" variant="destructive">
+											<Trash2 className="mr-2 h-4 w-4" />
+											Delete
+										</Button>
+									</AlertDialogTrigger>
+									<AlertDialogContent>
+										<AlertDialogHeader>
+											<AlertDialogTitle>Delete Team</AlertDialogTitle>
+											<AlertDialogDescription>
+												Are you sure you want to delete the {existingTeam.clubName} team from{" "}
+												{existingTeam.groupName}? This action cannot be undone.
+											</AlertDialogDescription>
+										</AlertDialogHeader>
+										<AlertDialogFooter>
+											<AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+											<AlertDialogAction
+												onClick={(e) => {
+													e.preventDefault()
+													handleDelete()
+												}}
+												disabled={deleting}
+												className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+											>
+												{deleting ? "Deleting..." : "Delete"}
+											</AlertDialogAction>
+										</AlertDialogFooter>
+									</AlertDialogContent>
+								</AlertDialog>
+							)}
+
+							{/* Spacer when no delete button */}
+							{!existingTeam && <div />}
+
+							{/* Save/Cancel buttons on the right */}
+							<div className="flex gap-2">
+								<Button type="button" variant="secondaryoutline" onClick={handleCancel}>
+									Cancel
+								</Button>
+								<Button type="submit" variant="secondary" disabled={saving}>
+									{saving ? "Saving..." : "Save"}
+								</Button>
+							</div>
+						</div>
+					</form>
+				</CardContent>
+			</Card>
+			{existingTeam && <CaptainList teamId={existingTeam.id} clubId={existingTeam.clubId} />}
+		</>
 	)
 }

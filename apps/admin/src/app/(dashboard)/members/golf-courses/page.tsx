@@ -19,9 +19,7 @@ import {
 	type Column,
 	type ColumnDef,
 	type FilterFn,
-	type PaginationState,
 	type SortingFn,
-	type SortingState,
 	flexRender,
 	getCoreRowModel,
 	getFilteredRowModel,
@@ -32,6 +30,8 @@ import {
 import { ChevronDown, ChevronUp, ChevronsUpDown } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+
+import { useTableSearchParams } from "@/hooks/use-table-search-params"
 
 import { type GolfCourseData, listGolfCoursesAction } from "./actions"
 
@@ -105,13 +105,16 @@ export default function GolfCoursesPage() {
 	const [courses, setCourses] = useState<GolfCourseData[]>([])
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
-	const [globalFilter, setGlobalFilter] = useState("")
-	const [sorting, setSorting] = useState<SortingState>([{ id: "name", desc: false }])
-	const [pagination, setPagination] = useState<PaginationState>({
-		pageIndex: 0,
-		pageSize: 25,
-	})
-	const [pageSizeOption, setPageSizeOption] = useState<string>("25")
+	const {
+		globalFilter,
+		setGlobalFilter,
+		sorting,
+		setSorting,
+		pagination,
+		setPagination,
+		pageSizeOption,
+		setPageSizeOption,
+	} = useTableSearchParams({ defaultSort: [{ id: "name", desc: false }] })
 
 	useEffect(() => {
 		async function fetchCourses() {
@@ -145,7 +148,7 @@ export default function GolfCoursesPage() {
 		onGlobalFilterChange: setGlobalFilter,
 		onPaginationChange: setPagination,
 		globalFilterFn: golfCourseGlobalFilterFn,
-		autoResetPageIndex: true,
+		autoResetPageIndex: false,
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		getSortedRowModel: getSortedRowModel(),
@@ -154,12 +157,6 @@ export default function GolfCoursesPage() {
 
 	const handlePageSizeChange = (value: string) => {
 		setPageSizeOption(value)
-		if (value === "all") {
-			table.setPageSize(courses.length || 1)
-		} else {
-			table.setPageSize(Number(value))
-		}
-		table.setPageIndex(0)
 	}
 
 	const filteredCount = table.getFilteredRowModel().rows.length

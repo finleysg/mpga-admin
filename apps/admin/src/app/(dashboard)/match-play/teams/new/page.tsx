@@ -3,19 +3,26 @@
 import { H1 } from "@mpga/ui"
 import { useEffect, useState } from "react"
 
-import { type ClubOption, listClubOptionsAction } from "../actions"
+import { type ClubOption, listClubOptionsAction, listGroupNamesAction } from "../actions"
 import { TeamForm } from "../team-form"
 
 export default function NewTeamPage() {
 	const [clubs, setClubs] = useState<ClubOption[]>([])
+	const [groupNames, setGroupNames] = useState<string[]>([])
 	const [loading, setLoading] = useState(true)
 
 	useEffect(() => {
 		async function fetchClubs() {
 			try {
-				const result = await listClubOptionsAction()
+				const [result, groupNamesResult] = await Promise.all([
+					listClubOptionsAction(),
+					listGroupNamesAction(new Date().getFullYear()),
+				])
 				if (result.success && result.data) {
 					setClubs(result.data)
+				}
+				if (groupNamesResult.success && groupNamesResult.data) {
+					setGroupNames(groupNamesResult.data)
 				}
 			} catch (err) {
 				console.error("Failed to fetch clubs:", err)
@@ -40,7 +47,7 @@ export default function NewTeamPage() {
 			<H1 variant="secondary" className="mb-6">
 				New Team
 			</H1>
-			<TeamForm clubs={clubs} />
+			<TeamForm clubs={clubs} groupNames={groupNames} />
 		</div>
 	)
 }

@@ -24,8 +24,6 @@ import {
 	type Column,
 	type ColumnDef,
 	type FilterFn,
-	type PaginationState,
-	type SortingState,
 	flexRender,
 	getCoreRowModel,
 	getFilteredRowModel,
@@ -33,11 +31,14 @@ import {
 	getSortedRowModel,
 	useReactTable,
 } from "@tanstack/react-table"
+import ExcelJS from "exceljs"
 import { ChevronDown, ChevronUp, ChevronsUpDown } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
-import { type TeamData, listTeamsAction } from "./actions"
+import { useTableSearchParams, useYearSearchParam } from "@/hooks/use-table-search-params"
+
+import { type TeamData, listTeamCaptainsForExportAction, listTeamsAction } from "./actions"
 
 const teamGlobalFilterFn: FilterFn<TeamData> = (row, _columnId, filterValue) => {
 	const term = (filterValue as string).toLowerCase()
@@ -82,18 +83,21 @@ const yearOptions = Array.from({ length: 7 }, (_, i) => currentYear - 5 + i)
 
 export default function MatchPlayTeamsPage() {
 	const router = useRouter()
-	const [mounted, setMounted] = useState(false)
 	const [teams, setTeams] = useState<TeamData[]>([])
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
-	const [year, setYear] = useState(currentYear)
-	const [globalFilter, setGlobalFilter] = useState("")
-	const [sorting, setSorting] = useState<SortingState>([{ id: "groupName", desc: false }])
-	const [pagination, setPagination] = useState<PaginationState>({
-		pageIndex: 0,
-		pageSize: 25,
-	})
-	const [pageSizeOption, setPageSizeOption] = useState<string>("25")
+	const [year, setYear] = useYearSearchParam(currentYear)
+	const {
+		globalFilter,
+		setGlobalFilter,
+		sorting,
+		setSorting,
+		pagination,
+		setPagination,
+		pageSizeOption,
+		setPageSizeOption,
+	} = useTableSearchParams({ defaultSort: [{ id: "groupName", desc: false }] })
+	const [mounted, setMounted] = useState(false)
 
 	useEffect(() => setMounted(true), [])
 
@@ -124,6 +128,46 @@ export default function MatchPlayTeamsPage() {
 		}
 	}, [year])
 
+	const exportCaptains = async () => {
+		const result = await listTeamCaptainsForExportAction(year)
+		if (!result.success || !result.data) {
+			return
+		}
+
+		const wb = new ExcelJS.Workbook()
+		const ws = wb.addWorksheet("Match Play Captains")
+		ws.columns = [
+			{ header: "Year", key: "year" },
+			{ header: "Group", key: "groupName" },
+			{ header: "Club", key: "clubName" },
+			{ header: "Senior", key: "isSenior" },
+			{ header: "Captain Name", key: "captainName" },
+			{ header: "Email", key: "email" },
+			{ header: "Phone", key: "phone" },
+		]
+		for (const row of result.data) {
+			ws.addRow({
+				year: row.year,
+				groupName: row.groupName,
+				clubName: row.clubName,
+				isSenior: row.isSenior ? "Yes" : "No",
+				captainName: row.captainName,
+				email: row.email,
+				phone: row.phone,
+			})
+		}
+		const buffer = await wb.xlsx.writeBuffer()
+		const blob = new Blob([buffer], {
+			type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+		})
+		const url = URL.createObjectURL(blob)
+		const a = document.createElement("a")
+		a.href = url
+		a.download = `match-play-captains-${year}.xlsx`
+		a.click()
+		URL.revokeObjectURL(url)
+	}
+
 	const table = useReactTable({
 		data: teams,
 		columns,
@@ -136,7 +180,7 @@ export default function MatchPlayTeamsPage() {
 		onGlobalFilterChange: setGlobalFilter,
 		onPaginationChange: setPagination,
 		globalFilterFn: teamGlobalFilterFn,
-		autoResetPageIndex: true,
+		autoResetPageIndex: false,
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		getSortedRowModel: getSortedRowModel(),
@@ -145,12 +189,6 @@ export default function MatchPlayTeamsPage() {
 
 	const handlePageSizeChange = (value: string) => {
 		setPageSizeOption(value)
-		if (value === "all") {
-			table.setPageSize(teams.length || 1)
-		} else {
-			table.setPageSize(Number(value))
-		}
-		table.setPageIndex(0)
 	}
 
 	const filteredCount = table.getFilteredRowModel().rows.length
@@ -160,9 +198,17 @@ export default function MatchPlayTeamsPage() {
 		<div className="mx-auto max-w-6xl">
 			<div className="mb-6 flex items-center justify-between">
 				<H1 variant="secondary">Match Play Teams</H1>
-				<Button variant="secondary" onClick={() => router.push("/match-play/teams/new")}>
-					Add Team
-				</Button>
+				<div className="flex gap-2">
+					<Button variant="secondaryoutline" onClick={() => router.push("/match-play/teams/setup")}>
+						Season Setup
+					</Button>
+					<Button variant="secondaryoutline" onClick={exportCaptains}>
+						Export Captains
+					</Button>
+					<Button variant="secondary" onClick={() => router.push("/match-play/teams/new")}>
+						Add Team
+					</Button>
+				</div>
 			</div>
 
 			{/* Year selector */}

@@ -19,9 +19,7 @@ import {
 	type Column,
 	type ColumnDef,
 	type FilterFn,
-	type PaginationState,
 	type SortingFn,
-	type SortingState,
 	flexRender,
 	getCoreRowModel,
 	getFilteredRowModel,
@@ -33,6 +31,8 @@ import ExcelJS from "exceljs"
 import { ChevronDown, ChevronUp, ChevronsUpDown, Download } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+
+import { useTableSearchParams } from "@/hooks/use-table-search-params"
 
 import { type ContactData, listContactsAction, exportGGAction } from "./actions"
 import { exportClubContactsAction } from "../clubs/actions"
@@ -125,13 +125,16 @@ export default function ContactsPage() {
 	const router = useRouter()
 	const [contacts, setContacts] = useState<ContactData[]>([])
 	const [loading, setLoading] = useState(true)
-	const [globalFilter, setGlobalFilter] = useState("")
-	const [sorting, setSorting] = useState<SortingState>([{ id: "name", desc: false }])
-	const [pagination, setPagination] = useState<PaginationState>({
-		pageIndex: 0,
-		pageSize: 25,
-	})
-	const [pageSizeOption, setPageSizeOption] = useState<string>("25")
+	const {
+		globalFilter,
+		setGlobalFilter,
+		sorting,
+		setSorting,
+		pagination,
+		setPagination,
+		pageSizeOption,
+		setPageSizeOption,
+	} = useTableSearchParams({ defaultSort: [{ id: "name", desc: false }] })
 
 	useEffect(() => {
 		async function fetchContacts() {
@@ -162,7 +165,7 @@ export default function ContactsPage() {
 		onGlobalFilterChange: setGlobalFilter,
 		onPaginationChange: setPagination,
 		globalFilterFn: contactGlobalFilterFn,
-		autoResetPageIndex: true,
+		autoResetPageIndex: false,
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		getSortedRowModel: getSortedRowModel(),
@@ -171,12 +174,6 @@ export default function ContactsPage() {
 
 	const handlePageSizeChange = (value: string) => {
 		setPageSizeOption(value)
-		if (value === "all") {
-			table.setPageSize(contacts.length || 1)
-		} else {
-			table.setPageSize(Number(value))
-		}
-		table.setPageIndex(0)
 	}
 
 	const exportToExcel = async () => {
