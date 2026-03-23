@@ -45,7 +45,11 @@ const teamGlobalFilterFn: FilterFn<TeamData> = (row, _columnId, filterValue) => 
 	if (!term) return true
 
 	const t = row.original
-	return t.groupName.toLowerCase().includes(term) || t.clubName.toLowerCase().includes(term)
+	return (
+		t.groupName.toLowerCase().includes(term) ||
+		t.clubName.toLowerCase().includes(term) ||
+		t.captains.toLowerCase().includes(term)
+	)
 }
 
 const columns: ColumnDef<TeamData>[] = [
@@ -59,9 +63,8 @@ const columns: ColumnDef<TeamData>[] = [
 		header: "Club",
 	},
 	{
-		accessorKey: "isSenior",
-		header: "Senior",
-		cell: ({ getValue }) => (getValue<boolean>() ? "Yes" : "No"),
+		accessorKey: "captains",
+		header: "Captains",
 		enableSorting: false,
 	},
 ]

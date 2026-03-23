@@ -24,6 +24,7 @@ export interface TeamData {
 	clubId: number
 	clubName: string
 	notes: string | null
+	captains: string
 }
 
 export interface ClubOption {
@@ -53,7 +54,31 @@ export async function listTeamsAction(year: number): Promise<ActionResult<TeamDa
 			.where(eq(team.year, year))
 			.orderBy(asc(team.groupName), asc(club.name))
 
-		return { success: true, data: results }
+		const captainRows = await db
+			.select({
+				teamId: teamCaptain.teamId,
+				firstName: contact.firstName,
+				lastName: contact.lastName,
+			})
+			.from(teamCaptain)
+			.innerJoin(contact, eq(teamCaptain.contactId, contact.id))
+			.innerJoin(team, eq(teamCaptain.teamId, team.id))
+			.where(eq(team.year, year))
+			.orderBy(asc(contact.lastName), asc(contact.firstName))
+
+		const captainMap = new Map<number, string[]>()
+		for (const row of captainRows) {
+			const names = captainMap.get(row.teamId) ?? []
+			names.push(`${row.firstName} ${row.lastName}`)
+			captainMap.set(row.teamId, names)
+		}
+
+		const data: TeamData[] = results.map((r) => ({
+			...r,
+			captains: captainMap.get(r.id)?.join(", ") ?? "",
+		}))
+
+		return { success: true, data }
 	} catch (error) {
 		console.error("Failed to list teams:", error)
 		return { success: false, error: "Failed to list teams" }
@@ -85,7 +110,7 @@ export async function getTeamAction(id: number): Promise<ActionResult<TeamData>>
 			return { success: false, error: "Team not found" }
 		}
 
-		return { success: true, data: results[0] }
+		return { success: true, data: { ...results[0]!, captains: "" } }
 	} catch (error) {
 		console.error("Failed to get team:", error)
 		return { success: false, error: "Failed to get team" }
