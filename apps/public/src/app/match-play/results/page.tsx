@@ -20,21 +20,20 @@ export default async function MatchPlayResultsPage() {
 	}))
 
 	return (
-		<div className="mx-auto max-w-4xl px-4 py-8">
+		<div className="mx-auto max-w-7xl px-4 py-8">
 			<H1 className="mb-8">Schedule and Results</H1>
 
-			{documentItems.length > 0 && (
-				<div className="mb-8">
-					<DocumentsCard documents={documentItems} title="Downloads" />
-				</div>
-			)}
+			<div className="lg:grid lg:grid-cols-[1fr_auto] lg:gap-8">
+				{documentItems.length > 0 && (
+					<div className="mb-8 lg:order-last lg:mb-0 lg:w-72">
+						<DocumentsCard documents={documentItems} title="Downloads" />
+					</div>
+				)}
 
-			<section>
-				{/* <h2 className="mb-4 text-xl font-bold font-heading text-primary-900">
-          {year} Results
-        </h2> */}
-				<MatchPlayResultsTable results={results} />
-			</section>
+				<section className="lg:order-first">
+					<MatchPlayResultsTable results={results} />
+				</section>
+			</div>
 		</div>
 	)
 }

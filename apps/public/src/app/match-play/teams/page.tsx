@@ -37,6 +37,7 @@ export default async function MatchPlayTeamsPage() {
 	return (
 		<div className="mx-auto max-w-6xl px-4 py-8">
 			<H1 className="mb-4">{currentYear} Match Play Teams</H1>
+			<p className="mb-6 text-sm text-gray-500">Star one or more teams to bring them to the top</p>
 			<TeamsClient teams={teams} year={currentYear} />
 		</div>
 	)

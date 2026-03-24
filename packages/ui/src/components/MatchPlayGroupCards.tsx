@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { Star } from "lucide-react"
+import { useEffect, useState } from "react"
 
 import { Button } from "./ui/button"
 import { Card, CardContent, CardHeader } from "./ui/card"
@@ -34,11 +35,32 @@ export interface MatchPlayGroupCardsProps {
 
 export function MatchPlayGroupCards({ teams, year, onRequestCaptains }: MatchPlayGroupCardsProps) {
 	const [dialogOpen, setDialogOpen] = useState(false)
+	const [resultsDialogOpen, setResultsDialogOpen] = useState(false)
 	const [selectedGroup, setSelectedGroup] = useState("")
 	const [email, setEmail] = useState("")
 	const [loading, setLoading] = useState(false)
 	const [error, setError] = useState("")
 	const [sent, setSent] = useState(false)
+	const [favorites, setFavorites] = useState<string[]>([])
+
+	useEffect(() => {
+		try {
+			const stored = localStorage.getItem("mpga-favorite-groups")
+			if (stored) setFavorites(JSON.parse(stored))
+		} catch {
+			// ignore
+		}
+	}, [])
+
+	function toggleFavorite(groupName: string) {
+		setFavorites((prev) => {
+			const next = prev.includes(groupName)
+				? prev.filter((g) => g !== groupName)
+				: [...prev, groupName]
+			localStorage.setItem("mpga-favorite-groups", JSON.stringify(next))
+			return next
+		})
+	}
 
 	if (teams.length === 0) {
 		return <p className="text-gray-600">No teams have been assigned for {year} yet.</p>
@@ -50,6 +72,14 @@ export function MatchPlayGroupCards({ teams, year, onRequestCaptains }: MatchPla
 		existing.push(team)
 		groups.set(team.groupName, existing)
 	}
+
+	const sortedGroups = Array.from(groups.entries()).sort(([a], [b]) => {
+		const aFav = favorites.includes(a)
+		const bFav = favorites.includes(b)
+		if (aFav && !bFav) return -1
+		if (!aFav && bFav) return 1
+		return a.localeCompare(b)
+	})
 
 	function openDialog(groupName: string) {
 		setSelectedGroup(groupName)
@@ -82,18 +112,33 @@ export function MatchPlayGroupCards({ teams, year, onRequestCaptains }: MatchPla
 	return (
 		<>
 			<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-				{Array.from(groups.entries()).map(([groupName, groupTeams]) => {
+				{sortedGroups.map(([groupName, groupTeams]) => {
 					const isSenior = groupTeams[0]?.isSenior
+					const isFavorite = favorites.includes(groupName)
 					return (
 						<Card key={groupName}>
 							<CardHeader>
 								<div className="flex items-center justify-between">
-									<H3 className="text-lg font-bold text-primary-900">{groupName}</H3>
-									{isSenior && (
-										<span className="rounded-full px-2.5 py-0.5 text-xs font-medium bg-amber-100 text-amber-800">
-											Senior
-										</span>
-									)}
+									<div className="flex items-center gap-2">
+										<H3 className="text-lg font-bold text-primary-900">{groupName}</H3>
+										{isSenior && (
+											<span className="rounded-full px-2.5 py-0.5 text-xs font-medium bg-amber-100 text-amber-800">
+												Senior
+											</span>
+										)}
+									</div>
+									<button
+										type="button"
+										onClick={() => toggleFavorite(groupName)}
+										className="text-amber-400 hover:text-amber-500 transition-colors"
+										aria-label={
+											isFavorite
+												? `Remove ${groupName} from favorites`
+												: `Add ${groupName} to favorites`
+										}
+									>
+										<Star className="h-5 w-5" fill={isFavorite ? "currentColor" : "none"} />
+									</button>
 								</div>
 							</CardHeader>
 							<CardContent>
@@ -107,11 +152,23 @@ export function MatchPlayGroupCards({ teams, year, onRequestCaptains }: MatchPla
 										</li>
 									))}
 								</ul>
-								{onRequestCaptains && (
-									<Button variant="outline" size="sm" onClick={() => openDialog(groupName)}>
-										Captains
+								<div className="flex gap-2">
+									{onRequestCaptains && (
+										<Button variant="outline" size="sm" onClick={() => openDialog(groupName)}>
+											Captains
+										</Button>
+									)}
+									<Button
+										variant="outline"
+										size="sm"
+										onClick={() => {
+											setSelectedGroup(groupName)
+											setResultsDialogOpen(true)
+										}}
+									>
+										Enter Results
 									</Button>
-								)}
+								</div>
 							</CardContent>
 						</Card>
 					)
@@ -124,8 +181,7 @@ export function MatchPlayGroupCards({ teams, year, onRequestCaptains }: MatchPla
 						<DialogTitle className="font-heading">Request Captain Contacts</DialogTitle>
 						<DialogDescription>
 							Enter your email to receive captain contact information for{" "}
-							<strong>{selectedGroup}</strong>. You must be a registered club contact and team
-							captain in this group.
+							<strong>{selectedGroup}</strong>. You must be a team captain in this group.
 						</DialogDescription>
 					</DialogHeader>
 					{sent ? (
@@ -157,6 +213,17 @@ export function MatchPlayGroupCards({ teams, year, onRequestCaptains }: MatchPla
 							</div>
 						</form>
 					)}
+				</DialogContent>
+			</Dialog>
+
+			<Dialog open={resultsDialogOpen} onOpenChange={setResultsDialogOpen}>
+				<DialogContent className="sm:max-w-md">
+					<DialogHeader>
+						<DialogTitle className="font-heading">Enter Results — {selectedGroup}</DialogTitle>
+					</DialogHeader>
+					<div className="py-4 text-center">
+						<p className="text-sm text-gray-500">Coming Soon</p>
+					</div>
 				</DialogContent>
 			</Dialog>
 		</>
