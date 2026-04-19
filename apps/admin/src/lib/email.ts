@@ -69,19 +69,49 @@ function emailLayout(body: string): string {
 	`
 }
 
+interface MagicLinkCopy {
+	subject: string
+	heading: string
+	intro: string
+}
+
+function magicLinkCopyForCallback(callbackUrl: string | null): MagicLinkCopy {
+	if (callbackUrl?.startsWith("/match-play-captain")) {
+		return {
+			subject: "MPGA Match Play Captain Sign In",
+			heading: "Match Play Captain Sign In",
+			intro: "Verify your identity to enter match play results for your team.",
+		}
+	}
+	return {
+		subject: "MPGA Club Contact Verification",
+		heading: "Club Contact Verification",
+		intro: "Verify your identity to access club contact features.",
+	}
+}
+
 /**
- * Sends a magic link email for club contact verification.
+ * Sends a magic link email. The wording adapts based on the callback URL
+ * so captains and club contacts see copy appropriate to their flow.
  */
 export async function sendMagicLinkEmail(email: string, url: string): Promise<void> {
 	const link = rewriteUrlOrigin(url)
+	let callbackUrl: string | null = null
+	try {
+		callbackUrl = new URL(link).searchParams.get("callbackURL")
+	} catch {
+		callbackUrl = null
+	}
+	const copy = magicLinkCopyForCallback(callbackUrl)
+
 	await transporter.sendMail({
 		from: process.env.MAIL_FROM ?? "noreply@mpga.net",
 		to: email,
-		subject: "MPGA Club Contact Verification",
-		text: `Verify your identity to access club contact features.\n\nClick the link below to sign in:\n${link}\n\nThis link expires in 10 minutes.`,
+		subject: copy.subject,
+		text: `${copy.intro}\n\nClick the link below to sign in:\n${link}\n\nThis link expires in 10 minutes.`,
 		html: emailLayout(`
-			<h1 style="font-size: 22px; color: #333;">Club Contact Verification</h1>
-			<p>Verify your identity to access club contact features.</p>
+			<h1 style="font-size: 22px; color: #333;">${copy.heading}</h1>
+			<p>${copy.intro}</p>
 			<p><a href="${link}" style="display: inline-block; padding: 10px 20px; background-color: #2563eb; color: #fff; text-decoration: none; border-radius: 4px;">Click here to sign in</a></p>
 			<p style="font-size: 13px; color: #666;">Or copy this link: ${link}</p>
 			<p style="font-size: 13px; color: #999;"><em>This link expires in 10 minutes.</em></p>

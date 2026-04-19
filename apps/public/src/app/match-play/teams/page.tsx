@@ -1,5 +1,6 @@
 import { H1 } from "@mpga/ui"
 
+import { CaptainEntryButton } from "@/components/CaptainEntryButton"
 import { getTeamsForYear } from "@/lib/queries/match-play"
 import { getCurrentSeason } from "@/lib/season"
 
@@ -36,7 +37,10 @@ export default async function MatchPlayTeamsPage() {
 
 	return (
 		<div className="mx-auto max-w-6xl px-4 py-8">
-			<H1 className="mb-4">{currentYear} Match Play Teams</H1>
+			<div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+				<H1 className="mb-0">{currentYear} Match Play Teams</H1>
+				<CaptainEntryButton />
+			</div>
 			<p className="mb-6 text-sm text-gray-500">Star one or more teams to bring them to the top</p>
 			<TeamsClient teams={teams} year={currentYear} />
 		</div>
