@@ -35,7 +35,6 @@ export interface MatchPlayGroupCardsProps {
 
 export function MatchPlayGroupCards({ teams, year, onRequestCaptains }: MatchPlayGroupCardsProps) {
 	const [dialogOpen, setDialogOpen] = useState(false)
-	const [resultsDialogOpen, setResultsDialogOpen] = useState(false)
 	const [selectedGroup, setSelectedGroup] = useState("")
 	const [email, setEmail] = useState("")
 	const [loading, setLoading] = useState(false)
@@ -152,23 +151,13 @@ export function MatchPlayGroupCards({ teams, year, onRequestCaptains }: MatchPla
 										</li>
 									))}
 								</ul>
-								<div className="flex gap-2">
-									{onRequestCaptains && (
+								{onRequestCaptains && (
+									<div className="flex gap-2">
 										<Button variant="outline" size="sm" onClick={() => openDialog(groupName)}>
 											Captains
 										</Button>
-									)}
-									<Button
-										variant="outline"
-										size="sm"
-										onClick={() => {
-											setSelectedGroup(groupName)
-											setResultsDialogOpen(true)
-										}}
-									>
-										Enter Results
-									</Button>
-								</div>
+									</div>
+								)}
 							</CardContent>
 						</Card>
 					)
@@ -213,17 +202,6 @@ export function MatchPlayGroupCards({ teams, year, onRequestCaptains }: MatchPla
 							</div>
 						</form>
 					)}
-				</DialogContent>
-			</Dialog>
-
-			<Dialog open={resultsDialogOpen} onOpenChange={setResultsDialogOpen}>
-				<DialogContent className="sm:max-w-md">
-					<DialogHeader>
-						<DialogTitle className="font-heading">Enter Results — {selectedGroup}</DialogTitle>
-					</DialogHeader>
-					<div className="py-4 text-center">
-						<p className="text-sm text-gray-500">Coming Soon</p>
-					</div>
 				</DialogContent>
 			</Dialog>
 		</>
