@@ -7,6 +7,7 @@ import { headers } from "next/headers"
 
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { sendCaptainNoteEmail } from "@/lib/email"
 
 import type { CaptainResult, CaptainResultInput, CaptainTeam, OpponentOption } from "./types"
 import { getCaptainTeamIds, isCaptainOfTeam } from "./validate-captain"
@@ -176,6 +177,7 @@ export async function listCaptainResults(teamId: number): Promise<ActionResult<C
 				awayTeamScore: matchPlayResult.awayTeamScore,
 				forfeit: matchPlayResult.forfeit,
 				enteredBy: matchPlayResult.enteredBy,
+				notes: matchPlayResult.notes,
 			})
 			.from(matchPlayResult)
 			.innerJoin(homeTeam, eq(matchPlayResult.homeTeamId, homeTeam.id))
@@ -214,6 +216,8 @@ export async function saveCaptainResult(
 		return { success: false, error: "Match date cannot be in the future" }
 	}
 
+	const notes = input.notes?.trim() || null
+
 	try {
 		const selfRows = await db
 			.select({ year: team.year, groupName: team.groupName })
@@ -239,7 +243,7 @@ export async function saveCaptainResult(
 		const awayTeamScore = input.weAreHome ? input.opponentScore : input.ourScore
 
 		const existing = await db
-			.select({ id: matchPlayResult.id })
+			.select({ id: matchPlayResult.id, notes: matchPlayResult.notes })
 			.from(matchPlayResult)
 			.where(
 				and(
@@ -251,6 +255,9 @@ export async function saveCaptainResult(
 			.limit(1)
 
 		const existingId = input.id ?? existing[0]?.id
+		const priorNotes = existing[0]?.notes ?? null
+		const notesChanged = notes !== null && notes !== priorNotes
+		let resultId: number
 
 		if (existingId !== undefined) {
 			await db
@@ -264,28 +271,80 @@ export async function saveCaptainResult(
 					awayTeamScore,
 					forfeit: input.forfeit,
 					enteredBy: email,
+					notes,
 				})
 				.where(eq(matchPlayResult.id, existingId))
-
-			return { success: true, data: { id: existingId } }
+			resultId = existingId
+		} else {
+			const result = await db.insert(matchPlayResult).values({
+				groupName: self.groupName,
+				matchDate: input.matchDate,
+				homeTeamId,
+				awayTeamId,
+				homeTeamScore,
+				awayTeamScore,
+				forfeit: input.forfeit,
+				enteredBy: email,
+				notes,
+			})
+			resultId = result[0].insertId
 		}
 
-		const result = await db.insert(matchPlayResult).values({
-			groupName: self.groupName,
-			matchDate: input.matchDate,
-			homeTeamId,
-			awayTeamId,
-			homeTeamScore,
-			awayTeamScore,
-			forfeit: input.forfeit,
-			enteredBy: email,
-		})
+		if (notesChanged && notes) {
+			void notifyCaptainNote({
+				resultId,
+				captainEmail: email,
+				homeTeamId,
+				awayTeamId,
+				matchDate: input.matchDate,
+				homeTeamScore,
+				awayTeamScore,
+				groupName: self.groupName,
+				notes,
+			}).catch((err) => {
+				console.error("Failed to send captain note email:", err)
+			})
+		}
 
-		return { success: true, data: { id: result[0].insertId } }
+		return { success: true, data: { id: resultId } }
 	} catch (error) {
 		console.error("Failed to save result:", error)
 		return { success: false, error: "Failed to save result" }
 	}
+}
+
+async function notifyCaptainNote(args: {
+	resultId: number
+	captainEmail: string
+	homeTeamId: number
+	awayTeamId: number
+	matchDate: string
+	homeTeamScore: string
+	awayTeamScore: string
+	groupName: string
+	notes: string
+}): Promise<void> {
+	const rows = await db
+		.select({ teamId: team.id, clubName: club.name })
+		.from(team)
+		.innerJoin(club, eq(team.clubId, club.id))
+		.where(or(eq(team.id, args.homeTeamId), eq(team.id, args.awayTeamId)))
+
+	const homeClubName = rows.find((r) => r.teamId === args.homeTeamId)?.clubName
+	const awayClubName = rows.find((r) => r.teamId === args.awayTeamId)?.clubName
+	if (!homeClubName || !awayClubName) return
+
+	await sendCaptainNoteEmail({
+		resultId: args.resultId,
+		captainEmail: args.captainEmail,
+		homeClubName,
+		awayClubName,
+		matchDate: args.matchDate,
+		homeTeamScore: args.homeTeamScore,
+		awayTeamScore: args.awayTeamScore,
+		groupName: args.groupName,
+		notes: args.notes,
+	})
 }
 
 export async function getCaptainResult(
@@ -317,6 +376,7 @@ export async function getCaptainResult(
 				awayTeamScore: matchPlayResult.awayTeamScore,
 				forfeit: matchPlayResult.forfeit,
 				enteredBy: matchPlayResult.enteredBy,
+				notes: matchPlayResult.notes,
 			})
 			.from(matchPlayResult)
 			.innerJoin(homeTeam, eq(matchPlayResult.homeTeamId, homeTeam.id))

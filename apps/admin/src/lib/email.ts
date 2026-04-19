@@ -246,6 +246,69 @@ export async function sendCaptainContactsEmail(
 }
 
 /**
+ * Sends a notification to the MPGA match play committee when a captain
+ * attaches notes to a result. Recipients are configured via MATCH_PLAY_EMAIL
+ * (comma-separated for multiple addresses).
+ */
+export async function sendCaptainNoteEmail(args: {
+	resultId: number
+	captainEmail: string
+	homeClubName: string
+	awayClubName: string
+	matchDate: string
+	homeTeamScore: string
+	awayTeamScore: string
+	groupName: string
+	notes: string
+}): Promise<void> {
+	const to = (process.env.MATCH_PLAY_EMAIL ?? "secretary@mpga.net")
+		.split(",")
+		.map((addr) => addr.trim())
+		.filter(Boolean)
+	if (to.length === 0) return
+	const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:4100"
+	const editLink = `${adminUrl}/match-play/results/${args.resultId}`
+
+	const subject = `MPGA Match Play Note — ${args.homeClubName} vs ${args.awayClubName}`
+	const textLines = [
+		`A match play captain has added notes to a result.`,
+		``,
+		`Group: ${args.groupName}`,
+		`Match: ${args.homeClubName} (home) vs ${args.awayClubName} (away)`,
+		`Date: ${args.matchDate}`,
+		`Score: ${args.homeTeamScore} - ${args.awayTeamScore}`,
+		`Entered by: ${args.captainEmail}`,
+		``,
+		`Notes:`,
+		args.notes,
+		``,
+		`View in admin: ${editLink}`,
+	]
+
+	await transporter.sendMail({
+		from: process.env.MAIL_FROM ?? "noreply@mpga.net",
+		to,
+		replyTo: args.captainEmail,
+		subject,
+		text: textLines.join("\n"),
+		html: emailLayout(`
+			<h1 style="font-size: 22px; color: #333;">Match Play Note</h1>
+			<p>A match play captain has added notes to a result.</p>
+			<table style="border-collapse: collapse; margin-top: 12px;">
+				<tr><td style="padding: 4px 12px 4px 0;"><strong>Group</strong></td><td style="padding: 4px 0;">${escapeHtml(args.groupName)}</td></tr>
+				<tr><td style="padding: 4px 12px 4px 0;"><strong>Match</strong></td><td style="padding: 4px 0;">${escapeHtml(args.homeClubName)} (home) vs ${escapeHtml(args.awayClubName)} (away)</td></tr>
+				<tr><td style="padding: 4px 12px 4px 0;"><strong>Date</strong></td><td style="padding: 4px 0;">${escapeHtml(args.matchDate)}</td></tr>
+				<tr><td style="padding: 4px 12px 4px 0;"><strong>Score</strong></td><td style="padding: 4px 0;">${escapeHtml(args.homeTeamScore)} &ndash; ${escapeHtml(args.awayTeamScore)}</td></tr>
+				<tr><td style="padding: 4px 12px 4px 0;"><strong>Captain</strong></td><td style="padding: 4px 0;">${escapeHtml(args.captainEmail)}</td></tr>
+			</table>
+			<h2 style="font-size: 16px; color: #333; margin-top: 20px;">Notes</h2>
+			<p style="white-space: pre-wrap;">${escapeHtml(args.notes)}</p>
+			<p style="margin-top: 20px;"><a href="${editLink}" style="display: inline-block; padding: 10px 20px; background-color: #2563eb; color: #fff; text-decoration: none; border-radius: 4px;">View in admin</a></p>
+		`),
+	})
+}
+
+/**
  * Sends an invitation email to the specified address with an accept link.
  */
 export async function sendInvitationEmail(email: string, token: string): Promise<void> {

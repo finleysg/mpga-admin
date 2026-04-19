@@ -19,6 +19,7 @@ export interface CaptainResult {
 	awayTeamScore: string
 	forfeit: boolean
 	enteredBy: string
+	notes: string | null
 }
 
 export interface OpponentOption {
@@ -35,4 +36,5 @@ export interface CaptainResultInput {
 	ourScore: string
 	opponentScore: string
 	forfeit: boolean
+	notes: string | null
 }

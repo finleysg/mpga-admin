@@ -18,6 +18,7 @@ import {
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
+	Textarea,
 	toast,
 } from "@mpga/ui"
 import { useEffect, useState } from "react"
@@ -52,6 +53,7 @@ export function ResultFormDialog({
 	const [ourScore, setOurScore] = useState("0.0")
 	const [opponentScore, setOpponentScore] = useState("0.0")
 	const [forfeit, setForfeit] = useState(false)
+	const [notes, setNotes] = useState("")
 	const [saving, setSaving] = useState(false)
 	const [error, setError] = useState<string | null>(null)
 
@@ -66,6 +68,7 @@ export function ResultFormDialog({
 			setOurScore(isHome ? editing.homeTeamScore : editing.awayTeamScore)
 			setOpponentScore(isHome ? editing.awayTeamScore : editing.homeTeamScore)
 			setForfeit(editing.forfeit)
+			setNotes(editing.notes ?? "")
 		} else {
 			setOpponentId(null)
 			setWeAreHome(true)
@@ -73,6 +76,7 @@ export function ResultFormDialog({
 			setOurScore("0.0")
 			setOpponentScore("0.0")
 			setForfeit(false)
+			setNotes("")
 		}
 	}, [open, editing, team.id])
 
@@ -100,6 +104,7 @@ export function ResultFormDialog({
 				ourScore: ourScore.trim() || "0.0",
 				opponentScore: opponentScore.trim() || "0.0",
 				forfeit,
+				notes: notes.trim() || null,
 			})
 
 			if (!saveRes.success || !saveRes.data) {
@@ -228,6 +233,21 @@ export function ResultFormDialog({
 						<FieldLabel htmlFor="forfeit" className="mb-0">
 							Forfeit
 						</FieldLabel>
+					</Field>
+
+					<Field>
+						<FieldLabel htmlFor="notes">Notes (optional)</FieldLabel>
+						<Textarea
+							id="notes"
+							rows={3}
+							maxLength={140}
+							placeholder="Anything the MPGA should know — disputes, weather, corrections…"
+							value={notes}
+							onChange={(e) => setNotes(e.target.value)}
+						/>
+						<p className="text-muted-foreground text-xs">
+							Saving notes will email the MPGA match play committee.
+						</p>
 					</Field>
 
 					{error && <FieldError>{error}</FieldError>}
