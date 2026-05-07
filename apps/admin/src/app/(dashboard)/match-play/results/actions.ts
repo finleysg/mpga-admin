@@ -1,6 +1,6 @@
 "use server"
 
-import { club, matchPlayResult, team } from "@mpga/database"
+import { club, matchPlayGroup, matchPlayResult, team } from "@mpga/database"
 import type { ActionResult } from "@mpga/types"
 import { aliasedTable, and, asc, eq, gte, lt } from "drizzle-orm"
 
@@ -39,6 +39,11 @@ export interface ResultData {
 export interface TeamOption {
 	id: number
 	clubName: string
+	groupName: string
+}
+
+export interface GroupOption {
+	id: number
 	groupName: string
 }
 
@@ -211,6 +216,29 @@ export async function deleteResultAction(id: number): Promise<ActionResult> {
 	} catch (error) {
 		console.error("Failed to delete result:", error)
 		return { success: false, error: "Failed to delete result" }
+	}
+}
+
+export async function listGroupOptionsAction(year: number): Promise<ActionResult<GroupOption[]>> {
+	const userId = await requireAuth()
+	if (!userId) {
+		return { success: false, error: "Unauthorized" }
+	}
+
+	try {
+		const results = await db
+			.select({
+				id: matchPlayGroup.id,
+				groupName: matchPlayGroup.groupName,
+			})
+			.from(matchPlayGroup)
+			.where(eq(matchPlayGroup.year, year))
+			.orderBy(asc(matchPlayGroup.groupName))
+
+		return { success: true, data: results }
+	} catch (error) {
+		console.error("Failed to list groups:", error)
+		return { success: false, error: "Failed to list groups" }
 	}
 }
 

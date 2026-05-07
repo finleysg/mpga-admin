@@ -5,9 +5,11 @@ import { useParams, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 import {
+	type GroupOption,
 	type ResultData,
 	type TeamOption,
 	getResultAction,
+	listGroupOptionsAction,
 	listTeamOptionsAction,
 } from "../actions"
 import { ResultForm } from "../result-form"
@@ -17,6 +19,7 @@ export default function EditResultPage() {
 	const router = useRouter()
 	const [result, setResult] = useState<ResultData | null>(null)
 	const [teams, setTeams] = useState<TeamOption[]>([])
+	const [groups, setGroups] = useState<GroupOption[]>([])
 	const [loading, setLoading] = useState(true)
 
 	useEffect(() => {
@@ -37,10 +40,16 @@ export default function EditResultPage() {
 
 				setResult(resultRes.data)
 
-				const teamsRes = await listTeamOptionsAction(resultRes.data.year)
+				const [teamsRes, groupsRes] = await Promise.all([
+					listTeamOptionsAction(resultRes.data.year),
+					listGroupOptionsAction(resultRes.data.year),
+				])
 
 				if (teamsRes.success && teamsRes.data) {
 					setTeams(teamsRes.data)
+				}
+				if (groupsRes.success && groupsRes.data) {
+					setGroups(groupsRes.data)
 				}
 			} catch (err) {
 				console.error("Failed to fetch result:", err)
@@ -70,7 +79,7 @@ export default function EditResultPage() {
 			<H1 variant="secondary" className="mb-6">
 				Edit Result
 			</H1>
-			<ResultForm result={result} teams={teams} />
+			<ResultForm result={result} teams={teams} groups={groups} />
 		</div>
 	)
 }

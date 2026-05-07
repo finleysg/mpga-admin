@@ -3,7 +3,12 @@
 import { H1, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@mpga/ui"
 import { useEffect, useState } from "react"
 
-import { type TeamOption, listTeamOptionsAction } from "../actions"
+import {
+	type GroupOption,
+	type TeamOption,
+	listGroupOptionsAction,
+	listTeamOptionsAction,
+} from "../actions"
 import { ResultForm } from "../result-form"
 
 const currentYear = new Date().getFullYear()
@@ -13,26 +18,33 @@ export default function NewResultPage() {
 	const [mounted, setMounted] = useState(false)
 	const [year, setYear] = useState(currentYear)
 	const [teams, setTeams] = useState<TeamOption[]>([])
+	const [groups, setGroups] = useState<GroupOption[]>([])
 	const [loading, setLoading] = useState(true)
 
 	useEffect(() => setMounted(true), [])
 
 	useEffect(() => {
-		async function fetchTeams() {
+		async function fetchData() {
 			setLoading(true)
 			try {
-				const result = await listTeamOptionsAction(year)
-				if (result.success && result.data) {
-					setTeams(result.data)
+				const [teamsRes, groupsRes] = await Promise.all([
+					listTeamOptionsAction(year),
+					listGroupOptionsAction(year),
+				])
+				if (teamsRes.success && teamsRes.data) {
+					setTeams(teamsRes.data)
+				}
+				if (groupsRes.success && groupsRes.data) {
+					setGroups(groupsRes.data)
 				}
 			} catch (err) {
-				console.error("Failed to fetch teams:", err)
+				console.error("Failed to fetch teams/groups:", err)
 			} finally {
 				setLoading(false)
 			}
 		}
 
-		fetchTeams()
+		fetchData()
 	}, [year])
 
 	return (
@@ -65,7 +77,7 @@ export default function NewResultPage() {
 			{loading ? (
 				<div className="py-8 text-center text-gray-500">Loading teams...</div>
 			) : (
-				<ResultForm teams={teams} />
+				<ResultForm teams={teams} groups={groups} />
 			)}
 		</div>
 	)

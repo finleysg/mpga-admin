@@ -32,14 +32,21 @@ import { Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
-import { type ResultData, type TeamOption, deleteResultAction, saveResultAction } from "./actions"
+import {
+	type GroupOption,
+	type ResultData,
+	type TeamOption,
+	deleteResultAction,
+	saveResultAction,
+} from "./actions"
 
 interface ResultFormProps {
 	result?: ResultData
 	teams: TeamOption[]
+	groups: GroupOption[]
 }
 
-export function ResultForm({ result: existingResult, teams }: ResultFormProps) {
+export function ResultForm({ result: existingResult, teams, groups }: ResultFormProps) {
 	const router = useRouter()
 	const [mounted, setMounted] = useState(false)
 	const [saving, setSaving] = useState(false)
@@ -50,6 +57,7 @@ export function ResultForm({ result: existingResult, teams }: ResultFormProps) {
 	useEffect(() => setMounted(true), [])
 
 	const [groupName, setGroupName] = useState(existingResult?.groupName ?? "")
+	const filteredTeams = groupName ? teams.filter((t) => t.groupName === groupName) : []
 	const [matchDate, setMatchDate] = useState(existingResult?.matchDate ?? "")
 	const [homeTeamId, setHomeTeamId] = useState<number | null>(existingResult?.homeTeamId ?? null)
 	const [awayTeamId, setAwayTeamId] = useState<number | null>(existingResult?.awayTeamId ?? null)
@@ -63,7 +71,7 @@ export function ResultForm({ result: existingResult, teams }: ResultFormProps) {
 		e.preventDefault()
 
 		if (!groupName.trim()) {
-			setError("Group name is required")
+			setError("Group is required")
 			return
 		}
 
@@ -147,7 +155,16 @@ export function ResultForm({ result: existingResult, teams }: ResultFormProps) {
 		}
 	}
 
-	const formatTeamLabel = (t: TeamOption) => `${t.groupName} - ${t.clubName}`
+	const handleGroupChange = (value: string) => {
+		const next = value === "none" ? "" : value
+		setGroupName(next)
+		if (homeTeamId !== null && !teams.some((t) => t.id === homeTeamId && t.groupName === next)) {
+			setHomeTeamId(null)
+		}
+		if (awayTeamId !== null && !teams.some((t) => t.id === awayTeamId && t.groupName === next)) {
+			setAwayTeamId(null)
+		}
+	}
 
 	return (
 		<Card>
@@ -159,15 +176,26 @@ export function ResultForm({ result: existingResult, teams }: ResultFormProps) {
 					{/* Row 1: Group Name and Match Date */}
 					<div className="grid grid-cols-2 gap-4">
 						<Field>
-							<FieldLabel htmlFor="groupName">
+							<FieldLabel>
 								Group Name <span className="text-destructive">*</span>
 							</FieldLabel>
-							<Input
-								id="groupName"
-								value={groupName}
-								onChange={(e) => setGroupName(e.target.value)}
-								required
-							/>
+							{mounted ? (
+								<Select value={groupName || "none"} onValueChange={handleGroupChange}>
+									<SelectTrigger>
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value="none">Select a group</SelectItem>
+										{groups.map((g) => (
+											<SelectItem key={g.id} value={g.groupName}>
+												{g.groupName}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							) : (
+								<div className="h-9 rounded-md border bg-transparent" />
+							)}
 						</Field>
 						<Field>
 							<FieldLabel htmlFor="matchDate">
@@ -200,10 +228,12 @@ export function ResultForm({ result: existingResult, teams }: ResultFormProps) {
 										<SelectValue />
 									</SelectTrigger>
 									<SelectContent>
-										<SelectItem value="none">Select a team</SelectItem>
-										{teams.map((t) => (
+										<SelectItem value="none">
+											{groupName ? "Select a team" : "Select a group first"}
+										</SelectItem>
+										{filteredTeams.map((t) => (
 											<SelectItem key={t.id} value={String(t.id)}>
-												{formatTeamLabel(t)}
+												{t.clubName}
 											</SelectItem>
 										))}
 									</SelectContent>
@@ -239,10 +269,12 @@ export function ResultForm({ result: existingResult, teams }: ResultFormProps) {
 										<SelectValue />
 									</SelectTrigger>
 									<SelectContent>
-										<SelectItem value="none">Select a team</SelectItem>
-										{teams.map((t) => (
+										<SelectItem value="none">
+											{groupName ? "Select a team" : "Select a group first"}
+										</SelectItem>
+										{filteredTeams.map((t) => (
 											<SelectItem key={t.id} value={String(t.id)}>
-												{formatTeamLabel(t)}
+												{t.clubName}
 											</SelectItem>
 										))}
 									</SelectContent>
