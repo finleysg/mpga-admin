@@ -1,10 +1,10 @@
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import { nextCookies } from "better-auth/next-js"
-import { admin, magicLink } from "better-auth/plugins"
+import { admin, emailOTP } from "better-auth/plugins"
 
 import { db } from "./db"
-import { sendMagicLinkEmail } from "./email"
+import { sendSignInOtpEmail } from "./email"
 import { ac, adminRole, superAdminRole } from "./permissions"
 
 export const auth = betterAuth({
@@ -33,11 +33,14 @@ export const auth = betterAuth({
 				admin: adminRole,
 			},
 		}),
-		magicLink({
-			sendMagicLink: async ({ email, url }) => {
-				await sendMagicLinkEmail(email, url)
-			},
+		emailOTP({
+			otpLength: 6,
 			expiresIn: 600,
+			sendVerificationOTP: async ({ email, otp, type }) => {
+				if (type === "sign-in") {
+					await sendSignInOtpEmail(email, otp)
+				}
+			},
 		}),
 		nextCookies(),
 	],

@@ -13,31 +13,48 @@ import {
 	Input,
 } from "@mpga/ui"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 
-import { sendCaptainVerification } from "./actions"
+import { sendCaptainOtp, verifyCaptainOtp } from "./actions"
 
-interface CaptainLoginFormProps {
-	callbackPath: string
-}
-
-export function CaptainLoginForm({ callbackPath }: CaptainLoginFormProps) {
+export function CaptainLoginForm() {
+	const router = useRouter()
 	const [email, setEmail] = useState("")
+	const [otp, setOtp] = useState("")
 	const [error, setError] = useState("")
 	const [loading, setLoading] = useState(false)
-	const [sent, setSent] = useState(false)
+	const [step, setStep] = useState<"email" | "otp">("email")
 
-	const handleSubmit = async (e: React.FormEvent) => {
+	const handleSendOtp = async (e: React.FormEvent) => {
 		e.preventDefault()
 		setError("")
 		setLoading(true)
-
 		try {
-			const result = await sendCaptainVerification(email, callbackPath)
+			const result = await sendCaptainOtp(email)
 			if (result.error) {
 				setError(result.error)
 			} else {
-				setSent(true)
+				setStep("otp")
+				setOtp("")
+			}
+		} catch {
+			setError("An unexpected error occurred")
+		} finally {
+			setLoading(false)
+		}
+	}
+
+	const handleVerifyOtp = async (e: React.FormEvent) => {
+		e.preventDefault()
+		setError("")
+		setLoading(true)
+		try {
+			const result = await verifyCaptainOtp(email, otp.trim())
+			if (result.error) {
+				setError(result.error)
+			} else {
+				router.refresh()
 			}
 		} catch {
 			setError("An unexpected error occurred")
@@ -62,20 +79,14 @@ export function CaptainLoginForm({ callbackPath }: CaptainLoginFormProps) {
 					<CardHeader className="text-center">
 						<CardTitle className="font-heading text-xl">Captain Sign In</CardTitle>
 						<CardDescription>
-							Enter your email to verify your identity as a match play captain.
+							{step === "email"
+								? "Enter your email to verify your identity as a match play captain."
+								: `We sent a 6-digit code to ${email}. Enter it below to continue.`}
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
-						{sent ? (
-							<div className="text-center">
-								<p className="text-sm font-medium">Check your email</p>
-								<p className="text-muted-foreground mt-2 text-sm">
-									We sent a verification link to <strong>{email}</strong>. Click the link to
-									continue.
-								</p>
-							</div>
-						) : (
-							<form onSubmit={handleSubmit}>
+						{step === "email" ? (
+							<form onSubmit={handleSendOtp}>
 								<div className="grid gap-6">
 									{error && <FieldError>{error}</FieldError>}
 									<Field>
@@ -90,8 +101,45 @@ export function CaptainLoginForm({ callbackPath }: CaptainLoginFormProps) {
 										/>
 									</Field>
 									<Button type="submit" className="w-full" disabled={loading}>
-										{loading ? "Sending..." : "Send verification link"}
+										{loading ? "Sending..." : "Send sign-in code"}
 									</Button>
+								</div>
+							</form>
+						) : (
+							<form onSubmit={handleVerifyOtp}>
+								<div className="grid gap-6">
+									{error && <FieldError>{error}</FieldError>}
+									<Field>
+										<FieldLabel htmlFor="otp">Sign-in code</FieldLabel>
+										<Input
+											id="otp"
+											type="text"
+											inputMode="numeric"
+											autoComplete="one-time-code"
+											pattern="[0-9]*"
+											maxLength={6}
+											placeholder="123456"
+											value={otp}
+											onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+											required
+											autoFocus
+										/>
+									</Field>
+									<Button type="submit" className="w-full" disabled={loading || otp.length < 6}>
+										{loading ? "Verifying..." : "Verify and continue"}
+									</Button>
+									<button
+										type="button"
+										className="text-muted-foreground text-sm underline"
+										onClick={() => {
+											setStep("email")
+											setError("")
+											setOtp("")
+										}}
+										disabled={loading}
+									>
+										Use a different email or resend a code
+									</button>
 								</div>
 							</form>
 						)}

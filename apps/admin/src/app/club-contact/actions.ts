@@ -45,25 +45,42 @@ async function requireClubContactAuth(
 	return { authorized: true, email: session.user.email }
 }
 
-// ── Magic Link ──────────────────────────────────────────────────────
+// ── Email OTP ───────────────────────────────────────────────────────
 
-export async function sendClubContactVerification(
+export async function sendClubContactOtp(
 	clubId: number,
 	email: string,
-	callbackPath: string,
 ): Promise<{ success?: boolean; error?: string }> {
 	const isContact = await validateClubContact(clubId, email)
 	if (!isContact) {
 		return { error: "This email is not associated with a contact for this club." }
 	}
 
-	await auth.api.signInMagicLink({
-		body: {
-			email,
-			callbackURL: callbackPath,
-		},
-		headers: await headers(),
+	await auth.api.sendVerificationOTP({
+		body: { email, type: "sign-in" },
 	})
+
+	return { success: true }
+}
+
+export async function verifyClubContactOtp(
+	clubId: number,
+	email: string,
+	otp: string,
+): Promise<{ success?: boolean; error?: string }> {
+	try {
+		await auth.api.signInEmailOTP({
+			body: { email, otp },
+			headers: await headers(),
+		})
+	} catch {
+		return { error: "Invalid or expired code. Please try again." }
+	}
+
+	const isContact = await validateClubContact(clubId, email)
+	if (!isContact) {
+		return { error: "This email is not associated with a contact for this club." }
+	}
 
 	return { success: true }
 }

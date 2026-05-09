@@ -13,16 +13,15 @@ import { TeamView } from "./team-view"
 export default async function CaptainTeamPage({ params }: { params: Promise<{ teamId: string }> }) {
 	const { teamId } = await params
 	const teamIdNum = parseInt(teamId, 10)
-	const callbackPath = `/match-play-captain/${teamId}`
 
 	const session = await auth.api.getSession({ headers: await headers() })
 	if (!session) {
-		return <CaptainLoginForm callbackPath={callbackPath} />
+		return <CaptainLoginForm />
 	}
 
 	const authorized = await isCaptainOfTeam(session.user.email, teamIdNum)
 	if (!authorized) {
-		return <CaptainLoginForm callbackPath={callbackPath} />
+		return <CaptainLoginForm />
 	}
 
 	const [teamResult, resultsResult, opponentsResult] = await Promise.all([

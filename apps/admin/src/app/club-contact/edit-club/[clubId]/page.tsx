@@ -18,18 +18,17 @@ import { validateClubContact } from "../../validate-contact"
 export default async function EditClubPage({ params }: { params: Promise<{ clubId: string }> }) {
 	const { clubId } = await params
 	const clubIdNum = parseInt(clubId, 10)
-	const callbackPath = `/club-contact/edit-club/${clubId}`
 
 	const session = await auth.api.getSession({ headers: await headers() })
 
 	if (!session) {
-		return <ClubContactLoginForm clubId={clubIdNum} callbackPath={callbackPath} />
+		return <ClubContactLoginForm clubId={clubIdNum} />
 	}
 
 	const isAuthorized = await validateClubContact(clubIdNum, session.user.email)
 
 	if (!isAuthorized) {
-		return <ClubContactLoginForm clubId={clubIdNum} callbackPath={callbackPath} />
+		return <ClubContactLoginForm clubId={clubIdNum} />
 	}
 
 	const [clubResult, coursesResult, contactsResult, rolesResult] = await Promise.all([

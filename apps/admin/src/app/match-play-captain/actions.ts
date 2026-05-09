@@ -26,11 +26,10 @@ async function getSessionEmail(): Promise<string | null> {
 	return session?.user.email ?? null
 }
 
-// ── Magic Link ──────────────────────────────────────────────────────
+// ── Email OTP ───────────────────────────────────────────────────────
 
-export async function sendCaptainVerification(
+export async function sendCaptainOtp(
 	email: string,
-	callbackPath: string,
 ): Promise<{ success?: boolean; error?: string }> {
 	const year = getCurrentYear()
 	const teamIds = await getCaptainTeamIds(email, year)
@@ -40,13 +39,31 @@ export async function sendCaptainVerification(
 		}
 	}
 
-	await auth.api.signInMagicLink({
-		body: {
-			email,
-			callbackURL: callbackPath,
-		},
-		headers: await headers(),
+	await auth.api.sendVerificationOTP({
+		body: { email, type: "sign-in" },
 	})
+
+	return { success: true }
+}
+
+export async function verifyCaptainOtp(
+	email: string,
+	otp: string,
+): Promise<{ success?: boolean; error?: string }> {
+	try {
+		await auth.api.signInEmailOTP({
+			body: { email, otp },
+			headers: await headers(),
+		})
+	} catch {
+		return { error: "Invalid or expired code. Please try again." }
+	}
+
+	const year = getCurrentYear()
+	const teamIds = await getCaptainTeamIds(email, year)
+	if (teamIds.length === 0) {
+		return { error: "This email is not registered as a captain for the current season." }
+	}
 
 	return { success: true }
 }

@@ -21,11 +21,10 @@ function getCurrentYear(): number {
 }
 
 export default async function CaptainLobbyPage() {
-	const callbackPath = "/match-play-captain"
 	const session = await auth.api.getSession({ headers: await headers() })
 
 	if (!session) {
-		return <CaptainLoginForm callbackPath={callbackPath} />
+		return <CaptainLoginForm />
 	}
 
 	const email = session.user.email
