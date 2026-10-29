@@ -1,14 +1,14 @@
-FROM node:24-alpine AS base
+FROM node:24.22.1-alpine@sha256:06d7adf3e0ef61a13f1d28682726366f97a15aa1888c934d3ecec86c33918b53 AS base
 
 FROM base AS builder
 WORKDIR /app
-RUN npm install -g pnpm turbo
+RUN npm install -g pnpm@10.34.9 turbo@2.11.10
 COPY . .
 RUN turbo prune @mpga/public --docker
 
 FROM base AS installer
 WORKDIR /app
-RUN npm install -g pnpm
+RUN npm install -g pnpm@10.34.9
 ARG NEXT_PUBLIC_ADMIN_URL
 ENV NEXT_PUBLIC_ADMIN_URL=$NEXT_PUBLIC_ADMIN_URL
 ARG NEXT_PUBLIC_POSTHOG_KEY
@@ -26,22 +26,26 @@ RUN if [ -n "$POSTHOG_PERSONAL_API_KEY" ]; then \
       POSTHOG_CLI_API_KEY=$POSTHOG_PERSONAL_API_KEY \
       POSTHOG_CLI_PROJECT_ID=$POSTHOG_PROJECT_ID \
       POSTHOG_CLI_HOST=${NEXT_PUBLIC_POSTHOG_HOST:-https://us.i.posthog.com} \
-      npx --yes @posthog/cli@latest sourcemap inject --directory ./apps/public/.next/static && \
+      pnpm exec posthog-cli sourcemap inject --directory ./apps/public/.next/static && \
       POSTHOG_CLI_API_KEY=$POSTHOG_PERSONAL_API_KEY \
       POSTHOG_CLI_PROJECT_ID=$POSTHOG_PROJECT_ID \
       POSTHOG_CLI_HOST=${NEXT_PUBLIC_POSTHOG_HOST:-https://us.i.posthog.com} \
-      npx --yes @posthog/cli@latest sourcemap upload --directory ./apps/public/.next/static --release-name mpga-public; \
+      pnpm exec posthog-cli sourcemap upload --directory ./apps/public/.next/static --release-name mpga-public; \
     fi
 
 FROM base AS runner
+# The standalone server needs Node only. Do not ship package managers and their dependency trees.
+RUN rm -rf /usr/local/lib/node_modules /opt/yarn-* && \
+    rm -f /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack /usr/local/bin/yarn /usr/local/bin/yarnpkg
 WORKDIR /app
 ENV NODE_ENV=production
+COPY scripts/check-node-version.mjs ./scripts/check-node-version.mjs
+RUN node scripts/check-node-version.mjs
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 COPY --from=installer --chown=nextjs:nodejs /app/apps/public/.next/standalone ./
 COPY --from=installer --chown=nextjs:nodejs /app/apps/public/.next/static ./apps/public/.next/static
 COPY --from=installer --chown=nextjs:nodejs /app/apps/public/public ./apps/public/public
-RUN npm install --no-save mysql2
 COPY --chown=nextjs:nodejs apps/public/start.sh ./start.sh
 RUN chmod +x start.sh
 USER nextjs

@@ -10,7 +10,14 @@ env:
   REGISTRY: ghcr.io
 
 jobs:
+  validate:
+    permissions:
+      contents: read
+      packages: read
+    uses: ./.github/workflows/security.yml
+
   build-admin:
+    needs: validate
     if: startsWith(github.ref_name, 'admin-v')
     runs-on: ubuntu-latest
     permissions:
@@ -27,12 +34,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push admin image
+      - name: Build and verify admin image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: apps/admin/Dockerfile
-          push: true
+          push: false
+          load: true
+          pull: true
           build-args: |
             NEXT_PUBLIC_BETTER_AUTH_URL=${{ secrets.NEXT_PUBLIC_BETTER_AUTH_URL }}
             NEXT_PUBLIC_APP_URL=${{ secrets.NEXT_PUBLIC_APP_URL }}
@@ -43,7 +52,17 @@ jobs:
             ${{ env.REGISTRY }}/${{ github.repository }}/admin:${{ github.ref_name }}
             ${{ env.REGISTRY }}/${{ github.repository }}/admin:latest
 
+      - name: Check runtime and scan final image
+        run: bash scripts/verify-production-image.sh "${{ env.REGISTRY }}/${{ github.repository }}/admin:${{ github.ref_name }}"
+
+      - name: Publish verified image
+        run: |
+          docker push "${{ env.REGISTRY }}/${{ github.repository }}/admin:${{ github.ref_name }}"
+          docker push "${{ env.REGISTRY }}/${{ github.repository }}/admin:latest"
+
+
   build-public:
+    needs: validate
     if: startsWith(github.ref_name, 'public-v')
     runs-on: ubuntu-latest
     permissions:
@@ -60,12 +79,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push public image
+      - name: Build and verify public image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: apps/public/Dockerfile
-          push: true
+          push: false
+          load: true
+          pull: true
           build-args: |
             NEXT_PUBLIC_ADMIN_URL=${{ secrets.NEXT_PUBLIC_ADMIN_URL }}
             NEXT_PUBLIC_POSTHOG_KEY=${{ secrets.NEXT_PUBLIC_POSTHOG_KEY }}
@@ -75,6 +96,15 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ github.repository }}/public:${{ github.ref_name }}
             ${{ env.REGISTRY }}/${{ github.repository }}/public:latest
+
+      - name: Check runtime and scan final image
+        run: bash scripts/verify-production-image.sh "${{ env.REGISTRY }}/${{ github.repository }}/public:${{ github.ref_name }}"
+
+      - name: Publish verified image
+        run: |
+          docker push "${{ env.REGISTRY }}/${{ github.repository }}/public:${{ github.ref_name }}"
+          docker push "${{ env.REGISTRY }}/${{ github.repository }}/public:latest"
+
 
   deploy-public:
     needs: build-public

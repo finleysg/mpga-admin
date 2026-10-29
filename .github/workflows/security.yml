@@ -1,0 +1,65 @@
+name: Security and validation
+on:
+  pull_request:
+  workflow_call:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 10 * * 1'
+permissions:
+  contents: read
+jobs:
+  dependencies:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4.7
+        env:
+          MYSQL_ROOT_PASSWORD: mpga-test-only
+          MYSQL_DATABASE: mpga_security_test
+        ports:
+          - 25062:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.22.1'
+      - run: npm install -g pnpm@10.34.9
+      - run: node scripts/check-node-version.mjs
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm audit --audit-level high
+      - name: Prepare isolated integration database
+        run: pnpm --filter @mpga/database exec drizzle-kit push --force
+        env:
+          DATABASE_HOST: 127.0.0.1
+          DATABASE_PORT: '25062'
+          DATABASE_USER: root
+          DATABASE_PASSWORD: mpga-test-only
+          DATABASE_NAME: mpga_security_test
+      - run: pnpm exec turbo run lint typecheck test
+        env:
+          TEST_DATABASE_PORT: '25062'
+
+
+  deployed-images:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+    strategy:
+      matrix:
+        app: [admin, public]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Pull published production image
+        run: docker pull "ghcr.io/${{ github.repository }}/${{ matrix.app }}:latest"
+      - name: Check runtime and scan published image
+        run: bash scripts/verify-production-image.sh "ghcr.io/${{ github.repository }}/${{ matrix.app }}:latest"

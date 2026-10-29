@@ -1,0 +1,4952 @@
+{
+	"reviewDate": "2026-10-29",
+	"fullSummary": {
+		"vulnerabilities": {
+			"info": 0,
+			"low": 19,
+			"moderate": 115,
+			"high": 103,
+			"critical": 12
+		},
+		"dependencies": 1226,
+		"devDependencies": 0,
+		"optionalDependencies": 0,
+		"totalDependencies": 1226
+	},
+	"productionSummary": {
+		"vulnerabilities": {
+			"info": 0,
+			"low": 17,
+			"moderate": 113,
+			"high": 103,
+			"critical": 12
+		},
+		"dependencies": 1108,
+		"devDependencies": 0,
+		"optionalDependencies": 0,
+		"totalDependencies": 1108
+	},
+	"records": [
+		{
+			"package": "esbuild",
+			"severity": "moderate",
+			"title": "esbuild enables any website to send any requests to the development server and read the response",
+			"cves": [],
+			"affected": "<=0.24.2",
+			"patched": ">=0.25.0",
+			"url": "https://github.com/advisories/GHSA-67mh-4wv8-2f99",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "0.21.5",
+					"representativePaths": [
+						". > @vitejs/plugin-react@4.7.0 > vite@5.4.21 > esbuild@0.21.5",
+						". > vite-tsconfig-paths@5.1.4 > vite@5.4.21 > esbuild@0.21.5",
+						". > vitest@2.1.9 > @vitest/mocker@2.1.9 > vite@5.4.21 > esbuild@0.21.5"
+					],
+					"totalPaths": 8
+				},
+				{
+					"version": "0.18.20",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > drizzle-kit@0.31.8 > @esbuild-kit/esm-loader@2.6.5 > @esbuild-kit/core-utils@3.3.2 > esbuild@0.18.20",
+						"packages/database > drizzle-kit@0.31.8 > @esbuild-kit/esm-loader@2.6.5 > @esbuild-kit/core-utils@3.3.2 > esbuild@0.18.20"
+					],
+					"totalPaths": 2
+				}
+			]
+		},
+		{
+			"package": "markdown-it",
+			"severity": "moderate",
+			"title": "markdown-it is has a Regular Expression Denial of Service (ReDoS)",
+			"cves": ["CVE-2026-2327"],
+			"affected": ">=13.0.0 <14.1.1",
+			"patched": ">=14.1.1",
+			"url": "https://github.com/advisories/GHSA-38c4-r59v-3vqw",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "14.1.0",
+					"representativePaths": [
+						"apps/admin > @tiptap/extension-highlight@2.27.2 > @tiptap/core@2.27.2 > @tiptap/pm@2.27.2 > prosemirror-markdown@1.13.4 > markdown-it@14.1.0",
+						"apps/admin > @tiptap/extension-link@2.27.2 > @tiptap/core@2.27.2 > @tiptap/pm@2.27.2 > prosemirror-markdown@1.13.4 > markdown-it@14.1.0",
+						"apps/admin > @tiptap/extension-link@2.27.2 > @tiptap/pm@2.27.2 > prosemirror-markdown@1.13.4 > markdown-it@14.1.0"
+					],
+					"totalPaths": 39
+				}
+			]
+		},
+		{
+			"package": "minimatch",
+			"severity": "high",
+			"title": "minimatch has a ReDoS via repeated wildcards with non-matching literal in pattern",
+			"cves": ["CVE-2026-26996"],
+			"affected": "<3.1.3",
+			"patched": ">=3.1.3",
+			"url": "https://github.com/advisories/GHSA-3ppc-4f35-3m26",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.1.2",
+					"representativePaths": [
+						". > eslint@9.39.2 > @eslint/config-array@0.21.1 > minimatch@3.1.2",
+						". > eslint@9.39.2 > @eslint/eslintrc@3.3.3 > minimatch@3.1.2",
+						". > eslint@9.39.2 > minimatch@3.1.2"
+					],
+					"totalPaths": 690
+				}
+			]
+		},
+		{
+			"package": "minimatch",
+			"severity": "high",
+			"title": "minimatch has a ReDoS via repeated wildcards with non-matching literal in pattern",
+			"cves": ["CVE-2026-26996"],
+			"affected": ">=5.0.0 <5.1.7",
+			"patched": ">=5.1.7",
+			"url": "https://github.com/advisories/GHSA-3ppc-4f35-3m26",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "5.1.6",
+					"representativePaths": [
+						"apps/admin > exceljs@4.4.0 > archiver@5.3.2 > readdir-glob@1.1.3 > minimatch@5.1.6"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "minimatch",
+			"severity": "high",
+			"title": "minimatch has a ReDoS via repeated wildcards with non-matching literal in pattern",
+			"cves": ["CVE-2026-26996"],
+			"affected": ">=9.0.0 <9.0.6",
+			"patched": ">=9.0.6",
+			"url": "https://github.com/advisories/GHSA-3ppc-4f35-3m26",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "9.0.5",
+					"representativePaths": [
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-import-resolver-typescript@3.10.1 > eslint-plugin-import@2.32.0 > eslint-module-utils@2.12.1 > @typescript-eslint/parser@8.54.0 > @typescript-eslint/typescript-estree@8.54.0 > minimatch@9.0.5",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-import-resolver-typescript@3.10.1 > eslint-plugin-import@2.32.0 > @typescript-eslint/parser@8.54.0 > @typescript-eslint/typescript-estree@8.54.0 > minimatch@9.0.5",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-plugin-import@2.32.0 > eslint-module-utils@2.12.1 > @typescript-eslint/parser@8.54.0 > @typescript-eslint/typescript-estree@8.54.0 > minimatch@9.0.5"
+					],
+					"totalPaths": 120
+				}
+			]
+		},
+		{
+			"package": "rollup",
+			"severity": "high",
+			"title": "Rollup 4 has Arbitrary File Write via Path Traversal",
+			"cves": ["CVE-2026-27606"],
+			"affected": ">=4.0.0 <4.59.0",
+			"patched": ">=4.59.0",
+			"url": "https://github.com/advisories/GHSA-mw96-cpmx-2vgc",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "4.57.1",
+					"representativePaths": [
+						". > @vitejs/plugin-react@4.7.0 > vite@5.4.21 > rollup@4.57.1",
+						". > vite-tsconfig-paths@5.1.4 > vite@5.4.21 > rollup@4.57.1",
+						". > vitest@2.1.9 > @vitest/mocker@2.1.9 > vite@5.4.21 > rollup@4.57.1"
+					],
+					"totalPaths": 8
+				}
+			]
+		},
+		{
+			"package": "minimatch",
+			"severity": "high",
+			"title": "minimatch has ReDoS: matchOne() combinatorial backtracking via multiple non-adjacent GLOBSTAR segments",
+			"cves": ["CVE-2026-27903"],
+			"affected": "<3.1.3",
+			"patched": ">=3.1.3",
+			"url": "https://github.com/advisories/GHSA-7r86-cg39-jmmj",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.1.2",
+					"representativePaths": [
+						". > eslint@9.39.2 > @eslint/config-array@0.21.1 > minimatch@3.1.2",
+						". > eslint@9.39.2 > @eslint/eslintrc@3.3.3 > minimatch@3.1.2",
+						". > eslint@9.39.2 > minimatch@3.1.2"
+					],
+					"totalPaths": 690
+				}
+			]
+		},
+		{
+			"package": "minimatch",
+			"severity": "high",
+			"title": "minimatch has ReDoS: matchOne() combinatorial backtracking via multiple non-adjacent GLOBSTAR segments",
+			"cves": ["CVE-2026-27903"],
+			"affected": ">=5.0.0 <5.1.8",
+			"patched": ">=5.1.8",
+			"url": "https://github.com/advisories/GHSA-7r86-cg39-jmmj",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "5.1.6",
+					"representativePaths": [
+						"apps/admin > exceljs@4.4.0 > archiver@5.3.2 > readdir-glob@1.1.3 > minimatch@5.1.6"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "minimatch",
+			"severity": "high",
+			"title": "minimatch has ReDoS: matchOne() combinatorial backtracking via multiple non-adjacent GLOBSTAR segments",
+			"cves": ["CVE-2026-27903"],
+			"affected": ">=9.0.0 <9.0.7",
+			"patched": ">=9.0.7",
+			"url": "https://github.com/advisories/GHSA-7r86-cg39-jmmj",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "9.0.5",
+					"representativePaths": [
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-import-resolver-typescript@3.10.1 > eslint-plugin-import@2.32.0 > eslint-module-utils@2.12.1 > @typescript-eslint/parser@8.54.0 > @typescript-eslint/typescript-estree@8.54.0 > minimatch@9.0.5",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-import-resolver-typescript@3.10.1 > eslint-plugin-import@2.32.0 > @typescript-eslint/parser@8.54.0 > @typescript-eslint/typescript-estree@8.54.0 > minimatch@9.0.5",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-plugin-import@2.32.0 > eslint-module-utils@2.12.1 > @typescript-eslint/parser@8.54.0 > @typescript-eslint/typescript-estree@8.54.0 > minimatch@9.0.5"
+					],
+					"totalPaths": 120
+				}
+			]
+		},
+		{
+			"package": "minimatch",
+			"severity": "high",
+			"title": "minimatch ReDoS: nested *() extglobs generate catastrophically backtracking regular expressions",
+			"cves": ["CVE-2026-27904"],
+			"affected": "<3.1.4",
+			"patched": ">=3.1.4",
+			"url": "https://github.com/advisories/GHSA-23c5-xmqv-rm74",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.1.2",
+					"representativePaths": [
+						". > eslint@9.39.2 > @eslint/config-array@0.21.1 > minimatch@3.1.2",
+						". > eslint@9.39.2 > @eslint/eslintrc@3.3.3 > minimatch@3.1.2",
+						". > eslint@9.39.2 > minimatch@3.1.2"
+					],
+					"totalPaths": 690
+				}
+			]
+		},
+		{
+			"package": "minimatch",
+			"severity": "high",
+			"title": "minimatch ReDoS: nested *() extglobs generate catastrophically backtracking regular expressions",
+			"cves": ["CVE-2026-27904"],
+			"affected": ">=5.0.0 <5.1.8",
+			"patched": ">=5.1.8",
+			"url": "https://github.com/advisories/GHSA-23c5-xmqv-rm74",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "5.1.6",
+					"representativePaths": [
+						"apps/admin > exceljs@4.4.0 > archiver@5.3.2 > readdir-glob@1.1.3 > minimatch@5.1.6"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "minimatch",
+			"severity": "high",
+			"title": "minimatch ReDoS: nested *() extglobs generate catastrophically backtracking regular expressions",
+			"cves": ["CVE-2026-27904"],
+			"affected": ">=9.0.0 <9.0.7",
+			"patched": ">=9.0.7",
+			"url": "https://github.com/advisories/GHSA-23c5-xmqv-rm74",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "9.0.5",
+					"representativePaths": [
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-import-resolver-typescript@3.10.1 > eslint-plugin-import@2.32.0 > eslint-module-utils@2.12.1 > @typescript-eslint/parser@8.54.0 > @typescript-eslint/typescript-estree@8.54.0 > minimatch@9.0.5",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-import-resolver-typescript@3.10.1 > eslint-plugin-import@2.32.0 > @typescript-eslint/parser@8.54.0 > @typescript-eslint/typescript-estree@8.54.0 > minimatch@9.0.5",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-plugin-import@2.32.0 > eslint-module-utils@2.12.1 > @typescript-eslint/parser@8.54.0 > @typescript-eslint/typescript-estree@8.54.0 > minimatch@9.0.5"
+					],
+					"totalPaths": 120
+				}
+			]
+		},
+		{
+			"package": "fast-xml-parser",
+			"severity": "critical",
+			"title": "fast-xml-parser has an entity encoding bypass via regex injection in DOCTYPE entity names",
+			"cves": ["CVE-2026-25896"],
+			"affected": ">=5.0.0 <5.3.5",
+			"patched": ">=5.3.5",
+			"url": "https://github.com/advisories/GHSA-m7jm-9gc2-mpf2",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "5.3.4",
+					"representativePaths": [
+						"apps/admin > @aws-sdk/client-s3@3.985.0 > @aws-sdk/core@3.973.7 > @aws-sdk/xml-builder@3.972.4 > fast-xml-parser@5.3.4",
+						"apps/admin > @aws-sdk/client-s3@3.985.0 > @aws-sdk/credential-provider-node@3.972.6 > @aws-sdk/credential-provider-env@3.972.5 > @aws-sdk/core@3.973.7 > @aws-sdk/xml-builder@3.972.4 > fast-xml-parser@5.3.4",
+						"apps/admin > @aws-sdk/client-s3@3.985.0 > @aws-sdk/credential-provider-node@3.972.6 > @aws-sdk/credential-provider-http@3.972.7 > @aws-sdk/core@3.973.7 > @aws-sdk/xml-builder@3.972.4 > fast-xml-parser@5.3.4"
+					],
+					"totalPaths": 44
+				}
+			]
+		},
+		{
+			"package": "fast-xml-parser",
+			"severity": "high",
+			"title": "fast-xml-parser affected by DoS through entity expansion in DOCTYPE (no expansion limit)",
+			"cves": ["CVE-2026-26278"],
+			"affected": ">=5.0.0 <5.3.6",
+			"patched": ">=5.3.6",
+			"url": "https://github.com/advisories/GHSA-jmr7-xgp7-cmfj",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "5.3.4",
+					"representativePaths": [
+						"apps/admin > @aws-sdk/client-s3@3.985.0 > @aws-sdk/core@3.973.7 > @aws-sdk/xml-builder@3.972.4 > fast-xml-parser@5.3.4",
+						"apps/admin > @aws-sdk/client-s3@3.985.0 > @aws-sdk/credential-provider-node@3.972.6 > @aws-sdk/credential-provider-env@3.972.5 > @aws-sdk/core@3.973.7 > @aws-sdk/xml-builder@3.972.4 > fast-xml-parser@5.3.4",
+						"apps/admin > @aws-sdk/client-s3@3.985.0 > @aws-sdk/credential-provider-node@3.972.6 > @aws-sdk/credential-provider-http@3.972.7 > @aws-sdk/core@3.973.7 > @aws-sdk/xml-builder@3.972.4 > fast-xml-parser@5.3.4"
+					],
+					"totalPaths": 44
+				}
+			]
+		},
+		{
+			"package": "ajv",
+			"severity": "moderate",
+			"title": "ajv has ReDoS when using `$data` option",
+			"cves": ["CVE-2025-69873"],
+			"affected": "<6.14.0",
+			"patched": ">=6.14.0",
+			"url": "https://github.com/advisories/GHSA-2g4f-4pwh-qvx6",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "6.12.6",
+					"representativePaths": [
+						". > eslint@9.39.2 > @eslint/eslintrc@3.3.3 > ajv@6.12.6",
+						". > eslint@9.39.2 > ajv@6.12.6",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > @eslint/eslintrc@3.3.3 > ajv@6.12.6"
+					],
+					"totalPaths": 440
+				}
+			]
+		},
+		{
+			"package": "fast-xml-parser",
+			"severity": "low",
+			"title": "fast-xml-parser has stack overflow in XMLBuilder with preserveOrder",
+			"cves": ["CVE-2026-27942"],
+			"affected": ">=5.0.0 <5.3.8",
+			"patched": ">=5.3.8",
+			"url": "https://github.com/advisories/GHSA-fj3w-jwp8-x2g3",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "5.3.4",
+					"representativePaths": [
+						"apps/admin > @aws-sdk/client-s3@3.985.0 > @aws-sdk/core@3.973.7 > @aws-sdk/xml-builder@3.972.4 > fast-xml-parser@5.3.4",
+						"apps/admin > @aws-sdk/client-s3@3.985.0 > @aws-sdk/credential-provider-node@3.972.6 > @aws-sdk/credential-provider-env@3.972.5 > @aws-sdk/core@3.973.7 > @aws-sdk/xml-builder@3.972.4 > fast-xml-parser@5.3.4",
+						"apps/admin > @aws-sdk/client-s3@3.985.0 > @aws-sdk/credential-provider-node@3.972.6 > @aws-sdk/credential-provider-http@3.972.7 > @aws-sdk/core@3.973.7 > @aws-sdk/xml-builder@3.972.4 > fast-xml-parser@5.3.4"
+					],
+					"totalPaths": 44
+				}
+			]
+		},
+		{
+			"package": "flatted",
+			"severity": "high",
+			"title": "flatted vulnerable to unbounded recursion DoS in parse() revive phase",
+			"cves": ["CVE-2026-32141"],
+			"affected": "<3.4.0",
+			"patched": ">=3.4.0",
+			"url": "https://github.com/advisories/GHSA-25h7-pfq9-p65f",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.3.3",
+					"representativePaths": [
+						". > eslint@9.39.2 > file-entry-cache@8.0.0 > flat-cache@4.0.1 > flatted@3.3.3",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint@9.39.2 > file-entry-cache@8.0.0 > flat-cache@4.0.1 > flatted@3.3.3",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint@9.39.2 > file-entry-cache@8.0.0 > flat-cache@4.0.1 > flatted@3.3.3"
+					],
+					"totalPaths": 217
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "moderate",
+			"title": "Next.js: HTTP request smuggling in rewrites",
+			"cves": ["CVE-2026-29057"],
+			"affected": ">=16.0.0-beta.0 <16.1.7",
+			"patched": ">=16.1.7",
+			"url": "https://github.com/advisories/GHSA-ggv3-7p47-pfv8",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "moderate",
+			"title": "Next.js: Unbounded next/image disk cache growth can exhaust storage",
+			"cves": ["CVE-2026-27980"],
+			"affected": ">=16.0.0-beta.0 <16.1.7",
+			"patched": ">=16.1.7",
+			"url": "https://github.com/advisories/GHSA-3x4c-7xq6-9pq8",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "moderate",
+			"title": "Next.js: Unbounded postponed resume buffering can lead to DoS",
+			"cves": ["CVE-2026-27979"],
+			"affected": ">=16.0.1 <16.1.7",
+			"patched": ">=16.1.7",
+			"url": "https://github.com/advisories/GHSA-h27x-g6w4-24gq",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "moderate",
+			"title": "Next.js: null origin can bypass Server Actions CSRF checks",
+			"cves": ["CVE-2026-27978"],
+			"affected": ">=16.0.1 <16.1.7",
+			"patched": ">=16.1.7",
+			"url": "https://github.com/advisories/GHSA-mq59-m269-xvcx",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "kysely",
+			"severity": "high",
+			"title": "SQL Injection via unsanitized JSON path keys when ignoring/silencing compilation errors or using `Kysely<any>`.",
+			"cves": ["CVE-2026-32763"],
+			"affected": ">=0.26.0 <=0.28.11",
+			"patched": ">=0.28.12",
+			"url": "https://github.com/advisories/GHSA-wmrf-hv6w-mr66",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "0.28.11",
+					"representativePaths": [
+						"apps/admin > @mpga/database@link:../../packages/database > drizzle-orm@0.45.1 > kysely@0.28.11",
+						"apps/admin > @mpga/types@link:../../packages/types > @mpga/database@link:../../packages/database > drizzle-orm@0.45.1 > kysely@0.28.11",
+						"apps/admin > @mpga/types@link:../../packages/types > drizzle-orm@0.45.1 > kysely@0.28.11"
+					],
+					"totalPaths": 21
+				}
+			]
+		},
+		{
+			"package": "fast-xml-parser",
+			"severity": "high",
+			"title": "fast-xml-parser affected by numeric entity expansion bypassing all entity expansion limits (incomplete fix for CVE-2026-26278)",
+			"cves": ["CVE-2026-33036"],
+			"affected": ">=5.0.0 <5.5.6",
+			"patched": ">=5.5.6",
+			"url": "https://github.com/advisories/GHSA-8gc5-j5rx-235r",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "5.3.4",
+					"representativePaths": [
+						"apps/admin > @aws-sdk/client-s3@3.985.0 > @aws-sdk/core@3.973.7 > @aws-sdk/xml-builder@3.972.4 > fast-xml-parser@5.3.4",
+						"apps/admin > @aws-sdk/client-s3@3.985.0 > @aws-sdk/credential-provider-node@3.972.6 > @aws-sdk/credential-provider-env@3.972.5 > @aws-sdk/core@3.973.7 > @aws-sdk/xml-builder@3.972.4 > fast-xml-parser@5.3.4",
+						"apps/admin > @aws-sdk/client-s3@3.985.0 > @aws-sdk/credential-provider-node@3.972.6 > @aws-sdk/credential-provider-http@3.972.7 > @aws-sdk/core@3.973.7 > @aws-sdk/xml-builder@3.972.4 > fast-xml-parser@5.3.4"
+					],
+					"totalPaths": 44
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "low",
+			"title": "Next.js: null origin can bypass dev HMR websocket CSRF checks",
+			"cves": ["CVE-2026-27977"],
+			"affected": ">=16.0.1 <16.1.7",
+			"patched": ">=16.1.7",
+			"url": "https://github.com/advisories/GHSA-jcc7-9wpm-mj36",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "nodemailer",
+			"severity": "low",
+			"title": "Nodemailer has SMTP command injection due to unsanitized `envelope.size` parameter",
+			"cves": [],
+			"affected": "<8.0.4",
+			"patched": ">=8.0.4",
+			"url": "https://github.com/advisories/GHSA-c7w3-x93f-qmm8",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "8.0.1",
+					"representativePaths": ["apps/admin > nodemailer@8.0.1"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "kysely",
+			"severity": "high",
+			"title": "Kysely has a MySQL SQL Injection via Insufficient Backslash Escaping in `sql.lit(string)` usage or similar methods that append string literal values into the compiled SQL strings",
+			"cves": ["CVE-2026-33468"],
+			"affected": "<=0.28.13",
+			"patched": ">=0.28.14",
+			"url": "https://github.com/advisories/GHSA-8cpq-38p9-67gx",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "0.28.11",
+					"representativePaths": [
+						"apps/admin > @mpga/database@link:../../packages/database > drizzle-orm@0.45.1 > kysely@0.28.11",
+						"apps/admin > @mpga/types@link:../../packages/types > @mpga/database@link:../../packages/database > drizzle-orm@0.45.1 > kysely@0.28.11",
+						"apps/admin > @mpga/types@link:../../packages/types > drizzle-orm@0.45.1 > kysely@0.28.11"
+					],
+					"totalPaths": 21
+				}
+			]
+		},
+		{
+			"package": "brace-expansion",
+			"severity": "moderate",
+			"title": "brace-expansion: Zero-step sequence causes process hang and memory exhaustion",
+			"cves": ["CVE-2026-33750"],
+			"affected": "<1.1.13",
+			"patched": ">=1.1.13",
+			"url": "https://github.com/advisories/GHSA-f886-m6hf-6m8v",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.1.12",
+					"representativePaths": [
+						". > eslint@9.39.2 > @eslint/config-array@0.21.1 > minimatch@3.1.2 > brace-expansion@1.1.12",
+						". > eslint@9.39.2 > @eslint/eslintrc@3.3.3 > minimatch@3.1.2 > brace-expansion@1.1.12",
+						". > eslint@9.39.2 > minimatch@3.1.2 > brace-expansion@1.1.12"
+					],
+					"totalPaths": 690
+				}
+			]
+		},
+		{
+			"package": "brace-expansion",
+			"severity": "moderate",
+			"title": "brace-expansion: Zero-step sequence causes process hang and memory exhaustion",
+			"cves": ["CVE-2026-33750"],
+			"affected": ">=2.0.0 <2.0.3",
+			"patched": ">=2.0.3",
+			"url": "https://github.com/advisories/GHSA-f886-m6hf-6m8v",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "2.0.2",
+					"representativePaths": [
+						"apps/admin > exceljs@4.4.0 > archiver@5.3.2 > readdir-glob@1.1.3 > minimatch@5.1.6 > brace-expansion@2.0.2",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-import-resolver-typescript@3.10.1 > eslint-plugin-import@2.32.0 > eslint-module-utils@2.12.1 > @typescript-eslint/parser@8.54.0 > @typescript-eslint/typescript-estree@8.54.0 > minimatch@9.0.5 > brace-expansion@2.0.2",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-import-resolver-typescript@3.10.1 > eslint-plugin-import@2.32.0 > @typescript-eslint/parser@8.54.0 > @typescript-eslint/typescript-estree@8.54.0 > minimatch@9.0.5 > brace-expansion@2.0.2"
+					],
+					"totalPaths": 121
+				}
+			]
+		},
+		{
+			"package": "picomatch",
+			"severity": "moderate",
+			"title": "Picomatch: Method Injection in POSIX Character Classes causes incorrect Glob Matching",
+			"cves": ["CVE-2026-33672"],
+			"affected": "<2.3.2",
+			"patched": ">=2.3.2",
+			"url": "https://github.com/advisories/GHSA-3v7f-55p6-f55p",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "2.3.1",
+					"representativePaths": [
+						". > lint-staged@16.2.7 > micromatch@4.0.8 > picomatch@2.3.1",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > @next/eslint-plugin-next@16.1.6 > fast-glob@3.3.1 > micromatch@4.0.8 > picomatch@2.3.1",
+						"apps/public > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > @next/eslint-plugin-next@16.1.6 > fast-glob@3.3.1 > micromatch@4.0.8 > picomatch@2.3.1"
+					],
+					"totalPaths": 7
+				}
+			]
+		},
+		{
+			"package": "picomatch",
+			"severity": "moderate",
+			"title": "Picomatch: Method Injection in POSIX Character Classes causes incorrect Glob Matching",
+			"cves": ["CVE-2026-33672"],
+			"affected": ">=4.0.0 <4.0.4",
+			"patched": ">=4.0.4",
+			"url": "https://github.com/advisories/GHSA-3v7f-55p6-f55p",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "4.0.3",
+					"representativePaths": [
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-import-resolver-typescript@3.10.1 > tinyglobby@0.2.15 > fdir@6.5.0 > picomatch@4.0.3",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-import-resolver-typescript@3.10.1 > tinyglobby@0.2.15 > picomatch@4.0.3",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-import-resolver-typescript@3.10.1 > eslint-plugin-import@2.32.0 > eslint-module-utils@2.12.1 > @typescript-eslint/parser@8.54.0 > @typescript-eslint/typescript-estree@8.54.0 > tinyglobby@0.2.15 > fdir@6.5.0 > picomatch@4.0.3"
+					],
+					"totalPaths": 254
+				}
+			]
+		},
+		{
+			"package": "picomatch",
+			"severity": "high",
+			"title": "Picomatch has a ReDoS vulnerability via extglob quantifiers",
+			"cves": ["CVE-2026-33671"],
+			"affected": "<2.3.2",
+			"patched": ">=2.3.2",
+			"url": "https://github.com/advisories/GHSA-c2c7-rcm5-vvqj",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "2.3.1",
+					"representativePaths": [
+						". > lint-staged@16.2.7 > micromatch@4.0.8 > picomatch@2.3.1",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > @next/eslint-plugin-next@16.1.6 > fast-glob@3.3.1 > micromatch@4.0.8 > picomatch@2.3.1",
+						"apps/public > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > @next/eslint-plugin-next@16.1.6 > fast-glob@3.3.1 > micromatch@4.0.8 > picomatch@2.3.1"
+					],
+					"totalPaths": 7
+				}
+			]
+		},
+		{
+			"package": "picomatch",
+			"severity": "high",
+			"title": "Picomatch has a ReDoS vulnerability via extglob quantifiers",
+			"cves": ["CVE-2026-33671"],
+			"affected": ">=4.0.0 <4.0.4",
+			"patched": ">=4.0.4",
+			"url": "https://github.com/advisories/GHSA-c2c7-rcm5-vvqj",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "4.0.3",
+					"representativePaths": [
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-import-resolver-typescript@3.10.1 > tinyglobby@0.2.15 > fdir@6.5.0 > picomatch@4.0.3",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-import-resolver-typescript@3.10.1 > tinyglobby@0.2.15 > picomatch@4.0.3",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-import-resolver-typescript@3.10.1 > eslint-plugin-import@2.32.0 > eslint-module-utils@2.12.1 > @typescript-eslint/parser@8.54.0 > @typescript-eslint/typescript-estree@8.54.0 > tinyglobby@0.2.15 > fdir@6.5.0 > picomatch@4.0.3"
+					],
+					"totalPaths": 254
+				}
+			]
+		},
+		{
+			"package": "yaml",
+			"severity": "moderate",
+			"title": "yaml is vulnerable to Stack Overflow via deeply nested YAML collections",
+			"cves": ["CVE-2026-33532"],
+			"affected": ">=2.0.0 <2.8.3",
+			"patched": ">=2.8.3",
+			"url": "https://github.com/advisories/GHSA-48c2-rrv3-qjmp",
+			"inProductionAudit": false,
+			"findings": [
+				{
+					"version": "2.8.2",
+					"representativePaths": [". > lint-staged@16.2.7 > yaml@2.8.2"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "dompurify",
+			"severity": "moderate",
+			"title": "DOMPurify contains a Cross-site Scripting vulnerability",
+			"cves": ["CVE-2026-0540"],
+			"affected": ">=3.1.3 <=3.3.1",
+			"patched": ">=3.3.2",
+			"url": "https://github.com/advisories/GHSA-v2wj-7wpq-c8vv",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.3.1",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/admin > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/public > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1"
+					],
+					"totalPaths": 4
+				}
+			]
+		},
+		{
+			"package": "defu",
+			"severity": "high",
+			"title": "defu: Prototype pollution via `__proto__` key in defaults argument",
+			"cves": ["CVE-2026-35209"],
+			"affected": "<=6.1.4",
+			"patched": ">=6.1.5",
+			"url": "https://github.com/advisories/GHSA-737v-mqg7-c878",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "6.1.4",
+					"representativePaths": ["apps/admin > better-auth@1.4.18 > defu@6.1.4"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "vite",
+			"severity": "moderate",
+			"title": "Vite Vulnerable to Path Traversal in Optimized Deps `.map` Handling",
+			"cves": ["CVE-2026-39365"],
+			"affected": "<=6.4.1",
+			"patched": ">=6.4.2",
+			"url": "https://github.com/advisories/GHSA-4w7w-66w2-5vf9",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "5.4.21",
+					"representativePaths": [
+						". > @vitejs/plugin-react@4.7.0 > vite@5.4.21",
+						". > vite-tsconfig-paths@5.1.4 > vite@5.4.21",
+						". > vitest@2.1.9 > @vitest/mocker@2.1.9 > vite@5.4.21"
+					],
+					"totalPaths": 8
+				}
+			]
+		},
+		{
+			"package": "drizzle-orm",
+			"severity": "high",
+			"title": "Drizzle ORM has SQL injection via improperly escaped SQL identifiers",
+			"cves": ["CVE-2026-39356"],
+			"affected": "<0.45.2",
+			"patched": ">=0.45.2",
+			"url": "https://github.com/advisories/GHSA-gpj5-g38j-94v9",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "0.45.1",
+					"representativePaths": [
+						"apps/admin > @mpga/database@link:../../packages/database > drizzle-orm@0.45.1",
+						"apps/admin > @mpga/types@link:../../packages/types > @mpga/database@link:../../packages/database > drizzle-orm@0.45.1",
+						"apps/admin > @mpga/types@link:../../packages/types > drizzle-orm@0.45.1"
+					],
+					"totalPaths": 18
+				}
+			]
+		},
+		{
+			"package": "nodemailer",
+			"severity": "moderate",
+			"title": "Nodemailer Vulnerable to SMTP Command Injection via CRLF in Transport name Option (EHLO/HELO) ",
+			"cves": [],
+			"affected": "<=8.0.4",
+			"patched": ">=8.0.5",
+			"url": "https://github.com/advisories/GHSA-vvjj-xcjg-gr5g",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "8.0.1",
+					"representativePaths": ["apps/admin > nodemailer@8.0.1"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "fast-xml-parser",
+			"severity": "moderate",
+			"title": "Entity Expansion Limits Bypassed When Set to Zero Due to JavaScript Falsy Evaluation in fast-xml-parser",
+			"cves": ["CVE-2026-33349"],
+			"affected": ">=5.0.0 <5.5.7",
+			"patched": ">=5.5.7",
+			"url": "https://github.com/advisories/GHSA-jp2q-39xq-3w4g",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "5.3.4",
+					"representativePaths": [
+						"apps/admin > @aws-sdk/client-s3@3.985.0 > @aws-sdk/core@3.973.7 > @aws-sdk/xml-builder@3.972.4 > fast-xml-parser@5.3.4",
+						"apps/admin > @aws-sdk/client-s3@3.985.0 > @aws-sdk/credential-provider-node@3.972.6 > @aws-sdk/credential-provider-env@3.972.5 > @aws-sdk/core@3.973.7 > @aws-sdk/xml-builder@3.972.4 > fast-xml-parser@5.3.4",
+						"apps/admin > @aws-sdk/client-s3@3.985.0 > @aws-sdk/credential-provider-node@3.972.6 > @aws-sdk/credential-provider-http@3.972.7 > @aws-sdk/core@3.973.7 > @aws-sdk/xml-builder@3.972.4 > fast-xml-parser@5.3.4"
+					],
+					"totalPaths": 44
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "high",
+			"title": "Next.js has a Denial of Service with Server Components",
+			"cves": [],
+			"affected": ">=16.0.0-beta.0 <16.2.3",
+			"patched": ">=16.2.3",
+			"url": "https://github.com/advisories/GHSA-q4gf-8mx6-v5v3",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "follow-redirects",
+			"severity": "moderate",
+			"title": "follow-redirects leaks Custom Authentication Headers to Cross-Domain Redirect Targets",
+			"cves": [],
+			"affected": "<=1.15.11",
+			"patched": ">=1.16.0",
+			"url": "https://github.com/advisories/GHSA-r4q5-vmmm-2653",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.15.11",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5 > follow-redirects@1.15.11"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "moderate",
+			"title": "Axios has a NO_PROXY Hostname Normalization Bypass that Leads to SSRF",
+			"cves": ["CVE-2025-62718"],
+			"affected": ">=1.0.0 <1.15.0",
+			"patched": ">=1.15.0",
+			"url": "https://github.com/advisories/GHSA-3p68-rc4w-qgx5",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "postcss",
+			"severity": "moderate",
+			"title": "PostCSS has XSS via Unescaped </style> in its CSS Stringify Output",
+			"cves": ["CVE-2026-41305"],
+			"affected": "<8.5.10",
+			"patched": ">=8.5.10",
+			"url": "https://github.com/advisories/GHSA-qx2v-qp2m-jg93",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "8.5.6",
+					"representativePaths": [
+						". > @vitejs/plugin-react@4.7.0 > vite@5.4.21 > postcss@8.5.6",
+						". > vite-tsconfig-paths@5.1.4 > vite@5.4.21 > postcss@8.5.6",
+						". > vitest@2.1.9 > @vitest/mocker@2.1.9 > vite@5.4.21 > postcss@8.5.6"
+					],
+					"totalPaths": 10
+				},
+				{
+					"version": "8.4.31",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6 > postcss@8.4.31",
+						"apps/admin > next@16.1.6 > postcss@8.4.31",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6 > postcss@8.4.31"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "dompurify",
+			"severity": "moderate",
+			"title": "DOMPurify: FORBID_TAGS bypassed by function-based ADD_TAGS predicate (asymmetry with FORBID_ATTR fix)",
+			"cves": ["CVE-2026-41240"],
+			"affected": "<3.4.0",
+			"patched": ">=3.4.0",
+			"url": "https://github.com/advisories/GHSA-h7mw-gpvr-xq4m",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.3.1",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/admin > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/public > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1"
+					],
+					"totalPaths": 4
+				}
+			]
+		},
+		{
+			"package": "dompurify",
+			"severity": "moderate",
+			"title": "DOMPurify has a SAFE_FOR_TEMPLATES bypass in RETURN_DOM mode",
+			"cves": ["CVE-2026-41239"],
+			"affected": ">=1.0.10 <3.4.0",
+			"patched": ">=3.4.0",
+			"url": "https://github.com/advisories/GHSA-crv5-9vww-q3g8",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.3.1",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/admin > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/public > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1"
+					],
+					"totalPaths": 4
+				}
+			]
+		},
+		{
+			"package": "dompurify",
+			"severity": "moderate",
+			"title": "DOMPurify: Prototype Pollution to XSS Bypass via CUSTOM_ELEMENT_HANDLING Fallback",
+			"cves": ["CVE-2026-41238"],
+			"affected": ">=3.0.1 <3.4.0",
+			"patched": ">=3.4.0",
+			"url": "https://github.com/advisories/GHSA-v9jr-rg53-9pgp",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.3.1",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/admin > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/public > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1"
+					],
+					"totalPaths": 4
+				}
+			]
+		},
+		{
+			"package": "protobufjs",
+			"severity": "critical",
+			"title": "Arbitrary code execution in protobufjs",
+			"cves": ["CVE-2026-41242"],
+			"affected": "<7.5.5",
+			"patched": ">=7.5.5",
+			"url": "https://github.com/advisories/GHSA-xq3m-2v4x-88gg",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "7.5.4",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-exporter-base@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4",
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4",
+						"apps/admin > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-exporter-base@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4"
+					],
+					"totalPaths": 8
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "moderate",
+			"title": "Axios: Authentication Bypass via Prototype Pollution Gadget in `validateStatus` Merge Strategy",
+			"cves": ["CVE-2026-42041"],
+			"affected": ">=1.0.0 <1.15.1",
+			"patched": ">=1.15.1",
+			"url": "https://github.com/advisories/GHSA-w9j2-pvgh-6h63",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "high",
+			"title": "Axios: Incomplete Fix for CVE-2025-62718 — NO_PROXY Protection Bypassed via RFC 1122 Loopback Subnet (127.0.0.0/8) in Axios 1.15.0",
+			"cves": ["CVE-2026-42043"],
+			"affected": ">=1.0.0 <1.15.1",
+			"patched": ">=1.15.1",
+			"url": "https://github.com/advisories/GHSA-pmwg-cvhr-8vh7",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "moderate",
+			"title": "Axios: Invisible JSON Response Tampering via Prototype Pollution Gadget in `parseReviver`",
+			"cves": ["CVE-2026-42044"],
+			"affected": ">=1.0.0 <1.15.2",
+			"patched": ">=1.15.2",
+			"url": "https://github.com/advisories/GHSA-3w6x-2g7m-8v23",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "low",
+			"title": "Axios: Null Byte Injection via Reverse-Encoding in AxiosURLSearchParams",
+			"cves": ["CVE-2026-42040"],
+			"affected": ">=1.0.0 <1.15.1",
+			"patched": ">=1.15.1",
+			"url": "https://github.com/advisories/GHSA-xhjh-pmcv-23jw",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "moderate",
+			"title": "Axios: CRLF Injection in multipart/form-data body via unsanitized blob.type in formDataToStream",
+			"cves": ["CVE-2026-42037"],
+			"affected": ">=1.0.0 <1.15.1",
+			"patched": ">=1.15.1",
+			"url": "https://github.com/advisories/GHSA-445q-vr5w-6q77",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "moderate",
+			"title": "Axios: no_proxy bypass via IP alias allows SSRF",
+			"cves": ["CVE-2026-42038"],
+			"affected": ">=1.0.0 <1.15.1",
+			"patched": ">=1.15.1",
+			"url": "https://github.com/advisories/GHSA-m7pr-hjqh-92cm",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "moderate",
+			"title": "Axios' HTTP adapter-streamed uploads bypass maxBodyLength when maxRedirects: 0",
+			"cves": ["CVE-2026-42034"],
+			"affected": ">=1.0.0 <1.15.1",
+			"patched": ">=1.15.1",
+			"url": "https://github.com/advisories/GHSA-5c9x-8gcm-mpgx",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "moderate",
+			"title": "Axios: HTTP adapter streamed responses bypass maxContentLength",
+			"cves": ["CVE-2026-42036"],
+			"affected": ">=1.0.0 <1.15.1",
+			"patched": ">=1.15.1",
+			"url": "https://github.com/advisories/GHSA-vf2m-468p-8v99",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "high",
+			"title": "Axios: Prototype Pollution Gadgets - Response Tampering, Data Exfiltration, and Request Hijacking",
+			"cves": ["CVE-2026-42033"],
+			"affected": ">=1.0.0 <1.15.1",
+			"patched": ">=1.15.1",
+			"url": "https://github.com/advisories/GHSA-pf86-5x62-jrwf",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "high",
+			"title": "Axios: Header Injection via Prototype Pollution",
+			"cves": ["CVE-2026-42035"],
+			"affected": ">=1.0.0 <1.15.1",
+			"patched": ">=1.15.1",
+			"url": "https://github.com/advisories/GHSA-6chq-wfr3-2hj9",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "moderate",
+			"title": "Axios: XSRF Token Cross-Origin Leakage via Prototype Pollution Gadget in `withXSRFToken` Boolean Coercion",
+			"cves": ["CVE-2026-42042"],
+			"affected": ">=1.0.0 <1.15.1",
+			"patched": ">=1.15.1",
+			"url": "https://github.com/advisories/GHSA-xx6v-rp6x-q39c",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "fast-xml-parser",
+			"severity": "moderate",
+			"title": "fast-xml-parser XMLBuilder: XML Comment and CDATA Injection via Unescaped Delimiters",
+			"cves": ["CVE-2026-41650"],
+			"affected": "<5.7.0",
+			"patched": ">=5.7.0",
+			"url": "https://github.com/advisories/GHSA-gh4j-gqv2-49f6",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "5.3.4",
+					"representativePaths": [
+						"apps/admin > @aws-sdk/client-s3@3.985.0 > @aws-sdk/core@3.973.7 > @aws-sdk/xml-builder@3.972.4 > fast-xml-parser@5.3.4",
+						"apps/admin > @aws-sdk/client-s3@3.985.0 > @aws-sdk/credential-provider-node@3.972.6 > @aws-sdk/credential-provider-env@3.972.5 > @aws-sdk/core@3.973.7 > @aws-sdk/xml-builder@3.972.4 > fast-xml-parser@5.3.4",
+						"apps/admin > @aws-sdk/client-s3@3.985.0 > @aws-sdk/credential-provider-node@3.972.6 > @aws-sdk/credential-provider-http@3.972.7 > @aws-sdk/core@3.973.7 > @aws-sdk/xml-builder@3.972.4 > fast-xml-parser@5.3.4"
+					],
+					"totalPaths": 44
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "high",
+			"title": "Next.js Vulnerable to Denial of Service with Server Components",
+			"cves": [],
+			"affected": ">=16.0.0 <16.2.5",
+			"patched": ">=16.2.5",
+			"url": "https://github.com/advisories/GHSA-8h8q-6873-q5fj",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "high",
+			"title": "Axios has prototype pollution read-side gadgets in HTTP adapter that allow credential injection and request hijacking",
+			"cves": ["CVE-2026-42264"],
+			"affected": ">=1.0.0 <1.15.2",
+			"patched": ">=1.15.2",
+			"url": "https://github.com/advisories/GHSA-q8qp-cvcw-x6jj",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "protobufjs",
+			"severity": "high",
+			"title": "protobuf.js: Code injection through bytes field defaults in generated toObject code",
+			"cves": ["CVE-2026-44293"],
+			"affected": "<=7.5.5",
+			"patched": ">=7.5.6",
+			"url": "https://github.com/advisories/GHSA-66ff-xgx4-vchm",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "7.5.4",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-exporter-base@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4",
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4",
+						"apps/admin > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-exporter-base@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4"
+					],
+					"totalPaths": 8
+				}
+			]
+		},
+		{
+			"package": "protobufjs",
+			"severity": "moderate",
+			"title": "protobuf.js: Denial of service from crafted field names in generated code",
+			"cves": ["CVE-2026-44294"],
+			"affected": "<=7.5.5",
+			"patched": ">=7.5.6",
+			"url": "https://github.com/advisories/GHSA-2pr8-phx7-x9h3",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "7.5.4",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-exporter-base@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4",
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4",
+						"apps/admin > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-exporter-base@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4"
+					],
+					"totalPaths": 8
+				}
+			]
+		},
+		{
+			"package": "protobufjs",
+			"severity": "moderate",
+			"title": "protobuf.js: Prototype injection in generated message constructors",
+			"cves": ["CVE-2026-44292"],
+			"affected": "<=7.5.5",
+			"patched": ">=7.5.6",
+			"url": "https://github.com/advisories/GHSA-fx83-v9x8-x52w",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "7.5.4",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-exporter-base@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4",
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4",
+						"apps/admin > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-exporter-base@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4"
+					],
+					"totalPaths": 8
+				}
+			]
+		},
+		{
+			"package": "protobufjs",
+			"severity": "high",
+			"title": "protobuf.js: Code generation gadget after prototype pollution",
+			"cves": ["CVE-2026-44291"],
+			"affected": "<=7.5.5",
+			"patched": ">=7.5.6",
+			"url": "https://github.com/advisories/GHSA-75px-5xx7-5xc7",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "7.5.4",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-exporter-base@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4",
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4",
+						"apps/admin > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-exporter-base@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4"
+					],
+					"totalPaths": 8
+				}
+			]
+		},
+		{
+			"package": "protobufjs",
+			"severity": "high",
+			"title": "protobuf.js: Process-wide denial of service through unsafe option paths",
+			"cves": ["CVE-2026-44290"],
+			"affected": "<=7.5.5",
+			"patched": ">=7.5.6",
+			"url": "https://github.com/advisories/GHSA-jvwf-75h9-cwgg",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "7.5.4",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-exporter-base@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4",
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4",
+						"apps/admin > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-exporter-base@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4"
+					],
+					"totalPaths": 8
+				}
+			]
+		},
+		{
+			"package": "protobufjs",
+			"severity": "high",
+			"title": "protobuf.js: Denial of service through unbounded protobuf recursion",
+			"cves": ["CVE-2026-44289"],
+			"affected": "<=7.5.5",
+			"patched": ">=7.5.6",
+			"url": "https://github.com/advisories/GHSA-685m-2w69-288q",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "7.5.4",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-exporter-base@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4",
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4",
+						"apps/admin > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-exporter-base@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4"
+					],
+					"totalPaths": 8
+				}
+			]
+		},
+		{
+			"package": "@protobufjs/utf8",
+			"severity": "moderate",
+			"title": "protobufjs has overlong UTF-8 decoding",
+			"cves": ["CVE-2026-44288"],
+			"affected": "<=1.1.0",
+			"patched": ">=1.1.1",
+			"url": "https://github.com/advisories/GHSA-q6x5-8v7m-xcrf",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.1.0",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-exporter-base@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4 > @protobufjs/utf8@1.1.0",
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4 > @protobufjs/utf8@1.1.0",
+						"apps/admin > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-exporter-base@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4 > @protobufjs/utf8@1.1.0"
+					],
+					"totalPaths": 8
+				}
+			]
+		},
+		{
+			"package": "protobufjs",
+			"severity": "moderate",
+			"title": "protobufjs has overlong UTF-8 decoding",
+			"cves": ["CVE-2026-44288"],
+			"affected": "<=7.5.5",
+			"patched": ">=7.5.6",
+			"url": "https://github.com/advisories/GHSA-q6x5-8v7m-xcrf",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "7.5.4",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-exporter-base@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4",
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4",
+						"apps/admin > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-exporter-base@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4"
+					],
+					"totalPaths": 8
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "high",
+			"title": "Next.js has a Middleware / Proxy bypass in App Router applications via segment-prefetch routes - Incomplete Fix Follow-Up",
+			"cves": ["CVE-2026-45109"],
+			"affected": ">=16.0.0 <16.2.6",
+			"patched": ">=16.2.6",
+			"url": "https://github.com/advisories/GHSA-26hh-7cqf-hhc6",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "low",
+			"title": "Next.js's Middleware / Proxy redirects can be cache-poisoned",
+			"cves": ["CVE-2026-44572"],
+			"affected": ">=16.0.0 <16.2.5",
+			"patched": ">=16.2.5",
+			"url": "https://github.com/advisories/GHSA-3g8h-86w9-wvmq",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "moderate",
+			"title": "Next.js vulnerable to cross-site scripting in App Router applications using CSP nonces",
+			"cves": ["CVE-2026-44581"],
+			"affected": ">=16.0.0 <16.2.5",
+			"patched": ">=16.2.5",
+			"url": "https://github.com/advisories/GHSA-ffhc-5mcf-pf4q",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "low",
+			"title": "Next.js vulnerable to cache poisoning via collisions in React Server Component cache-busting",
+			"cves": ["CVE-2026-44582"],
+			"affected": ">=16.0.0 <16.2.5",
+			"patched": ">=16.2.5",
+			"url": "https://github.com/advisories/GHSA-vfv6-92ff-j949",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "moderate",
+			"title": "Next.js has cross-site scripting in beforeInteractive scripts with untrusted input",
+			"cves": ["CVE-2026-44580"],
+			"affected": ">=16.0.0 <16.2.5",
+			"patched": ">=16.2.5",
+			"url": "https://github.com/advisories/GHSA-gx5p-jg67-6x7h",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "high",
+			"title": "Next.js vulnerable to Denial of Service via connection exhaustion in applications using Cache Components",
+			"cves": ["CVE-2026-44579"],
+			"affected": ">=16.0.0 <16.2.5",
+			"patched": ">=16.2.5",
+			"url": "https://github.com/advisories/GHSA-mg66-mrh9-m8jx",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "moderate",
+			"title": "Next.js has a Denial of Service in the Image Optimization API",
+			"cves": ["CVE-2026-44577"],
+			"affected": ">=16.0.0 <16.2.5",
+			"patched": ">=16.2.5",
+			"url": "https://github.com/advisories/GHSA-h64f-5h5j-jqjh",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "high",
+			"title": "Next.js vulnerable to server-side request forgery in applications using WebSocket upgrades",
+			"cves": ["CVE-2026-44578"],
+			"affected": ">=16.0.0 <16.2.5",
+			"patched": ">=16.2.5",
+			"url": "https://github.com/advisories/GHSA-c4j6-fc7j-m34r",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "high",
+			"title": "Next.js has a Middleware / Proxy bypass through dynamic route parameter injection",
+			"cves": ["CVE-2026-44574"],
+			"affected": ">=16.0.0 <16.2.5",
+			"patched": ">=16.2.5",
+			"url": "https://github.com/advisories/GHSA-492v-c6pp-mqqv",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "moderate",
+			"title": "Next.js vulnerable to cache poisoning in React Server Component responses",
+			"cves": ["CVE-2026-44576"],
+			"affected": ">=16.0.0 <16.2.5",
+			"patched": ">=16.2.5",
+			"url": "https://github.com/advisories/GHSA-wfc6-r584-vfw7",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "high",
+			"title": "Next.js has a Middleware / Proxy bypass in App Router applications via segment-prefetch routes",
+			"cves": ["CVE-2026-44575"],
+			"affected": ">=16.0.0 <16.2.5",
+			"patched": ">=16.2.5",
+			"url": "https://github.com/advisories/GHSA-267c-6grr-h53f",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "high",
+			"title": "Next.js has a Middleware / Proxy bypass in Pages Router applications using i18n",
+			"cves": ["CVE-2026-44573"],
+			"affected": ">=16.0.0 <16.2.5",
+			"patched": ">=16.2.5",
+			"url": "https://github.com/advisories/GHSA-36qx-fr4f-26g5",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "better-auth",
+			"severity": "moderate",
+			"title": "Better Auth: OAuth callback accepts mismatched `state` when cookie-backed state storage is used without PKCE",
+			"cves": [],
+			"affected": "<1.6.2",
+			"patched": ">=1.6.2",
+			"url": "https://github.com/advisories/GHSA-wxw3-q3m9-c3jr",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.4.18",
+					"representativePaths": ["apps/admin > better-auth@1.4.18"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "ws",
+			"severity": "moderate",
+			"title": "ws: Uninitialized memory disclosure",
+			"cves": ["CVE-2026-45736"],
+			"affected": ">=8.0.0 <8.20.1",
+			"patched": ">=8.20.1",
+			"url": "https://github.com/advisories/GHSA-58qx-3vcg-4xpx",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "8.19.0",
+					"representativePaths": [
+						". > jsdom@25.0.1 > ws@8.19.0",
+						". > vitest@2.1.9 > jsdom@25.0.1 > ws@8.19.0",
+						"apps/admin > better-auth@1.4.18 > vitest@2.1.9 > jsdom@25.0.1 > ws@8.19.0"
+					],
+					"totalPaths": 3
+				}
+			]
+		},
+		{
+			"package": "protobufjs",
+			"severity": "moderate",
+			"title": "protobufjs: Denial of Service via unbounded recursive JSON descriptor expansion",
+			"cves": ["CVE-2026-45740"],
+			"affected": "<=7.5.7",
+			"patched": ">=7.5.8",
+			"url": "https://github.com/advisories/GHSA-jggg-4jg4-v7c6",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "7.5.4",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-exporter-base@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4",
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4",
+						"apps/admin > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-exporter-base@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4"
+					],
+					"totalPaths": 8
+				}
+			]
+		},
+		{
+			"package": "turbo",
+			"severity": "low",
+			"title": "Turbo: Unexpected local code execution during Yarn Berry detection",
+			"cves": ["CVE-2026-45772"],
+			"affected": ">=1.1.0 <2.9.14",
+			"patched": ">=2.9.14",
+			"url": "https://github.com/advisories/GHSA-3qcw-2rhx-2726",
+			"inProductionAudit": false,
+			"findings": [
+				{
+					"version": "2.8.1",
+					"representativePaths": [". > turbo@2.8.1"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "moderate",
+			"title": "Axios has Unrestricted Cloud Metadata Exfiltration via Header Injection Chain",
+			"cves": ["CVE-2026-40175"],
+			"affected": ">=1.0.0 <1.15.0",
+			"patched": ">=1.15.0",
+			"url": "https://github.com/advisories/GHSA-fvcv-3m26-pcqx",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "uuid",
+			"severity": "moderate",
+			"title": "uuid: Missing buffer bounds check in v3/v5/v6 when buf is provided",
+			"cves": ["CVE-2026-41907"],
+			"affected": "<11.1.1",
+			"patched": ">=11.1.1",
+			"url": "https://github.com/advisories/GHSA-w5hq-g745-h8pq",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "8.3.2",
+					"representativePaths": ["apps/admin > exceljs@4.4.0 > uuid@8.3.2"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "moderate",
+			"title": "Axios: unbounded recursion in toFormData causes DoS via deeply nested request data",
+			"cves": ["CVE-2026-42039"],
+			"affected": ">=1.0.0 <1.15.1",
+			"patched": ">=1.15.1",
+			"url": "https://github.com/advisories/GHSA-62hf-57xw-28j9",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "kysely",
+			"severity": "high",
+			"title": "Kysely: JSON-path traversal injection via unsanitized path-leg metacharacters in `JSONPathBuilder.key()` / `.at()`",
+			"cves": ["CVE-2026-44635"],
+			"affected": ">=0.26.0 <0.28.17",
+			"patched": ">=0.28.17",
+			"url": "https://github.com/advisories/GHSA-pv5w-4p9q-p3v2",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "0.28.11",
+					"representativePaths": [
+						"apps/admin > @mpga/database@link:../../packages/database > drizzle-orm@0.45.1 > kysely@0.28.11",
+						"apps/admin > @mpga/types@link:../../packages/types > @mpga/database@link:../../packages/database > drizzle-orm@0.45.1 > kysely@0.28.11",
+						"apps/admin > @mpga/types@link:../../packages/types > drizzle-orm@0.45.1 > kysely@0.28.11"
+					],
+					"totalPaths": 21
+				}
+			]
+		},
+		{
+			"package": "shell-quote",
+			"severity": "critical",
+			"title": "shell-quote quote() does not escape newlines in object .op values",
+			"cves": ["CVE-2026-9277"],
+			"affected": ">=1.1.0 <=1.8.3",
+			"patched": ">=1.8.4",
+			"url": "https://github.com/advisories/GHSA-w7jw-789q-3m8p",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.8.3",
+					"representativePaths": [
+						"apps/admin > @mpga/database@link:../../packages/database > drizzle-orm@0.45.1 > gel@2.2.0 > shell-quote@1.8.3",
+						"apps/admin > @mpga/types@link:../../packages/types > @mpga/database@link:../../packages/database > drizzle-orm@0.45.1 > gel@2.2.0 > shell-quote@1.8.3",
+						"apps/admin > @mpga/types@link:../../packages/types > drizzle-orm@0.45.1 > gel@2.2.0 > shell-quote@1.8.3"
+					],
+					"totalPaths": 18
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "high",
+			"title": "Axios: Regular Expression Denial of Service (ReDoS) via Cookie Name Injection",
+			"cves": ["CVE-2026-44496"],
+			"affected": ">=1.0.0 <1.16.0",
+			"patched": ">=1.16.0",
+			"url": "https://github.com/advisories/GHSA-hfxv-24rg-xrqf",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "high",
+			"title": "Allocation of Resources Without Limits or Throttling in Axios",
+			"cves": ["CVE-2026-44488"],
+			"affected": ">=1.7.0 <1.16.0",
+			"patched": ">=1.16.0",
+			"url": "https://github.com/advisories/GHSA-777c-7fjr-54vf",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "high",
+			"title": "Axios: Proxy-Authorization Credential Leak to Origin Server Across HTTP-to-HTTPS Redirect in Axios Node.js HTTP Adapter",
+			"cves": ["CVE-2026-44487"],
+			"affected": ">=1.0.0 <1.16.0",
+			"patched": ">=1.16.0",
+			"url": "https://github.com/advisories/GHSA-p92q-9vqr-4j8v",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "high",
+			"title": "Axios: Proxy-Authorization header leaks to redirect target when proxy is re-evaluated to direct connection",
+			"cves": ["CVE-2026-44486"],
+			"affected": ">=1.0.0 <1.16.0",
+			"patched": ">=1.16.0",
+			"url": "https://github.com/advisories/GHSA-j5f8-grm9-p9fc",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "high",
+			"title": "axios Vulnerable to Credential Theft and Response Hijacking via Prototype Pollution Gadget in Config Merge",
+			"cves": ["CVE-2026-44495"],
+			"affected": ">=1.0.0 <1.15.2",
+			"patched": ">=1.15.2",
+			"url": "https://github.com/advisories/GHSA-3g43-6gmg-66jw",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "high",
+			"title": "axios Vulnerable to Full Man-in-the-Middle via Prototype Pollution Gadget in `config.proxy`",
+			"cves": ["CVE-2026-44494"],
+			"affected": ">=1.0.0 <1.16.0",
+			"patched": ">=1.16.0",
+			"url": "https://github.com/advisories/GHSA-35jp-ww65-95wh",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "moderate",
+			"title": "axios has DoS & Header Injection via Prototype Pollution Read-Side Gadgets in axios merge functions",
+			"cves": ["CVE-2026-44490"],
+			"affected": ">=1.0.0 <1.16.0",
+			"patched": ">=1.16.0",
+			"url": "https://github.com/advisories/GHSA-898c-q2cr-xwhg",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "tmp",
+			"severity": "high",
+			"title": "tmp has Path Traversal via unsanitized prefix/postfix that enables directory escape",
+			"cves": ["CVE-2026-44705"],
+			"affected": "<0.2.6",
+			"patched": ">=0.2.6",
+			"url": "https://github.com/advisories/GHSA-ph9p-34f9-6g65",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "0.2.5",
+					"representativePaths": ["apps/admin > exceljs@4.4.0 > tmp@0.2.5"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "esbuild",
+			"severity": "low",
+			"title": "esbuild allows arbitrary file read when running the development server on Windows",
+			"cves": [],
+			"affected": ">=0.27.3 <0.28.1",
+			"patched": ">=0.28.1",
+			"url": "https://github.com/advisories/GHSA-g7r4-m6w7-qqqr",
+			"inProductionAudit": false,
+			"findings": [
+				{
+					"version": "0.27.3",
+					"representativePaths": [
+						". > tsx@4.21.0 > esbuild@0.27.3",
+						"apps/admin > tsx@4.21.0 > esbuild@0.27.3"
+					],
+					"totalPaths": 2
+				}
+			]
+		},
+		{
+			"package": "form-data",
+			"severity": "high",
+			"title": "form-data: CRLF injection in form-data via unescaped multipart field names and filenames",
+			"cves": ["CVE-2026-12143"],
+			"affected": ">=4.0.0 <4.0.6",
+			"patched": ">=4.0.6",
+			"url": "https://github.com/advisories/GHSA-hmw2-7cc7-3qxx",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "4.0.5",
+					"representativePaths": [
+						". > jsdom@25.0.1 > form-data@4.0.5",
+						". > vitest@2.1.9 > jsdom@25.0.1 > form-data@4.0.5",
+						"apps/admin > better-auth@1.4.18 > vitest@2.1.9 > jsdom@25.0.1 > form-data@4.0.5"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "vite",
+			"severity": "moderate",
+			"title": "launch-editor: NTLMv2 hash disclosure via UNC path handling on Windows",
+			"cves": ["CVE-2026-53632"],
+			"affected": "<=6.4.2",
+			"patched": ">=6.4.3",
+			"url": "https://github.com/advisories/GHSA-v6wh-96g9-6wx3",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "5.4.21",
+					"representativePaths": [
+						". > @vitejs/plugin-react@4.7.0 > vite@5.4.21",
+						". > vite-tsconfig-paths@5.1.4 > vite@5.4.21",
+						". > vitest@2.1.9 > @vitest/mocker@2.1.9 > vite@5.4.21"
+					],
+					"totalPaths": 8
+				}
+			]
+		},
+		{
+			"package": "nodemailer",
+			"severity": "moderate",
+			"title": "Nodemailer: CRLF injection in Nodemailer List-* header comments allows arbitrary message header injection",
+			"cves": [],
+			"affected": "<=8.0.8",
+			"patched": ">=8.0.9",
+			"url": "https://github.com/advisories/GHSA-268h-hp4c-crq3",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "8.0.1",
+					"representativePaths": ["apps/admin > nodemailer@8.0.1"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "nodemailer",
+			"severity": "moderate",
+			"title": "Nodemailer jsonTransport bypasses disableFileAccess and disableUrlAccess during message normalization",
+			"cves": [],
+			"affected": "<=8.0.8",
+			"patched": ">=8.0.9",
+			"url": "https://github.com/advisories/GHSA-wqvq-jvpq-h66f",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "8.0.1",
+					"representativePaths": ["apps/admin > nodemailer@8.0.1"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "dompurify",
+			"severity": "moderate",
+			"title": "DOMPurify: Cross-realm IN_PLACE sanitization leaves executable markup intact via realm-bound `instanceof` checks",
+			"cves": ["CVE-2026-49458"],
+			"affected": "<=3.4.5",
+			"patched": ">=3.4.6",
+			"url": "https://github.com/advisories/GHSA-hpcv-96wg-7vj8",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.3.1",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/admin > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/public > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1"
+					],
+					"totalPaths": 4
+				}
+			]
+		},
+		{
+			"package": "dompurify",
+			"severity": "moderate",
+			"title": "DOMPurify: IN_PLACE mode preserves attributes of a clobbered root element, allowing XSS via attacker-controlled root DOM",
+			"cves": ["CVE-2026-49459"],
+			"affected": "<=3.4.5",
+			"patched": ">=3.4.6",
+			"url": "https://github.com/advisories/GHSA-r47g-fvhr-h676",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.3.1",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/admin > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/public > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1"
+					],
+					"totalPaths": 4
+				}
+			]
+		},
+		{
+			"package": "dompurify",
+			"severity": "moderate",
+			"title": "DOMPurify IN_PLACE Sanitization Bypass via Attached Shadow Root Inside <template>.content",
+			"cves": ["CVE-2026-49978"],
+			"affected": "<=3.4.6",
+			"patched": ">=3.4.7",
+			"url": "https://github.com/advisories/GHSA-rp9w-3fw7-7cwq",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.3.1",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/admin > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/public > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1"
+					],
+					"totalPaths": 4
+				}
+			]
+		},
+		{
+			"package": "markdown-it",
+			"severity": "moderate",
+			"title": "markdown-it: Quadratic complexity DoS in smartquotes rule via replaceAt string operations",
+			"cves": ["CVE-2026-48988"],
+			"affected": "<=14.1.1",
+			"patched": ">=14.2.0",
+			"url": "https://github.com/advisories/GHSA-6v5v-wf23-fmfq",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "14.1.0",
+					"representativePaths": [
+						"apps/admin > @tiptap/extension-highlight@2.27.2 > @tiptap/core@2.27.2 > @tiptap/pm@2.27.2 > prosemirror-markdown@1.13.4 > markdown-it@14.1.0",
+						"apps/admin > @tiptap/extension-link@2.27.2 > @tiptap/core@2.27.2 > @tiptap/pm@2.27.2 > prosemirror-markdown@1.13.4 > markdown-it@14.1.0",
+						"apps/admin > @tiptap/extension-link@2.27.2 > @tiptap/pm@2.27.2 > prosemirror-markdown@1.13.4 > markdown-it@14.1.0"
+					],
+					"totalPaths": 39
+				}
+			]
+		},
+		{
+			"package": "linkify-it",
+			"severity": "high",
+			"title": "LinkifyIt#match scan loop has quadratic algorithmic complexity",
+			"cves": ["CVE-2026-48801"],
+			"affected": "<=5.0.0",
+			"patched": ">=5.0.1",
+			"url": "https://github.com/advisories/GHSA-22p9-wv53-3rq4",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "5.0.0",
+					"representativePaths": [
+						"apps/admin > @tiptap/extension-highlight@2.27.2 > @tiptap/core@2.27.2 > @tiptap/pm@2.27.2 > prosemirror-markdown@1.13.4 > markdown-it@14.1.0 > linkify-it@5.0.0",
+						"apps/admin > @tiptap/extension-link@2.27.2 > @tiptap/core@2.27.2 > @tiptap/pm@2.27.2 > prosemirror-markdown@1.13.4 > markdown-it@14.1.0 > linkify-it@5.0.0",
+						"apps/admin > @tiptap/extension-link@2.27.2 > @tiptap/pm@2.27.2 > prosemirror-markdown@1.13.4 > markdown-it@14.1.0 > linkify-it@5.0.0"
+					],
+					"totalPaths": 39
+				}
+			]
+		},
+		{
+			"package": "js-yaml",
+			"severity": "moderate",
+			"title": "JS-YAML: Quadratic-complexity DoS in merge key handling via repeated aliases",
+			"cves": ["CVE-2026-53550"],
+			"affected": ">=4.0.0 <=4.1.1",
+			"patched": ">=4.2.0",
+			"url": "https://github.com/advisories/GHSA-h67p-54hq-rp68",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "4.1.1",
+					"representativePaths": [
+						". > eslint@9.39.2 > @eslint/eslintrc@3.3.3 > js-yaml@4.1.1",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > @eslint/eslintrc@3.3.3 > js-yaml@4.1.1",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint@9.39.2 > @eslint/eslintrc@3.3.3 > js-yaml@4.1.1"
+					],
+					"totalPaths": 223
+				}
+			]
+		},
+		{
+			"package": "turbo",
+			"severity": "moderate",
+			"title": "Turbo: Login callback CSRF/session fixation",
+			"cves": ["CVE-2026-45773"],
+			"affected": "<=2.9.13",
+			"patched": ">=2.9.14",
+			"url": "https://github.com/advisories/GHSA-hcf7-66rw-9f5r",
+			"inProductionAudit": false,
+			"findings": [
+				{
+					"version": "2.8.1",
+					"representativePaths": [". > turbo@2.8.1"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "better-auth",
+			"severity": "low",
+			"title": "Better Auth: Stale sessions persist after user deletion across admin, anonymous, and SCIM flows",
+			"cves": [],
+			"affected": ">=0.3.4 <1.6.11",
+			"patched": ">=1.6.11",
+			"url": "https://github.com/advisories/GHSA-2vg6-77g8-24mp",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.4.18",
+					"representativePaths": ["apps/admin > better-auth@1.4.18"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "better-auth",
+			"severity": "high",
+			"title": "Better Auth has insecure cryptographic defaults in oidcProvider: alg=none advertised and plain PKCE accepted by default",
+			"cves": [],
+			"affected": "<1.6.11",
+			"patched": ">=1.6.11",
+			"url": "https://github.com/advisories/GHSA-9h47-pqcx-hjr4",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.4.18",
+					"representativePaths": ["apps/admin > better-auth@1.4.18"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "better-auth",
+			"severity": "high",
+			"title": "Better Auth has stored XSS in the auth-server origin via javascript: redirect_uri in oidc-provider and mcp",
+			"cves": [],
+			"affected": "<1.6.13",
+			"patched": ">=1.6.13",
+			"url": "https://github.com/advisories/GHSA-86j7-9j95-vpqj",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.4.18",
+					"representativePaths": ["apps/admin > better-auth@1.4.18"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "ws",
+			"severity": "high",
+			"title": "ws: Memory exhaustion DoS from tiny fragments and data chunks",
+			"cves": ["CVE-2026-48779"],
+			"affected": ">=8.0.0 <8.21.0",
+			"patched": ">=8.21.0",
+			"url": "https://github.com/advisories/GHSA-96hv-2xvq-fx4p",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "8.19.0",
+					"representativePaths": [
+						". > jsdom@25.0.1 > ws@8.19.0",
+						". > vitest@2.1.9 > jsdom@25.0.1 > ws@8.19.0",
+						"apps/admin > better-auth@1.4.18 > vitest@2.1.9 > jsdom@25.0.1 > ws@8.19.0"
+					],
+					"totalPaths": 3
+				}
+			]
+		},
+		{
+			"package": "protobufjs",
+			"severity": "high",
+			"title": "protobufjs: Denial of service through unbounded Any expansion during JSON conversion",
+			"cves": ["CVE-2026-48712"],
+			"affected": "<=7.6.0",
+			"patched": ">=7.6.1",
+			"url": "https://github.com/advisories/GHSA-wcpc-wj8m-hjx6",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "7.5.4",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-exporter-base@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4",
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4",
+						"apps/admin > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-exporter-base@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4"
+					],
+					"totalPaths": 8
+				}
+			]
+		},
+		{
+			"package": "protobufjs",
+			"severity": "moderate",
+			"title": "protobufjs : Schema-derived names can shadow runtime-significant properties",
+			"cves": ["CVE-2026-54269"],
+			"affected": "<=7.6.2",
+			"patched": ">=7.6.3",
+			"url": "https://github.com/advisories/GHSA-f38q-mgvj-vph7",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "7.5.4",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-exporter-base@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4",
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4",
+						"apps/admin > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-exporter-base@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4"
+					],
+					"totalPaths": 8
+				}
+			]
+		},
+		{
+			"package": "@babel/core",
+			"severity": "low",
+			"title": "@babel/core: Arbitrary File Read via sourceMappingURL Comment",
+			"cves": ["CVE-2026-49356"],
+			"affected": "<=7.29.0",
+			"patched": ">=7.29.6",
+			"url": "https://github.com/advisories/GHSA-4x5r-pxfx-6jf8",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "7.29.0",
+					"representativePaths": [
+						". > @vitejs/plugin-react@4.7.0 > @babel/core@7.29.0 > @babel/helper-module-transforms@7.28.6 > @babel/core@7.29.0",
+						". > @vitejs/plugin-react@4.7.0 > @babel/plugin-transform-react-jsx-self@7.27.1 > @babel/core@7.29.0 > @babel/helper-module-transforms@7.28.6 > @babel/core@7.29.0",
+						". > @vitejs/plugin-react@4.7.0 > @babel/plugin-transform-react-jsx-source@7.27.1 > @babel/core@7.29.0 > @babel/helper-module-transforms@7.28.6 > @babel/core@7.29.0"
+					],
+					"totalPaths": 14
+				}
+			]
+		},
+		{
+			"package": "better-auth",
+			"severity": "high",
+			"title": "@better-auth/oauth-provider's OAuth authorization-code grant allows concurrent redemption when two token requests race the find-then-delete primitive",
+			"cves": ["CVE-2026-53518"],
+			"affected": "<1.6.11",
+			"patched": ">=1.6.11",
+			"url": "https://github.com/advisories/GHSA-7w99-5wm4-3g79",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.4.18",
+					"representativePaths": ["apps/admin > better-auth@1.4.18"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "better-auth",
+			"severity": "high",
+			"title": "Better Auth: OAuth refresh-token rotation forks the token family on concurrent redemption",
+			"cves": ["CVE-2026-53517"],
+			"affected": ">=1.4.8-beta.7 <1.6.0",
+			"patched": ">=1.6.0",
+			"url": "https://github.com/advisories/GHSA-392p-2q2v-4372",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.4.18",
+					"representativePaths": ["apps/admin > better-auth@1.4.18"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "better-auth",
+			"severity": "high",
+			"title": "Better Auth has an account takeover issue via OAuth auto-link to unverified pre-registered email",
+			"cves": ["CVE-2026-53516"],
+			"affected": "<1.6.11",
+			"patched": ">=1.6.11",
+			"url": "https://github.com/advisories/GHSA-g38m-r43w-p2q7",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.4.18",
+					"representativePaths": ["apps/admin > better-auth@1.4.18"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "better-auth",
+			"severity": "high",
+			"title": "Better Auth vulnerable to unauthorized invitation acceptance via unverified email match in organization plugin",
+			"cves": ["CVE-2026-53514"],
+			"affected": "<1.6.11",
+			"patched": ">=1.6.11",
+			"url": "https://github.com/advisories/GHSA-fmh4-wcc4-5jm3",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.4.18",
+					"representativePaths": ["apps/admin > better-auth@1.4.18"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "better-auth",
+			"severity": "critical",
+			"title": "Better Auth: OAuth refresh-token replay via missing client authentication on oidc-provider and mcp plugins",
+			"cves": ["CVE-2026-53512"],
+			"affected": "<1.6.11",
+			"patched": ">=1.6.11",
+			"url": "https://github.com/advisories/GHSA-pw9m-5jxm-xr6h",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.4.18",
+					"representativePaths": ["apps/admin > better-auth@1.4.18"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "brace-expansion",
+			"severity": "high",
+			"title": "brace-expansion: DoS via exponential-time expansion of consecutive non-expanding {} groups",
+			"cves": ["CVE-2026-13149"],
+			"affected": ">=2.0.0 <2.1.2",
+			"patched": ">=2.1.2",
+			"url": "https://github.com/advisories/GHSA-3jxr-9vmj-r5cp",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "2.0.2",
+					"representativePaths": [
+						"apps/admin > exceljs@4.4.0 > archiver@5.3.2 > readdir-glob@1.1.3 > minimatch@5.1.6 > brace-expansion@2.0.2",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-import-resolver-typescript@3.10.1 > eslint-plugin-import@2.32.0 > eslint-module-utils@2.12.1 > @typescript-eslint/parser@8.54.0 > @typescript-eslint/typescript-estree@8.54.0 > minimatch@9.0.5 > brace-expansion@2.0.2",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-import-resolver-typescript@3.10.1 > eslint-plugin-import@2.32.0 > @typescript-eslint/parser@8.54.0 > @typescript-eslint/typescript-estree@8.54.0 > minimatch@9.0.5 > brace-expansion@2.0.2"
+					],
+					"totalPaths": 121
+				}
+			]
+		},
+		{
+			"package": "brace-expansion",
+			"severity": "high",
+			"title": "brace-expansion: DoS via exponential-time expansion of consecutive non-expanding {} groups",
+			"cves": ["CVE-2026-13149"],
+			"affected": "<1.1.16",
+			"patched": ">=1.1.16",
+			"url": "https://github.com/advisories/GHSA-3jxr-9vmj-r5cp",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.1.12",
+					"representativePaths": [
+						". > eslint@9.39.2 > @eslint/config-array@0.21.1 > minimatch@3.1.2 > brace-expansion@1.1.12",
+						". > eslint@9.39.2 > @eslint/eslintrc@3.3.3 > minimatch@3.1.2 > brace-expansion@1.1.12",
+						". > eslint@9.39.2 > minimatch@3.1.2 > brace-expansion@1.1.12"
+					],
+					"totalPaths": 690
+				}
+			]
+		},
+		{
+			"package": "js-yaml",
+			"severity": "high",
+			"title": "js-yaml: YAML merge-key chains can force quadratic CPU consumption",
+			"cves": ["CVE-2026-59869"],
+			"affected": ">=4.0.0 <4.3.0",
+			"patched": ">=4.3.0",
+			"url": "https://github.com/advisories/GHSA-52cp-r559-cp3m",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "4.1.1",
+					"representativePaths": [
+						". > eslint@9.39.2 > @eslint/eslintrc@3.3.3 > js-yaml@4.1.1",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > @eslint/eslintrc@3.3.3 > js-yaml@4.1.1",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint@9.39.2 > @eslint/eslintrc@3.3.3 > js-yaml@4.1.1"
+					],
+					"totalPaths": 223
+				}
+			]
+		},
+		{
+			"package": "shell-quote",
+			"severity": "high",
+			"title": "shell-quote: Quadratic-complexity Denial of Service in `parse()` (CWE-407)",
+			"cves": ["CVE-2026-13311"],
+			"affected": "<=1.8.4",
+			"patched": ">=1.9.0",
+			"url": "https://github.com/advisories/GHSA-395f-4hp3-45gv",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.8.3",
+					"representativePaths": [
+						"apps/admin > @mpga/database@link:../../packages/database > drizzle-orm@0.45.1 > gel@2.2.0 > shell-quote@1.8.3",
+						"apps/admin > @mpga/types@link:../../packages/types > @mpga/database@link:../../packages/database > drizzle-orm@0.45.1 > gel@2.2.0 > shell-quote@1.8.3",
+						"apps/admin > @mpga/types@link:../../packages/types > drizzle-orm@0.45.1 > gel@2.2.0 > shell-quote@1.8.3"
+					],
+					"totalPaths": 18
+				}
+			]
+		},
+		{
+			"package": "protobufjs",
+			"severity": "moderate",
+			"title": "protobufjs: Denial of Service via infinite loop in .proto option parsing",
+			"cves": ["CVE-2026-59877"],
+			"affected": ">=7.5.0 <=7.6.4",
+			"patched": ">=7.6.5",
+			"url": "https://github.com/advisories/GHSA-j3f2-48v5-ccww",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "7.5.4",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-exporter-base@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4",
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4",
+						"apps/admin > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-exporter-base@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > protobufjs@7.5.4"
+					],
+					"totalPaths": 8
+				}
+			]
+		},
+		{
+			"package": "linkify-it",
+			"severity": "high",
+			"title": "linkify-it: Quadratic-complexity DoS via the `mailto:` validator scan-loop on attacker text",
+			"cves": ["CVE-2026-59887"],
+			"affected": "<=5.0.1",
+			"patched": ">=5.0.2",
+			"url": "https://github.com/advisories/GHSA-v245-v573-v5vm",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "5.0.0",
+					"representativePaths": [
+						"apps/admin > @tiptap/extension-highlight@2.27.2 > @tiptap/core@2.27.2 > @tiptap/pm@2.27.2 > prosemirror-markdown@1.13.4 > markdown-it@14.1.0 > linkify-it@5.0.0",
+						"apps/admin > @tiptap/extension-link@2.27.2 > @tiptap/core@2.27.2 > @tiptap/pm@2.27.2 > prosemirror-markdown@1.13.4 > markdown-it@14.1.0 > linkify-it@5.0.0",
+						"apps/admin > @tiptap/extension-link@2.27.2 > @tiptap/pm@2.27.2 > prosemirror-markdown@1.13.4 > markdown-it@14.1.0 > linkify-it@5.0.0"
+					],
+					"totalPaths": 39
+				}
+			]
+		},
+		{
+			"package": "sharp",
+			"severity": "high",
+			"title": "sharp inherited vulnerabilities in libvips: CVE-2026-33327, CVE-2026-33328, CVE-2026-35590, CVE-2026-35591",
+			"cves": [],
+			"affected": "<0.35.0",
+			"patched": ">=0.35.0",
+			"url": "https://github.com/advisories/GHSA-f88m-g3jw-g9cj",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "0.34.5",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6 > sharp@0.34.5",
+						"apps/admin > next@16.1.6 > sharp@0.34.5",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6 > sharp@0.34.5"
+					],
+					"totalPaths": 6
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "high",
+			"title": "Next.js: Middleware / Proxy bypass in App Router applications using Turbopack and single locale",
+			"cves": ["CVE-2026-64642"],
+			"affected": ">=16.0.0 <16.2.11",
+			"patched": ">=16.2.11",
+			"url": "https://github.com/advisories/GHSA-6gpp-xcg3-4w24",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "high",
+			"title": "Next.js: Denial of Service in App Router using Server Actions",
+			"cves": ["CVE-2026-64641"],
+			"affected": ">=16.0.0 <16.2.11",
+			"patched": ">=16.2.11",
+			"url": "https://github.com/advisories/GHSA-m99w-x7hq-7vfj",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "high",
+			"title": "Next.js: Server-Side Request Forgery in Server Actions on custom servers",
+			"cves": ["CVE-2026-64649"],
+			"affected": ">=16.0.0 <16.2.11",
+			"patched": ">=16.2.11",
+			"url": "https://github.com/advisories/GHSA-89xv-2m56-2m9x",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "moderate",
+			"title": "Next.js: Cache confusion of response bodies for requests with bodies",
+			"cves": ["CVE-2026-64648"],
+			"affected": ">=16.0.0 <16.2.11",
+			"patched": ">=16.2.11",
+			"url": "https://github.com/advisories/GHSA-68g3-v927-f742",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "moderate",
+			"title": "Next.js: Cache confusion of response bodies for requests with bodies containing invalid UTF-8 byte sequences",
+			"cves": ["CVE-2026-64647"],
+			"affected": ">=16.0.0 <16.2.11",
+			"patched": ">=16.2.11",
+			"url": "https://github.com/advisories/GHSA-4633-3j49-mh5q",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "moderate",
+			"title": "Next.js: Unbounded Server Action payload in Edge runtime",
+			"cves": ["CVE-2026-64646"],
+			"affected": ">=16.0.0 <16.2.11",
+			"patched": ">=16.2.11",
+			"url": "https://github.com/advisories/GHSA-4c39-4ccg-62r3",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "high",
+			"title": "Next.js: Server-Side Request Forgery in rewrites via attacker-controlled destination hostname",
+			"cves": ["CVE-2026-64645"],
+			"affected": ">=16.0.0 <16.2.11",
+			"patched": ">=16.2.11",
+			"url": "https://github.com/advisories/GHSA-p9j2-gv94-2wf4",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "moderate",
+			"title": "Next.js: Denial of Service in the Image Optimization API using SVGs",
+			"cves": ["CVE-2026-64644"],
+			"affected": ">=16.0.0 <16.2.11",
+			"patched": ">=16.2.11",
+			"url": "https://github.com/advisories/GHSA-q8wf-6r8g-63ch",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "moderate",
+			"title": "Next.js: Unauthenticated disclosure of internal Server Function endpoints",
+			"cves": ["CVE-2026-64643"],
+			"affected": ">=16.0.0 <16.2.11",
+			"patched": ">=16.2.11",
+			"url": "https://github.com/advisories/GHSA-955p-x3mx-jcvp",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "dompurify",
+			"severity": "moderate",
+			"title": "DOMPurify: Permanent `ALLOWED_ATTR` pollution via `setConfig()` bypassing the hook clone-guard (incomplete fix of the 3.4.7 hook-pollution patch)",
+			"cves": ["CVE-2026-65898"],
+			"affected": "<=3.4.10",
+			"patched": ">=3.4.11",
+			"url": "https://github.com/advisories/GHSA-cmwh-pvxp-8882",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.3.1",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/admin > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/public > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1"
+					],
+					"totalPaths": 4
+				}
+			]
+		},
+		{
+			"package": "dompurify",
+			"severity": "low",
+			"title": "DOMPurify: Trusted Types policy survives `clearConfig()` and can poison later `RETURN_TRUSTED_TYPE` output",
+			"cves": ["CVE-2026-65899"],
+			"affected": "<3.4.9",
+			"patched": ">=3.4.9",
+			"url": "https://github.com/advisories/GHSA-vxr8-fq34-vvx9",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.3.1",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/admin > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/public > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1"
+					],
+					"totalPaths": 4
+				}
+			]
+		},
+		{
+			"package": "dompurify",
+			"severity": "low",
+			"title": "DOMPurify: SAFE_FOR_TEMPLATES bypass - template expressions survive sanitization inside <template> content when using DOM output modes",
+			"cves": ["CVE-2026-65900"],
+			"affected": ">=3.0.0 <=3.4.7",
+			"patched": ">=3.4.8",
+			"url": "https://github.com/advisories/GHSA-gvmj-g25r-r7wr",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.3.1",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/admin > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/public > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1"
+					],
+					"totalPaths": 4
+				}
+			]
+		},
+		{
+			"package": "dompurify",
+			"severity": "low",
+			"title": "DOMPurify: `IN_PLACE` mode trusts attacker-controlled `nodeName` on live non-form nodes, allowing script retention and XSS via attacker-supplied DOM objects",
+			"cves": ["CVE-2026-65901"],
+			"affected": "<=3.4.6",
+			"patched": "<0.0.0",
+			"url": "https://github.com/advisories/GHSA-x4vx-rjvf-j5p4",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.3.1",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/admin > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/public > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1"
+					],
+					"totalPaths": 4
+				}
+			]
+		},
+		{
+			"package": "dompurify",
+			"severity": "moderate",
+			"title": "DOMPurify: Hook mutation of `data.allowedTags` / `data.allowedAttributes` permanently pollutes `DEFAULT_ALLOWED_TAGS` / `DEFAULT_ALLOWED_ATTR`",
+			"cves": ["CVE-2026-65902"],
+			"affected": "<3.4.7",
+			"patched": ">=3.4.7",
+			"url": "https://github.com/advisories/GHSA-76mc-f452-cxcm",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.3.1",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/admin > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/public > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1"
+					],
+					"totalPaths": 4
+				}
+			]
+		},
+		{
+			"package": "dompurify",
+			"severity": "moderate",
+			"title": "DOMPurify's ADD_TAGS function form bypasses FORBID_TAGS due to short-circuit evaluation",
+			"cves": ["CVE-2026-65903"],
+			"affected": "<=3.3.3",
+			"patched": ">=3.4.0",
+			"url": "https://github.com/advisories/GHSA-39q2-94rc-95cp",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.3.1",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/admin > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/public > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1"
+					],
+					"totalPaths": 4
+				}
+			]
+		},
+		{
+			"package": "dompurify",
+			"severity": "moderate",
+			"title": "DOMPurify ADD_ATTR predicate skips URI validation",
+			"cves": ["CVE-2026-65912"],
+			"affected": "<=3.3.1",
+			"patched": ">=3.3.2",
+			"url": "https://github.com/advisories/GHSA-cjmm-f4jc-qw8r",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.3.1",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/admin > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/public > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1"
+					],
+					"totalPaths": 4
+				}
+			]
+		},
+		{
+			"package": "dompurify",
+			"severity": "moderate",
+			"title": "DOMPurify USE_PROFILES prototype pollution allows event handlers",
+			"cves": ["CVE-2026-65913"],
+			"affected": "<=3.3.1",
+			"patched": ">=3.3.2",
+			"url": "https://github.com/advisories/GHSA-cj63-jhhr-wcxv",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.3.1",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/admin > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/public > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1"
+					],
+					"totalPaths": 4
+				}
+			]
+		},
+		{
+			"package": "dompurify",
+			"severity": "moderate",
+			"title": "DOMPurify is vulnerable to mutation-XSS via Re-Contextualization ",
+			"cves": ["CVE-2026-65914"],
+			"affected": "<3.3.2",
+			"patched": ">=3.3.2",
+			"url": "https://github.com/advisories/GHSA-h8r8-wccr-v5f2",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.3.1",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/admin > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/public > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1"
+					],
+					"totalPaths": 4
+				}
+			]
+		},
+		{
+			"package": "postcss",
+			"severity": "high",
+			"title": "PostCSS: Arbitrary file read and information disclosure via attacker-controlled sourceMappingURL in CSS comments",
+			"cves": ["CVE-2026-45623"],
+			"affected": "<=8.5.11",
+			"patched": ">=8.5.12",
+			"url": "https://github.com/advisories/GHSA-6g55-p6wh-862q",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "8.5.6",
+					"representativePaths": [
+						". > @vitejs/plugin-react@4.7.0 > vite@5.4.21 > postcss@8.5.6",
+						". > vite-tsconfig-paths@5.1.4 > vite@5.4.21 > postcss@8.5.6",
+						". > vitest@2.1.9 > @vitest/mocker@2.1.9 > vite@5.4.21 > postcss@8.5.6"
+					],
+					"totalPaths": 10
+				},
+				{
+					"version": "8.4.31",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6 > postcss@8.4.31",
+						"apps/admin > next@16.1.6 > postcss@8.4.31",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6 > postcss@8.4.31"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "better-auth",
+			"severity": "high",
+			"title": "Better Auth: Account takeover via pre-account hijacking on magic-link and email-OTP sign-in",
+			"cves": [],
+			"affected": ">=1.1.3 <1.6.22",
+			"patched": ">=1.6.22",
+			"url": "https://github.com/advisories/GHSA-qq9h-g4jm-xgf3",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.4.18",
+					"representativePaths": ["apps/admin > better-auth@1.4.18"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "brace-expansion",
+			"severity": "high",
+			"title": "brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash",
+			"cves": ["CVE-2026-14257"],
+			"affected": "<1.1.17",
+			"patched": ">=1.1.17",
+			"url": "https://github.com/advisories/GHSA-mh99-v99m-4gvg",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.1.12",
+					"representativePaths": [
+						". > eslint@9.39.2 > @eslint/config-array@0.21.1 > minimatch@3.1.2 > brace-expansion@1.1.12",
+						". > eslint@9.39.2 > @eslint/eslintrc@3.3.3 > minimatch@3.1.2 > brace-expansion@1.1.12",
+						". > eslint@9.39.2 > minimatch@3.1.2 > brace-expansion@1.1.12"
+					],
+					"totalPaths": 690
+				}
+			]
+		},
+		{
+			"package": "brace-expansion",
+			"severity": "high",
+			"title": "brace-expansion: DoS via unbounded expansion length causing an out-of-memory process crash",
+			"cves": ["CVE-2026-14257"],
+			"affected": ">=2.0.0 <2.1.3",
+			"patched": ">=2.1.3",
+			"url": "https://github.com/advisories/GHSA-mh99-v99m-4gvg",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "2.0.2",
+					"representativePaths": [
+						"apps/admin > exceljs@4.4.0 > archiver@5.3.2 > readdir-glob@1.1.3 > minimatch@5.1.6 > brace-expansion@2.0.2",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-import-resolver-typescript@3.10.1 > eslint-plugin-import@2.32.0 > eslint-module-utils@2.12.1 > @typescript-eslint/parser@8.54.0 > @typescript-eslint/typescript-estree@8.54.0 > minimatch@9.0.5 > brace-expansion@2.0.2",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-import-resolver-typescript@3.10.1 > eslint-plugin-import@2.32.0 > @typescript-eslint/parser@8.54.0 > @typescript-eslint/typescript-estree@8.54.0 > minimatch@9.0.5 > brace-expansion@2.0.2"
+					],
+					"totalPaths": 121
+				}
+			]
+		},
+		{
+			"package": "postcss",
+			"severity": "moderate",
+			"title": "PostCSS: incomplete fix of GHSA-6g55-p6wh-862q — attacker-controlled sourceMappingURL reads arbitrary .map files when `from` is unset",
+			"cves": ["CVE-2026-69153"],
+			"affected": "<=8.5.22",
+			"patched": ">=8.5.23",
+			"url": "https://github.com/advisories/GHSA-fxqj-rqcc-2cmp",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "8.5.6",
+					"representativePaths": [
+						". > @vitejs/plugin-react@4.7.0 > vite@5.4.21 > postcss@8.5.6",
+						". > vite-tsconfig-paths@5.1.4 > vite@5.4.21 > postcss@8.5.6",
+						". > vitest@2.1.9 > @vitest/mocker@2.1.9 > vite@5.4.21 > postcss@8.5.6"
+					],
+					"totalPaths": 10
+				},
+				{
+					"version": "8.4.31",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6 > postcss@8.4.31",
+						"apps/admin > next@16.1.6 > postcss@8.4.31",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6 > postcss@8.4.31"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "brace-expansion",
+			"severity": "high",
+			"title": "brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation",
+			"cves": ["CVE-2026-69152"],
+			"affected": ">=2.0.0 <2.1.4",
+			"patched": ">=2.1.4",
+			"url": "https://github.com/advisories/GHSA-rgw5-rvv9-x895",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "2.0.2",
+					"representativePaths": [
+						"apps/admin > exceljs@4.4.0 > archiver@5.3.2 > readdir-glob@1.1.3 > minimatch@5.1.6 > brace-expansion@2.0.2",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-import-resolver-typescript@3.10.1 > eslint-plugin-import@2.32.0 > eslint-module-utils@2.12.1 > @typescript-eslint/parser@8.54.0 > @typescript-eslint/typescript-estree@8.54.0 > minimatch@9.0.5 > brace-expansion@2.0.2",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-import-resolver-typescript@3.10.1 > eslint-plugin-import@2.32.0 > @typescript-eslint/parser@8.54.0 > @typescript-eslint/typescript-estree@8.54.0 > minimatch@9.0.5 > brace-expansion@2.0.2"
+					],
+					"totalPaths": 121
+				}
+			]
+		},
+		{
+			"package": "brace-expansion",
+			"severity": "high",
+			"title": "brace-expansion: DoS via unbounded intermediate arrays, bypassing the CVE-2026-14257 mitigation",
+			"cves": ["CVE-2026-69152"],
+			"affected": "<1.1.18",
+			"patched": ">=1.1.18",
+			"url": "https://github.com/advisories/GHSA-rgw5-rvv9-x895",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.1.12",
+					"representativePaths": [
+						". > eslint@9.39.2 > @eslint/config-array@0.21.1 > minimatch@3.1.2 > brace-expansion@1.1.12",
+						". > eslint@9.39.2 > @eslint/eslintrc@3.3.3 > minimatch@3.1.2 > brace-expansion@1.1.12",
+						". > eslint@9.39.2 > minimatch@3.1.2 > brace-expansion@1.1.12"
+					],
+					"totalPaths": 690
+				}
+			]
+		},
+		{
+			"package": "js-yaml",
+			"severity": "high",
+			"title": "JS-YAML: Quadratic CPU consumption in !!omap resolution (3.x and 4.x) — CVE-2026-59870 fix not backported",
+			"cves": [],
+			"affected": ">=4.0.0 <4.3.1",
+			"patched": ">=4.3.1",
+			"url": "https://github.com/advisories/GHSA-5p4m-2wfm-xmqj",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "4.1.1",
+					"representativePaths": [
+						". > eslint@9.39.2 > @eslint/eslintrc@3.3.3 > js-yaml@4.1.1",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > @eslint/eslintrc@3.3.3 > js-yaml@4.1.1",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint@9.39.2 > @eslint/eslintrc@3.3.3 > js-yaml@4.1.1"
+					],
+					"totalPaths": 223
+				}
+			]
+		},
+		{
+			"package": "dompurify",
+			"severity": "moderate",
+			"title": "DOMPurify: IN_PLACE hook removal leaves a detached subtree executable, causing XSS",
+			"cves": [],
+			"affected": "<=3.4.12",
+			"patched": ">=3.4.13",
+			"url": "https://github.com/advisories/GHSA-55q2-fjhq-7xh7",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.3.1",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/admin > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/public > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1"
+					],
+					"totalPaths": 4
+				}
+			]
+		},
+		{
+			"package": "nanoid",
+			"severity": "high",
+			"title": "nanoid: non-secure generators can loop indefinitely with negative size",
+			"cves": ["CVE-2026-67214"],
+			"affected": "<3.3.16",
+			"patched": ">=3.3.16",
+			"url": "https://github.com/advisories/GHSA-28wg-ghj8-5hjv",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.3.11",
+					"representativePaths": [
+						". > @vitejs/plugin-react@4.7.0 > vite@5.4.21 > postcss@8.5.6 > nanoid@3.3.11",
+						". > vite-tsconfig-paths@5.1.4 > vite@5.4.21 > postcss@8.5.6 > nanoid@3.3.11",
+						". > vitest@2.1.9 > @vitest/mocker@2.1.9 > vite@5.4.21 > postcss@8.5.6 > nanoid@3.3.11"
+					],
+					"totalPaths": 15
+				}
+			]
+		},
+		{
+			"package": "nanoid",
+			"severity": "high",
+			"title": "nanoid: custom generators can loop indefinitely when size is zero",
+			"cves": ["CVE-2026-67213"],
+			"affected": "<3.3.18",
+			"patched": ">=3.3.18",
+			"url": "https://github.com/advisories/GHSA-2v37-7h3g-55p8",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.3.11",
+					"representativePaths": [
+						". > @vitejs/plugin-react@4.7.0 > vite@5.4.21 > postcss@8.5.6 > nanoid@3.3.11",
+						". > vite-tsconfig-paths@5.1.4 > vite@5.4.21 > postcss@8.5.6 > nanoid@3.3.11",
+						". > vitest@2.1.9 > @vitest/mocker@2.1.9 > vite@5.4.21 > postcss@8.5.6 > nanoid@3.3.11"
+					],
+					"totalPaths": 15
+				}
+			]
+		},
+		{
+			"package": "postcss",
+			"severity": "high",
+			"title": "PostCSS: Path Traversal in Previous Source Map Auto-Loading (sourceMappingURL) leads to Arbitrary .map File Disclosure",
+			"cves": ["CVE-2026-73646"],
+			"affected": "<=8.5.17",
+			"patched": ">=8.5.18",
+			"url": "https://github.com/advisories/GHSA-r28c-9q8g-f849",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "8.5.6",
+					"representativePaths": [
+						". > @vitejs/plugin-react@4.7.0 > vite@5.4.21 > postcss@8.5.6",
+						". > vite-tsconfig-paths@5.1.4 > vite@5.4.21 > postcss@8.5.6",
+						". > vitest@2.1.9 > @vitest/mocker@2.1.9 > vite@5.4.21 > postcss@8.5.6"
+					],
+					"totalPaths": 10
+				},
+				{
+					"version": "8.4.31",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6 > postcss@8.4.31",
+						"apps/admin > next@16.1.6 > postcss@8.4.31",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6 > postcss@8.4.31"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "vitest",
+			"severity": "critical",
+			"title": "When Vitest UI server is listening, arbitrary file can be read and executed",
+			"cves": ["CVE-2026-47429"],
+			"affected": "<3.2.6",
+			"patched": ">=3.2.6",
+			"url": "https://github.com/advisories/GHSA-5xrq-8626-4rwp",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "2.1.9",
+					"representativePaths": [
+						". > vitest@2.1.9",
+						"apps/admin > better-auth@1.4.18 > vitest@2.1.9"
+					],
+					"totalPaths": 2
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "moderate",
+			"title": "Axios: Prototype pollution gadgets can alter axios request construction",
+			"cves": ["CVE-2026-67316"],
+			"affected": ">=1.0.0 <1.18.0",
+			"patched": ">=1.18.0",
+			"url": "https://github.com/advisories/GHSA-mmx7-hfxf-jppx",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "moderate",
+			"title": "Axios: Deep formToJSON Key Recursion Can Cause Denial of Service",
+			"cves": ["CVE-2026-67312"],
+			"affected": ">=1.0.0 <1.18.0",
+			"patched": ">=1.18.0",
+			"url": "https://github.com/advisories/GHSA-pmv8-rq9r-6j72",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "browserslist",
+			"severity": "high",
+			"title": "Browserslist: Unbounded memory growth (no cache eviction) via distinct query results, leading to eventual OOM",
+			"cves": ["CVE-2026-73089"],
+			"affected": "<=4.28.6",
+			"patched": ">=4.28.7",
+			"url": "https://github.com/advisories/GHSA-c83g-rgw3-j3cx",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "4.28.1",
+					"representativePaths": [
+						". > @vitejs/plugin-react@4.7.0 > @babel/core@7.29.0 > @babel/helper-compilation-targets@7.28.6 > browserslist@4.28.1 > update-browserslist-db@1.2.3 > browserslist@4.28.1",
+						". > @vitejs/plugin-react@4.7.0 > @babel/plugin-transform-react-jsx-self@7.27.1 > @babel/core@7.29.0 > @babel/helper-compilation-targets@7.28.6 > browserslist@4.28.1 > update-browserslist-db@1.2.3 > browserslist@4.28.1",
+						". > @vitejs/plugin-react@4.7.0 > @babel/plugin-transform-react-jsx-source@7.27.1 > @babel/core@7.29.0 > @babel/helper-compilation-targets@7.28.6 > browserslist@4.28.1 > update-browserslist-db@1.2.3 > browserslist@4.28.1"
+					],
+					"totalPaths": 14
+				}
+			]
+		},
+		{
+			"package": "browserslist",
+			"severity": "high",
+			"title": "Browserslist: Uncaught crash / prototype write via untrusted browserslist-stats.json custom stats (normalizeStats)",
+			"cves": ["CVE-2026-73088"],
+			"affected": "<=4.28.6",
+			"patched": ">=4.28.7",
+			"url": "https://github.com/advisories/GHSA-73wf-gq98-2v4g",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "4.28.1",
+					"representativePaths": [
+						". > @vitejs/plugin-react@4.7.0 > @babel/core@7.29.0 > @babel/helper-compilation-targets@7.28.6 > browserslist@4.28.1 > update-browserslist-db@1.2.3 > browserslist@4.28.1",
+						". > @vitejs/plugin-react@4.7.0 > @babel/plugin-transform-react-jsx-self@7.27.1 > @babel/core@7.29.0 > @babel/helper-compilation-targets@7.28.6 > browserslist@4.28.1 > update-browserslist-db@1.2.3 > browserslist@4.28.1",
+						". > @vitejs/plugin-react@4.7.0 > @babel/plugin-transform-react-jsx-source@7.27.1 > @babel/core@7.29.0 > @babel/helper-compilation-targets@7.28.6 > browserslist@4.28.1 > update-browserslist-db@1.2.3 > browserslist@4.28.1"
+					],
+					"totalPaths": 14
+				}
+			]
+		},
+		{
+			"package": "mysql2",
+			"severity": "high",
+			"title": "MySQL2: Auth Plugin Downgrade to mysql_clear_password Leaks Plaintext Credentials",
+			"cves": [],
+			"affected": "<3.22.0",
+			"patched": ">=3.22.0",
+			"url": "https://github.com/advisories/GHSA-3f6p-5ww8-9rcr",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.16.2",
+					"representativePaths": [
+						". > mysql2@3.16.2",
+						"apps/admin > @mpga/database@link:../../packages/database > drizzle-orm@0.45.1 > mysql2@3.16.2",
+						"apps/admin > @mpga/database@link:../../packages/database > mysql2@3.16.2"
+					],
+					"totalPaths": 29
+				}
+			]
+		},
+		{
+			"package": "@opentelemetry/core",
+			"severity": "moderate",
+			"title": "OpenTelemetry Core: Unbounded memory allocation in W3C Baggage propagation",
+			"cves": ["CVE-2026-54285"],
+			"affected": "<2.8.0",
+			"patched": ">=2.8.0",
+			"url": "https://github.com/advisories/GHSA-8988-4f7v-96qf",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "2.2.0",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/core@2.2.0",
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-exporter-base@0.208.0 > @opentelemetry/core@2.2.0",
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/exporter-logs-otlp-http@0.208.0 > @opentelemetry/otlp-exporter-base@0.208.0 > @opentelemetry/otlp-transformer@0.208.0 > @opentelemetry/core@2.2.0"
+					],
+					"totalPaths": 88
+				},
+				{
+					"version": "2.5.1",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/resources@2.5.1 > @opentelemetry/core@2.5.1",
+						"apps/admin > posthog-js@1.347.2 > @opentelemetry/resources@2.5.1 > @opentelemetry/core@2.5.1",
+						"apps/public > @posthog/react@1.7.1 > posthog-js@1.347.2 > @opentelemetry/resources@2.5.1 > @opentelemetry/core@2.5.1"
+					],
+					"totalPaths": 4
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "moderate",
+			"title": "Axios: HTTP/2 streamed uploads bypass `maxBodyLength`",
+			"cves": ["CVE-2026-67318"],
+			"affected": ">=1.13.0 <1.18.0",
+			"patched": ">=1.18.0",
+			"url": "https://github.com/advisories/GHSA-mwf2-3pr3-8698",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "moderate",
+			"title": "Axios: Nested axios option objects can consume polluted prototype values",
+			"cves": ["CVE-2026-67319"],
+			"affected": ">=1.0.0 <1.18.0",
+			"patched": ">=1.18.0",
+			"url": "https://github.com/advisories/GHSA-7q8q-rj6j-mhjq",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "moderate",
+			"title": "Axios: Fetch adapter `ReadableStream` uploads bypass `maxBodyLength`",
+			"cves": ["CVE-2026-67317"],
+			"affected": ">=1.7.0 <1.18.0",
+			"patched": ">=1.18.0",
+			"url": "https://github.com/advisories/GHSA-jqh4-m9w3-8hp9",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "moderate",
+			"title": "Axios: Excessive recursion in formDataToJSON can cause denial of service",
+			"cves": ["CVE-2026-67313"],
+			"affected": ">=1.0.0 <1.18.0",
+			"patched": ">=1.18.0",
+			"url": "https://github.com/advisories/GHSA-42h9-826w-cgv3",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "nanoid",
+			"severity": "high",
+			"title": "nanoid: Integer Overflow or Wraparound",
+			"cves": ["CVE-2026-73086"],
+			"affected": "<3.3.12",
+			"patched": ">=3.3.12",
+			"url": "https://github.com/advisories/GHSA-xwg4-73v4-xw9w",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.3.11",
+					"representativePaths": [
+						". > @vitejs/plugin-react@4.7.0 > vite@5.4.21 > postcss@8.5.6 > nanoid@3.3.11",
+						". > vite-tsconfig-paths@5.1.4 > vite@5.4.21 > postcss@8.5.6 > nanoid@3.3.11",
+						". > vitest@2.1.9 > @vitest/mocker@2.1.9 > vite@5.4.21 > postcss@8.5.6 > nanoid@3.3.11"
+					],
+					"totalPaths": 15
+				}
+			]
+		},
+		{
+			"package": "@humanfs/node",
+			"severity": "moderate",
+			"title": "humanfs: Recursive copy follows symlinked files and copies data from outside the source tree",
+			"cves": [],
+			"affected": "<0.16.8",
+			"patched": ">=0.16.8",
+			"url": "https://github.com/advisories/GHSA-p498-v437-472g",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "0.16.7",
+					"representativePaths": [
+						". > eslint@9.39.2 > @humanfs/node@0.16.7",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint@9.39.2 > @humanfs/node@0.16.7",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint@9.39.2 > @humanfs/node@0.16.7"
+					],
+					"totalPaths": 217
+				}
+			]
+		},
+		{
+			"package": "@tiptap/core",
+			"severity": "moderate",
+			"title": "Tiptap: mergeAttributes() turns an own __proto__ key into inherited executable DOM attributes",
+			"cves": [],
+			"affected": ">=2.0.0-alpha.0 <3.30.4",
+			"patched": ">=3.30.4",
+			"url": "https://github.com/advisories/GHSA-cp6q-959q-f8rh",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "2.27.2",
+					"representativePaths": [
+						"apps/admin > @tiptap/extension-highlight@2.27.2 > @tiptap/core@2.27.2",
+						"apps/admin > @tiptap/extension-link@2.27.2 > @tiptap/core@2.27.2",
+						"apps/admin > @tiptap/react@2.27.2 > @tiptap/core@2.27.2"
+					],
+					"totalPaths": 26
+				}
+			]
+		},
+		{
+			"package": "nodemailer",
+			"severity": "high",
+			"title": "Nodemailer: Message-level raw option bypasses disableFileAccess/disableUrlAccess, enabling arbitrary file read and full-response SSRF in the delivered message",
+			"cves": ["CVE-2026-82659"],
+			"affected": "<=9.0.0",
+			"patched": ">=9.0.1",
+			"url": "https://github.com/advisories/GHSA-p6gq-j5cr-w38f",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "8.0.1",
+					"representativePaths": ["apps/admin > nodemailer@8.0.1"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "mysql2",
+			"severity": "moderate",
+			"title": "MySQL2: Unbounded zlib inflate in compressed MySQL protocol handler allows decompression-bomb DoS",
+			"cves": [],
+			"affected": "<=3.23.0",
+			"patched": ">=3.23.1",
+			"url": "https://github.com/advisories/GHSA-rgwj-5xj2-c3m3",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.16.2",
+					"representativePaths": [
+						". > mysql2@3.16.2",
+						"apps/admin > @mpga/database@link:../../packages/database > drizzle-orm@0.45.1 > mysql2@3.16.2",
+						"apps/admin > @mpga/database@link:../../packages/database > mysql2@3.16.2"
+					],
+					"totalPaths": 29
+				}
+			]
+		},
+		{
+			"package": "fflate",
+			"severity": "moderate",
+			"title": "fflate unzipSync can enter an infinite loop when parsing malformed ZIP64 archives",
+			"cves": ["CVE-2026-45820"],
+			"affected": ">=0.4.5 <0.4.9",
+			"patched": ">=0.4.9",
+			"url": "https://github.com/advisories/GHSA-px8p-9vwx-vf98",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "0.4.8",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > fflate@0.4.8",
+						"apps/admin > posthog-js@1.347.2 > fflate@0.4.8",
+						"apps/public > @posthog/react@1.7.1 > posthog-js@1.347.2 > fflate@0.4.8"
+					],
+					"totalPaths": 4
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "critical",
+			"title": "Next.js: Unauthenticated Remote Code Execution on windows-hosted servers",
+			"cves": ["CVE-2026-75604"],
+			"affected": ">=16.0.0 <16.3.3",
+			"patched": ">=16.3.3",
+			"url": "https://github.com/advisories/GHSA-p293-qw3h-jr36",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "vitest",
+			"severity": "moderate",
+			"title": "Vitest: Path Traversal / Arbitrary File Read via @vitest/mocker Redirect Mock",
+			"cves": ["CVE-2026-84373"],
+			"affected": ">=2.1.0 <4.1.11",
+			"patched": ">=4.1.11",
+			"url": "https://github.com/advisories/GHSA-82fw-gwwq-j7x9",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "2.1.9",
+					"representativePaths": [
+						". > vitest@2.1.9",
+						"apps/admin > better-auth@1.4.18 > vitest@2.1.9"
+					],
+					"totalPaths": 2
+				}
+			]
+		},
+		{
+			"package": "@vitest/mocker",
+			"severity": "moderate",
+			"title": "Vitest: Path Traversal / Arbitrary File Read via @vitest/mocker Redirect Mock",
+			"cves": ["CVE-2026-84373"],
+			"affected": ">=2.1.0 <4.1.11",
+			"patched": ">=4.1.11",
+			"url": "https://github.com/advisories/GHSA-82fw-gwwq-j7x9",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "2.1.9",
+					"representativePaths": [
+						". > vitest@2.1.9 > @vitest/mocker@2.1.9",
+						"apps/admin > better-auth@1.4.18 > vitest@2.1.9 > @vitest/mocker@2.1.9"
+					],
+					"totalPaths": 2
+				}
+			]
+		},
+		{
+			"package": "baseline-browser-mapping",
+			"severity": "moderate",
+			"title": "baseline-browser-mapping process termination on invalid input causes denial of service",
+			"cves": ["CVE-2026-45819"],
+			"affected": ">=2.0.0 <2.11.0",
+			"patched": ">=2.11.0",
+			"url": "https://github.com/advisories/GHSA-w5vr-8v7q-w6rv",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "2.9.19",
+					"representativePaths": [
+						". > @vitejs/plugin-react@4.7.0 > @babel/core@7.29.0 > @babel/helper-compilation-targets@7.28.6 > browserslist@4.28.1 > baseline-browser-mapping@2.9.19",
+						". > @vitejs/plugin-react@4.7.0 > @babel/plugin-transform-react-jsx-self@7.27.1 > @babel/core@7.29.0 > @babel/helper-compilation-targets@7.28.6 > browserslist@4.28.1 > baseline-browser-mapping@2.9.19",
+						". > @vitejs/plugin-react@4.7.0 > @babel/plugin-transform-react-jsx-source@7.27.1 > @babel/core@7.29.0 > @babel/helper-compilation-targets@7.28.6 > browserslist@4.28.1 > baseline-browser-mapping@2.9.19"
+					],
+					"totalPaths": 19
+				}
+			]
+		},
+		{
+			"package": "sharp",
+			"severity": "high",
+			"title": "sharp: Vulnerabilities in libheif: GHSA-g89c-p67h-r497 and GHSA-2jg2-4ch7-h545",
+			"cves": [],
+			"affected": "<0.35.4",
+			"patched": ">=0.35.4",
+			"url": "https://github.com/advisories/GHSA-rgj7-g3m4-5g8c",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "0.34.5",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6 > sharp@0.34.5",
+						"apps/admin > next@16.1.6 > sharp@0.34.5",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6 > sharp@0.34.5"
+					],
+					"totalPaths": 6
+				}
+			]
+		},
+		{
+			"package": "js-yaml",
+			"severity": "high",
+			"title": "js-yaml: maxTotalMergeKeys does not limit CPU use for empty merge sources",
+			"cves": ["CVE-2026-84375"],
+			"affected": ">=4.0.0 <4.3.2",
+			"patched": ">=4.3.2",
+			"url": "https://github.com/advisories/GHSA-2883-xcg3-v3hh",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "4.1.1",
+					"representativePaths": [
+						". > eslint@9.39.2 > @eslint/eslintrc@3.3.3 > js-yaml@4.1.1",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > @eslint/eslintrc@3.3.3 > js-yaml@4.1.1",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint@9.39.2 > @eslint/eslintrc@3.3.3 > js-yaml@4.1.1"
+					],
+					"totalPaths": 223
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "critical",
+			"title": "Next.js: Unauthenticated Remote Code Execution in Image Optimization API when AVIF files are used",
+			"cves": [],
+			"affected": ">=16.0.0 <16.3.3",
+			"patched": ">=16.3.3",
+			"url": "https://github.com/advisories/GHSA-2xp9-vwfh-vxw4",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "nodemailer",
+			"severity": "moderate",
+			"title": "Nodemailer: resolveContent() on a MailMessage bypasses disableFileAccess/disableUrlAccess when called with the legacy signature",
+			"cves": [],
+			"affected": "<=9.1.0",
+			"patched": ">=9.1.1",
+			"url": "https://github.com/advisories/GHSA-8m3c-c648-2xjj",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "8.0.1",
+					"representativePaths": ["apps/admin > nodemailer@8.0.1"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "nodemailer",
+			"severity": "moderate",
+			"title": "Nodemailer: IDN/Punycode domain allow-list bypass leads to email delivery to an attacker-controlled domain",
+			"cves": [],
+			"affected": "<9.1.0",
+			"patched": ">=9.1.0",
+			"url": "https://github.com/advisories/GHSA-wmmp-3585-3rmp",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "8.0.1",
+					"representativePaths": ["apps/admin > nodemailer@8.0.1"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "nodemailer",
+			"severity": "high",
+			"title": "Nodemailer: Quadratic (O(n²)) time complexity in addressparser allows remote denial of service via a crafted address list",
+			"cves": [],
+			"affected": "<9.1.0",
+			"patched": ">=9.1.0",
+			"url": "https://github.com/advisories/GHSA-2x7j-588g-ccc2",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "8.0.1",
+					"representativePaths": ["apps/admin > nodemailer@8.0.1"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "nodemailer",
+			"severity": "moderate",
+			"title": "Nodemailer: Recipient-domain validation bypass via RFC 5322 comment mis-parsing leads to email delivery to an attacker-controlled domain",
+			"cves": [],
+			"affected": ">=6.9.16 <9.1.0",
+			"patched": ">=9.1.0",
+			"url": "https://github.com/advisories/GHSA-cc9r-2j5m-2m83",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "8.0.1",
+					"representativePaths": ["apps/admin > nodemailer@8.0.1"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "nodemailer",
+			"severity": "moderate",
+			"title": "Nodemailer: Process-global DNS cache reuses TLS `servername` across transports, enabling cross-tenant SMTP credential disclosure",
+			"cves": [],
+			"affected": ">=5.0.0 <10.0.2",
+			"patched": ">=10.0.2",
+			"url": "https://github.com/advisories/GHSA-6vj9-mwq6-2f5v",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "8.0.1",
+					"representativePaths": ["apps/admin > nodemailer@8.0.1"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "nodemailer",
+			"severity": "moderate",
+			"title": "Nodemailer: Nested structured recipient arrays bypass the parser depth limit and cause stack exhaustion DoS",
+			"cves": [],
+			"affected": "<10.0.2",
+			"patched": ">=10.0.2",
+			"url": "https://github.com/advisories/GHSA-8vvx-rff5-p5rq",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "8.0.1",
+					"representativePaths": ["apps/admin > nodemailer@8.0.1"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "brace-expansion",
+			"severity": "moderate",
+			"title": "brace-expansion: Quadratic-time expansion of the `{a},b}` rewrite causes CPU denial of service",
+			"cves": ["CVE-2026-102277"],
+			"affected": "<1.1.21",
+			"patched": ">=1.1.21",
+			"url": "https://github.com/advisories/GHSA-q2hr-2g5m-vwhr",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.1.12",
+					"representativePaths": [
+						". > eslint@9.39.2 > @eslint/config-array@0.21.1 > minimatch@3.1.2 > brace-expansion@1.1.12",
+						". > eslint@9.39.2 > @eslint/eslintrc@3.3.3 > minimatch@3.1.2 > brace-expansion@1.1.12",
+						". > eslint@9.39.2 > minimatch@3.1.2 > brace-expansion@1.1.12"
+					],
+					"totalPaths": 690
+				}
+			]
+		},
+		{
+			"package": "brace-expansion",
+			"severity": "moderate",
+			"title": "brace-expansion: Quadratic-time expansion of the `{a},b}` rewrite causes CPU denial of service",
+			"cves": ["CVE-2026-102277"],
+			"affected": ">=2.0.0 <2.1.7",
+			"patched": ">=2.1.7",
+			"url": "https://github.com/advisories/GHSA-q2hr-2g5m-vwhr",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "2.0.2",
+					"representativePaths": [
+						"apps/admin > exceljs@4.4.0 > archiver@5.3.2 > readdir-glob@1.1.3 > minimatch@5.1.6 > brace-expansion@2.0.2",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-import-resolver-typescript@3.10.1 > eslint-plugin-import@2.32.0 > eslint-module-utils@2.12.1 > @typescript-eslint/parser@8.54.0 > @typescript-eslint/typescript-estree@8.54.0 > minimatch@9.0.5 > brace-expansion@2.0.2",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-import-resolver-typescript@3.10.1 > eslint-plugin-import@2.32.0 > @typescript-eslint/parser@8.54.0 > @typescript-eslint/typescript-estree@8.54.0 > minimatch@9.0.5 > brace-expansion@2.0.2"
+					],
+					"totalPaths": 121
+				}
+			]
+		},
+		{
+			"package": "brace-expansion",
+			"severity": "high",
+			"title": "brace-expansion: DoS via uncontrolled recursion on nested brace groups causing stack exhaustion",
+			"cves": ["CVE-2026-102278"],
+			"affected": "<1.1.20",
+			"patched": ">=1.1.20",
+			"url": "https://github.com/advisories/GHSA-qhr7-859c-m2p7",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.1.12",
+					"representativePaths": [
+						". > eslint@9.39.2 > @eslint/config-array@0.21.1 > minimatch@3.1.2 > brace-expansion@1.1.12",
+						". > eslint@9.39.2 > @eslint/eslintrc@3.3.3 > minimatch@3.1.2 > brace-expansion@1.1.12",
+						". > eslint@9.39.2 > minimatch@3.1.2 > brace-expansion@1.1.12"
+					],
+					"totalPaths": 690
+				}
+			]
+		},
+		{
+			"package": "brace-expansion",
+			"severity": "high",
+			"title": "brace-expansion: DoS via uncontrolled recursion on nested brace groups causing stack exhaustion",
+			"cves": ["CVE-2026-102278"],
+			"affected": ">=2.0.0 <2.1.6",
+			"patched": ">=2.1.6",
+			"url": "https://github.com/advisories/GHSA-qhr7-859c-m2p7",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "2.0.2",
+					"representativePaths": [
+						"apps/admin > exceljs@4.4.0 > archiver@5.3.2 > readdir-glob@1.1.3 > minimatch@5.1.6 > brace-expansion@2.0.2",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-import-resolver-typescript@3.10.1 > eslint-plugin-import@2.32.0 > eslint-module-utils@2.12.1 > @typescript-eslint/parser@8.54.0 > @typescript-eslint/typescript-estree@8.54.0 > minimatch@9.0.5 > brace-expansion@2.0.2",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-import-resolver-typescript@3.10.1 > eslint-plugin-import@2.32.0 > @typescript-eslint/parser@8.54.0 > @typescript-eslint/typescript-estree@8.54.0 > minimatch@9.0.5 > brace-expansion@2.0.2"
+					],
+					"totalPaths": 121
+				}
+			]
+		},
+		{
+			"package": "brace-expansion",
+			"severity": "high",
+			"title": "brace-expansion: DoS via uncontrolled recursion in parseCommaParts causing stack exhaustion",
+			"cves": ["CVE-2026-102276"],
+			"affected": "<1.1.19",
+			"patched": ">=1.1.19",
+			"url": "https://github.com/advisories/GHSA-6j4f-fj2g-mc7p",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.1.12",
+					"representativePaths": [
+						". > eslint@9.39.2 > @eslint/config-array@0.21.1 > minimatch@3.1.2 > brace-expansion@1.1.12",
+						". > eslint@9.39.2 > @eslint/eslintrc@3.3.3 > minimatch@3.1.2 > brace-expansion@1.1.12",
+						". > eslint@9.39.2 > minimatch@3.1.2 > brace-expansion@1.1.12"
+					],
+					"totalPaths": 690
+				}
+			]
+		},
+		{
+			"package": "brace-expansion",
+			"severity": "high",
+			"title": "brace-expansion: DoS via uncontrolled recursion in parseCommaParts causing stack exhaustion",
+			"cves": ["CVE-2026-102276"],
+			"affected": ">=2.0.0 <2.1.5",
+			"patched": ">=2.1.5",
+			"url": "https://github.com/advisories/GHSA-6j4f-fj2g-mc7p",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "2.0.2",
+					"representativePaths": [
+						"apps/admin > exceljs@4.4.0 > archiver@5.3.2 > readdir-glob@1.1.3 > minimatch@5.1.6 > brace-expansion@2.0.2",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-import-resolver-typescript@3.10.1 > eslint-plugin-import@2.32.0 > eslint-module-utils@2.12.1 > @typescript-eslint/parser@8.54.0 > @typescript-eslint/typescript-estree@8.54.0 > minimatch@9.0.5 > brace-expansion@2.0.2",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint-import-resolver-typescript@3.10.1 > eslint-plugin-import@2.32.0 > @typescript-eslint/parser@8.54.0 > @typescript-eslint/typescript-estree@8.54.0 > minimatch@9.0.5 > brace-expansion@2.0.2"
+					],
+					"totalPaths": 121
+				}
+			]
+		},
+		{
+			"package": "nodemailer",
+			"severity": "high",
+			"title": "Nodemailer: Quadratic backtracking in the addressparser free-text fallback allows remote denial of service",
+			"cves": [],
+			"affected": "<=10.0.5",
+			"patched": ">=10.0.6",
+			"url": "https://github.com/advisories/GHSA-v53p-9fqp-m79j",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "8.0.1",
+					"representativePaths": ["apps/admin > nodemailer@8.0.1"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "moderate",
+			"title": "Axios: Prototype pollution gadget in fetch adapter can alter outbound requests",
+			"cves": ["CVE-2026-101908"],
+			"affected": ">=1.7.0 <1.20.0",
+			"patched": ">=1.20.0",
+			"url": "https://github.com/advisories/GHSA-vh66-26gq-q6x8",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "moderate",
+			"title": "Axios: Prototype-Pollution Gadget in the Default Instance Allows Inherited Object.prototype.method to Override HTTP Method",
+			"cves": ["CVE-2026-101902"],
+			"affected": ">=1.0.0 <1.20.0",
+			"patched": ">=1.20.0",
+			"url": "https://github.com/advisories/GHSA-9fr6-4gfg-395g",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "high",
+			"title": "Axios: HTTP/2 adapter bypasses configured DNS lookup and proxy controls",
+			"cves": ["CVE-2026-101898"],
+			"affected": ">=1.13.0 <1.20.0",
+			"patched": ">=1.20.0",
+			"url": "https://github.com/advisories/GHSA-3pq3-5fj3-cg6v",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "high",
+			"title": "Axios: Denial of Service via Unhandled 'error' Event in HTTP/2 ClientHttp2Session Initialization",
+			"cves": ["CVE-2026-101901"],
+			"affected": ">=1.13.0 <1.20.0",
+			"patched": ">=1.20.0",
+			"url": "https://github.com/advisories/GHSA-542g-h47m-68v8",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "moderate",
+			"title": "Axios: Header Injection via Inherited headers After Minimal Interceptor",
+			"cves": ["CVE-2026-101904"],
+			"affected": ">=1.0.0 <1.20.0",
+			"patched": ">=1.20.0",
+			"url": "https://github.com/advisories/GHSA-j8rh-479h-cp32",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "axios",
+			"severity": "moderate",
+			"title": "Axios: Fetch Adapter Header Injection via Inherited FormData getHeaders",
+			"cves": ["CVE-2026-101900"],
+			"affected": ">=1.12.0 <1.20.0",
+			"patched": ">=1.20.0",
+			"url": "https://github.com/advisories/GHSA-4hqw-qxg8-jxx2",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.13.5",
+					"representativePaths": [
+						"apps/admin > nodemailer-mailgun-transport@2.1.5 > mailgun.js@8.2.2 > axios@1.13.5"
+					],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "dompurify",
+			"severity": "low",
+			"title": "DOMPurify: `CUSTOM_ELEMENT_HANDLING` bypasses `afterSanitizeElements` for allowed custom elements.",
+			"cves": ["CVE-2026-66010"],
+			"affected": "<=3.4.11",
+			"patched": ">=3.4.12",
+			"url": "https://github.com/advisories/GHSA-c2j3-45gr-mqc4",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.3.1",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/admin > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/public > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1"
+					],
+					"totalPaths": 4
+				}
+			]
+		},
+		{
+			"package": "nodemailer",
+			"severity": "high",
+			"title": "Nodemailer: Improper TLS Certificate Validation in OAuth2 Token Fetch Enables Credential Interception",
+			"cves": ["CVE-2026-82662"],
+			"affected": "<=8.0.7",
+			"patched": ">=8.0.8",
+			"url": "https://github.com/advisories/GHSA-r7g4-qg5f-qqm2",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "8.0.1",
+					"representativePaths": ["apps/admin > nodemailer@8.0.1"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "flatted",
+			"severity": "high",
+			"title": "Prototype Pollution via parse() in NodeJS flatted",
+			"cves": ["CVE-2026-33228"],
+			"affected": "<=3.4.1",
+			"patched": ">=3.4.2",
+			"url": "https://github.com/advisories/GHSA-rf6f-7fwh-wjgh",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.3.3",
+					"representativePaths": [
+						". > eslint@9.39.2 > file-entry-cache@8.0.0 > flat-cache@4.0.1 > flatted@3.3.3",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint@9.39.2 > file-entry-cache@8.0.0 > flat-cache@4.0.1 > flatted@3.3.3",
+						"apps/admin > @mpga/eslint-config@link:../../tooling/eslint > eslint-config-next@16.1.6 > eslint@9.39.2 > file-entry-cache@8.0.0 > flat-cache@4.0.1 > flatted@3.3.3"
+					],
+					"totalPaths": 217
+				}
+			]
+		},
+		{
+			"package": "dompurify",
+			"severity": "low",
+			"title": "DOMPurify: IN_PLACE returns a force-removed rawtext root whose text carries attacker markup — pure HTML reparse executes",
+			"cves": [],
+			"affected": "<=3.4.15",
+			"patched": ">=3.4.16",
+			"url": "https://github.com/advisories/GHSA-6688-9rhm-gjv2",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.3.1",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/admin > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/public > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1"
+					],
+					"totalPaths": 4
+				}
+			]
+		},
+		{
+			"package": "source-map-js",
+			"severity": "high",
+			"title": "source-map-js allows event-loop denial of service through indexed source-map section offsets",
+			"cves": ["CVE-2026-93749"],
+			"affected": ">=1.0.0 <1.2.2",
+			"patched": ">=1.2.2",
+			"url": "https://github.com/advisories/GHSA-68fv-2mgg-jv7q",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.2.1",
+					"representativePaths": [
+						". > @vitejs/plugin-react@4.7.0 > vite@5.4.21 > postcss@8.5.6 > source-map-js@1.2.1",
+						". > vite-tsconfig-paths@5.1.4 > vite@5.4.21 > postcss@8.5.6 > source-map-js@1.2.1",
+						". > vitest@2.1.9 > @vitest/mocker@2.1.9 > vite@5.4.21 > postcss@8.5.6 > source-map-js@1.2.1"
+					],
+					"totalPaths": 17
+				}
+			]
+		},
+		{
+			"package": "tinypool",
+			"severity": "critical",
+			"title": "Tinypool: Prototype Pollution gadget in worker options leads to Remote Code Execution",
+			"cves": ["CVE-2026-104848"],
+			"affected": "<=2.1.0",
+			"patched": ">=2.1.1",
+			"url": "https://github.com/advisories/GHSA-5gmw-xhrv-c9v3",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.1.1",
+					"representativePaths": [
+						". > vitest@2.1.9 > tinypool@1.1.1",
+						"apps/admin > better-auth@1.4.18 > vitest@2.1.9 > tinypool@1.1.1"
+					],
+					"totalPaths": 2
+				}
+			]
+		},
+		{
+			"package": "tinypool",
+			"severity": "critical",
+			"title": "Tinypool: Prototype Pollution Gadget to RCE in run() options",
+			"cves": ["CVE-2026-104849"],
+			"affected": "<2.1.2",
+			"patched": ">=2.1.2",
+			"url": "https://github.com/advisories/GHSA-85c8-ppgw-ccpr",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.1.1",
+					"representativePaths": [
+						". > vitest@2.1.9 > tinypool@1.1.1",
+						"apps/admin > better-auth@1.4.18 > vitest@2.1.9 > tinypool@1.1.1"
+					],
+					"totalPaths": 2
+				}
+			]
+		},
+		{
+			"package": "prosemirror-view",
+			"severity": "high",
+			"title": "ProseMirror has a XSS vulnerability in prosemirror-view's paste handling",
+			"cves": ["CVE-2026-104847"],
+			"affected": "<1.42.3",
+			"patched": ">=1.42.3",
+			"url": "https://github.com/advisories/GHSA-c8x8-7fp4-3x9w",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.41.6",
+					"representativePaths": [
+						"apps/admin > @tiptap/extension-highlight@2.27.2 > @tiptap/core@2.27.2 > @tiptap/pm@2.27.2 > prosemirror-collab@1.3.1 > prosemirror-state@1.4.4 > prosemirror-view@1.41.6",
+						"apps/admin > @tiptap/extension-highlight@2.27.2 > @tiptap/core@2.27.2 > @tiptap/pm@2.27.2 > prosemirror-commands@1.7.1 > prosemirror-state@1.4.4 > prosemirror-view@1.41.6",
+						"apps/admin > @tiptap/extension-highlight@2.27.2 > @tiptap/core@2.27.2 > @tiptap/pm@2.27.2 > prosemirror-dropcursor@1.8.2 > prosemirror-state@1.4.4 > prosemirror-view@1.41.6"
+					],
+					"totalPaths": 851
+				}
+			]
+		},
+		{
+			"package": "sharp",
+			"severity": "high",
+			"title": "sharp : Vulnerability in librsvg dependency CVE-2026-96889",
+			"cves": [],
+			"affected": "<0.35.5",
+			"patched": ">=0.35.5",
+			"url": "https://github.com/advisories/GHSA-wq5f-xc86-pv6w",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "0.34.5",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6 > sharp@0.34.5",
+						"apps/admin > next@16.1.6 > sharp@0.34.5",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6 > sharp@0.34.5"
+					],
+					"totalPaths": 6
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "moderate",
+			"title": "Next.js has cache poisoning of SSG and ISR pages in self-hosted applications",
+			"cves": ["CVE-2026-94543"],
+			"affected": ">=16.0.0 <16.3.8",
+			"patched": ">=16.3.8",
+			"url": "https://github.com/advisories/GHSA-4jqv-mc3x-m676",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "low",
+			"title": "Next.js has information disclosure in development server's Model Context Protocol endpoint",
+			"cves": ["CVE-2026-94486"],
+			"affected": ">=16.0.0 <16.3.8",
+			"patched": ">=16.3.8",
+			"url": "https://github.com/advisories/GHSA-39w2-rjm5-chcv",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "moderate",
+			"title": "Next.js has information disclosure in App Router metadata image routes via dynamicParams bypass",
+			"cves": ["CVE-2026-94485"],
+			"affected": ">=16.0.0 <16.3.8",
+			"patched": ">=16.3.8",
+			"url": "https://github.com/advisories/GHSA-f87g-xv8r-7p7x",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "moderate",
+			"title": "Next.js has cache poisoning in SSG/ISR rendering that leads to cross-user content substitution and persistent denial of service",
+			"cves": ["CVE-2026-94484"],
+			"affected": ">=16.0.0 <16.3.8",
+			"patched": ">=16.3.8",
+			"url": "https://github.com/advisories/GHSA-mcj8-r9mp-w47p",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "high",
+			"title": "Next.js has Server-Side Request Forgery in Image Optimization",
+			"cves": ["CVE-2026-94483"],
+			"affected": ">=16.0.0 <16.3.8",
+			"patched": ">=16.3.8",
+			"url": "https://github.com/advisories/GHSA-cjq9-62q9-8jv4",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "markdown-it",
+			"severity": "high",
+			"title": "markdown-it: Quadratic complexity in smartquotes with unmatched closing quotes",
+			"cves": ["CVE-2026-111759"],
+			"affected": "<14.3.2",
+			"patched": ">=14.3.2",
+			"url": "https://github.com/advisories/GHSA-r7fv-28h4-cvq7",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "14.1.0",
+					"representativePaths": [
+						"apps/admin > @tiptap/extension-highlight@2.27.2 > @tiptap/core@2.27.2 > @tiptap/pm@2.27.2 > prosemirror-markdown@1.13.4 > markdown-it@14.1.0",
+						"apps/admin > @tiptap/extension-link@2.27.2 > @tiptap/core@2.27.2 > @tiptap/pm@2.27.2 > prosemirror-markdown@1.13.4 > markdown-it@14.1.0",
+						"apps/admin > @tiptap/extension-link@2.27.2 > @tiptap/pm@2.27.2 > prosemirror-markdown@1.13.4 > markdown-it@14.1.0"
+					],
+					"totalPaths": 39
+				}
+			]
+		},
+		{
+			"package": "vite",
+			"severity": "moderate",
+			"title": "launch-editor: escapeCmdArgs() omits % escaping on Windows",
+			"cves": ["CVE-2026-112943"],
+			"affected": "<=6.4.3",
+			"patched": ">=6.4.4",
+			"url": "https://github.com/advisories/GHSA-698v-4r3x-3vcv",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "5.4.21",
+					"representativePaths": [
+						". > @vitejs/plugin-react@4.7.0 > vite@5.4.21",
+						". > vite-tsconfig-paths@5.1.4 > vite@5.4.21",
+						". > vitest@2.1.9 > @vitest/mocker@2.1.9 > vite@5.4.21"
+					],
+					"totalPaths": 8
+				}
+			]
+		},
+		{
+			"package": "markdown-it",
+			"severity": "low",
+			"title": "markdown-it: Quadratic-time denial of service in inline HTML parsing with html enabled",
+			"cves": ["CVE-2026-111766"],
+			"affected": "<14.3.3",
+			"patched": ">=14.3.3",
+			"url": "https://github.com/advisories/GHSA-vfgh-jcmw-g37q",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "14.1.0",
+					"representativePaths": [
+						"apps/admin > @tiptap/extension-highlight@2.27.2 > @tiptap/core@2.27.2 > @tiptap/pm@2.27.2 > prosemirror-markdown@1.13.4 > markdown-it@14.1.0",
+						"apps/admin > @tiptap/extension-link@2.27.2 > @tiptap/core@2.27.2 > @tiptap/pm@2.27.2 > prosemirror-markdown@1.13.4 > markdown-it@14.1.0",
+						"apps/admin > @tiptap/extension-link@2.27.2 > @tiptap/pm@2.27.2 > prosemirror-markdown@1.13.4 > markdown-it@14.1.0"
+					],
+					"totalPaths": 39
+				}
+			]
+		},
+		{
+			"package": "vite",
+			"severity": "moderate",
+			"title": "launch-editor: Editor CLI flag misinterpretation causing arbitrary command execution for some editors",
+			"cves": ["CVE-2026-112944"],
+			"affected": "<=6.4.3",
+			"patched": ">=6.4.4",
+			"url": "https://github.com/advisories/GHSA-r825-w8mm-5pxw",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "5.4.21",
+					"representativePaths": [
+						". > @vitejs/plugin-react@4.7.0 > vite@5.4.21",
+						". > vite-tsconfig-paths@5.1.4 > vite@5.4.21",
+						". > vitest@2.1.9 > @vitest/mocker@2.1.9 > vite@5.4.21"
+					],
+					"totalPaths": 8
+				}
+			]
+		},
+		{
+			"package": "vite",
+			"severity": "high",
+			"title": "launch-editor: `fs.existsSync()` existence check can be bypassed on Windows",
+			"cves": ["CVE-2026-112942"],
+			"affected": "<=6.4.3",
+			"patched": ">=6.4.4",
+			"url": "https://github.com/advisories/GHSA-587h-7wmj-h5pm",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "5.4.21",
+					"representativePaths": [
+						". > @vitejs/plugin-react@4.7.0 > vite@5.4.21",
+						". > vite-tsconfig-paths@5.1.4 > vite@5.4.21",
+						". > vitest@2.1.9 > @vitest/mocker@2.1.9 > vite@5.4.21"
+					],
+					"totalPaths": 8
+				}
+			]
+		},
+		{
+			"package": "markdown-it",
+			"severity": "high",
+			"title": "markdown-it: Quadratic-time rendering of a single multi-line link reference definition with default options (regression since 14.0)",
+			"cves": ["CVE-2026-111758"],
+			"affected": ">=14.1.0 <14.3.3",
+			"patched": ">=14.3.3",
+			"url": "https://github.com/advisories/GHSA-gfr2-rv44-r23c",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "14.1.0",
+					"representativePaths": [
+						"apps/admin > @tiptap/extension-highlight@2.27.2 > @tiptap/core@2.27.2 > @tiptap/pm@2.27.2 > prosemirror-markdown@1.13.4 > markdown-it@14.1.0",
+						"apps/admin > @tiptap/extension-link@2.27.2 > @tiptap/core@2.27.2 > @tiptap/pm@2.27.2 > prosemirror-markdown@1.13.4 > markdown-it@14.1.0",
+						"apps/admin > @tiptap/extension-link@2.27.2 > @tiptap/pm@2.27.2 > prosemirror-markdown@1.13.4 > markdown-it@14.1.0"
+					],
+					"totalPaths": 39
+				}
+			]
+		},
+		{
+			"package": "vite",
+			"severity": "low",
+			"title": "Vite: Cross origin script execution through Vite custom middleware",
+			"cves": ["CVE-2026-112945"],
+			"affected": "<=6.4.3",
+			"patched": ">=6.4.4",
+			"url": "https://github.com/advisories/GHSA-9jrq-w75r-8gcw",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "5.4.21",
+					"representativePaths": [
+						". > @vitejs/plugin-react@4.7.0 > vite@5.4.21",
+						". > vite-tsconfig-paths@5.1.4 > vite@5.4.21",
+						". > vitest@2.1.9 > @vitest/mocker@2.1.9 > vite@5.4.21"
+					],
+					"totalPaths": 8
+				}
+			]
+		},
+		{
+			"package": "vite",
+			"severity": "moderate",
+			"title": "Vite: Files outside `server.fs.allow` could be served when project paths match system paths on non-Windows machine",
+			"cves": ["CVE-2026-112946"],
+			"affected": "<=6.4.3",
+			"patched": ">=6.4.4",
+			"url": "https://github.com/advisories/GHSA-rq7h-c2jc-7f22",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "5.4.21",
+					"representativePaths": [
+						". > @vitejs/plugin-react@4.7.0 > vite@5.4.21",
+						". > vite-tsconfig-paths@5.1.4 > vite@5.4.21",
+						". > vitest@2.1.9 > @vitest/mocker@2.1.9 > vite@5.4.21"
+					],
+					"totalPaths": 8
+				}
+			]
+		},
+		{
+			"package": "@vitest/mocker",
+			"severity": "moderate",
+			"title": "Vitest: Code injection via unauthenticated manual mock registration",
+			"cves": ["CVE-2026-112949"],
+			"affected": ">=2.1.0-beta.7 <4.1.12",
+			"patched": ">=4.1.12",
+			"url": "https://github.com/advisories/GHSA-qxg6-89mg-rqv8",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "2.1.9",
+					"representativePaths": [
+						". > vitest@2.1.9 > @vitest/mocker@2.1.9",
+						"apps/admin > better-auth@1.4.18 > vitest@2.1.9 > @vitest/mocker@2.1.9"
+					],
+					"totalPaths": 2
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "critical",
+			"title": "Next.js: Unauthenticated Remote Code Execution in Image Optimization API when SVG files are used",
+			"cves": [],
+			"affected": ">=16.0.0 <=16.4.0",
+			"patched": ">=16.4.1",
+			"url": "https://github.com/advisories/GHSA-2464-fhr4-w9xw",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "high",
+			"title": "Next.js: Denial of Service in App Router using Server Actions",
+			"cves": ["CVE-2026-94482"],
+			"affected": ">=16.0.0 <=16.4.0",
+			"patched": ">=16.4.1",
+			"url": "https://github.com/advisories/GHSA-p3m5-59mp-jv5r",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "nodemailer",
+			"severity": "moderate",
+			"title": "Nodemailer: Quadratic (O(n^2)) DKIM header unfolding lets a large folded header cause remote denial of service during signing",
+			"cves": ["CVE-2026-110871"],
+			"affected": ">=3.0.0 <=10.0.9",
+			"patched": ">=10.0.10",
+			"url": "https://github.com/advisories/GHSA-39m8-27wv-hr27",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "8.0.1",
+					"representativePaths": ["apps/admin > nodemailer@8.0.1"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "next",
+			"severity": "critical",
+			"title": "Next.js: Unauthenticated Remote Code Execution in `use cache` functions returning typed arrays",
+			"cves": [],
+			"affected": ">=16.0.0 <=16.4.0",
+			"patched": ">=16.4.1",
+			"url": "https://github.com/advisories/GHSA-673q-mjm6-r5xr",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "16.1.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > next@16.1.6",
+						"apps/admin > next@16.1.6",
+						"apps/admin > nuqs@2.8.9 > next@16.1.6"
+					],
+					"totalPaths": 5
+				}
+			]
+		},
+		{
+			"package": "dompurify",
+			"severity": "high",
+			"title": "DOMPurify IN_PLACE: hook that removes a parent or sibling leaves the detached subtree's event handlers armed (incomplete fix for GHSA-p98j-92pf-mc4p)",
+			"cves": [],
+			"affected": "<=3.4.16",
+			"patched": ">=3.4.17",
+			"url": "https://github.com/advisories/GHSA-mrv2-3pqr-j5jr",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.3.1",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/admin > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/public > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1"
+					],
+					"totalPaths": 4
+				}
+			]
+		},
+		{
+			"package": "dompurify",
+			"severity": "low",
+			"title": "DOMPurify: SMIL attributeName=href guard is skipped when PARSER_MEDIA_TYPE is application/xhtml+xml",
+			"cves": [],
+			"affected": "<=3.4.16",
+			"patched": ">=3.4.17",
+			"url": "https://github.com/advisories/GHSA-c6gr-qvv4-5v3f",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "3.3.1",
+					"representativePaths": [
+						"apps/admin > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/admin > posthog-js@1.347.2 > dompurify@3.3.1",
+						"apps/public > @posthog/react@1.7.1 > posthog-js@1.347.2 > dompurify@3.3.1"
+					],
+					"totalPaths": 4
+				}
+			]
+		},
+		{
+			"package": "markdown-it",
+			"severity": "moderate",
+			"title": "markdown-it linkify: true has two quadratic paths, so a few hundred KB of markdown blocks the event loop for tens of seconds",
+			"cves": [],
+			"affected": "<14.3.1",
+			"patched": ">=14.3.1",
+			"url": "https://github.com/advisories/GHSA-253c-mchw-3w2r",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "14.1.0",
+					"representativePaths": [
+						"apps/admin > @tiptap/extension-highlight@2.27.2 > @tiptap/core@2.27.2 > @tiptap/pm@2.27.2 > prosemirror-markdown@1.13.4 > markdown-it@14.1.0",
+						"apps/admin > @tiptap/extension-link@2.27.2 > @tiptap/core@2.27.2 > @tiptap/pm@2.27.2 > prosemirror-markdown@1.13.4 > markdown-it@14.1.0",
+						"apps/admin > @tiptap/extension-link@2.27.2 > @tiptap/pm@2.27.2 > prosemirror-markdown@1.13.4 > markdown-it@14.1.0"
+					],
+					"totalPaths": 39
+				}
+			]
+		},
+		{
+			"package": "zod",
+			"severity": "high",
+			"title": "Zod can exhaust memory while validating oversized constrained collections",
+			"cves": ["CVE-2023-54404"],
+			"affected": "<4.6.6",
+			"patched": ">=4.6.6",
+			"url": "https://github.com/advisories/GHSA-mrhx-c7xc-m3w5",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "4.3.6",
+					"representativePaths": [
+						"apps/admin > better-auth@1.4.18 > @better-auth/core@1.4.18 > better-call@1.1.8 > zod@4.3.6",
+						"apps/admin > better-auth@1.4.18 > @better-auth/core@1.4.18 > zod@4.3.6",
+						"apps/admin > better-auth@1.4.18 > @better-auth/telemetry@1.4.18 > @better-auth/core@1.4.18 > better-call@1.1.8 > zod@4.3.6"
+					],
+					"totalPaths": 18
+				}
+			]
+		},
+		{
+			"package": "nodemailer",
+			"severity": "moderate",
+			"title": "Nodemailer: A nested comment ends early in addressparser, releasing the rest of the comment as a recipient",
+			"cves": [],
+			"affected": ">=3.0.0 <10.1.4",
+			"patched": ">=10.1.4",
+			"url": "https://github.com/advisories/GHSA-8c8m-p3m8-cjg8",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "8.0.1",
+					"representativePaths": ["apps/admin > nodemailer@8.0.1"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "nodemailer",
+			"severity": "moderate",
+			"title": "Nodemailer: A \";\" inside a quoted string or comment ends an address group early in addressparser, turning display text into a recipient",
+			"cves": [],
+			"affected": ">=3.0.0 <10.1.4",
+			"patched": ">=10.1.4",
+			"url": "https://github.com/advisories/GHSA-m943-m63m-w62w",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "8.0.1",
+					"representativePaths": ["apps/admin > nodemailer@8.0.1"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "nodemailer",
+			"severity": "moderate",
+			"title": "Nodemailer: A \">\" inside a quoted local part ends an angle-addr early in addressparser, delivering to a domain the header does not name",
+			"cves": [],
+			"affected": ">=3.0.0 <10.1.4",
+			"patched": ">=10.1.4",
+			"url": "https://github.com/advisories/GHSA-85x2-q946-cp5h",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "8.0.1",
+					"representativePaths": ["apps/admin > nodemailer@8.0.1"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "postcss-selector-parser",
+			"severity": "moderate",
+			"title": "PostCSS: Quadratic complexity in flat selector parsing allows CPU exhaustion",
+			"cves": ["CVE-2026-104844"],
+			"affected": "<6.1.5",
+			"patched": ">=6.1.5",
+			"url": "https://github.com/advisories/GHSA-rj75-hqrm-r3gf",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "6.0.10",
+					"representativePaths": [
+						"apps/admin > @mpga/tailwind-config@link:../../tooling/tailwind > @tailwindcss/typography@0.5.19 > postcss-selector-parser@6.0.10",
+						"apps/public > @mpga/tailwind-config@link:../../tooling/tailwind > @tailwindcss/typography@0.5.19 > postcss-selector-parser@6.0.10",
+						"tooling/tailwind > @tailwindcss/typography@0.5.19 > postcss-selector-parser@6.0.10"
+					],
+					"totalPaths": 3
+				}
+			]
+		},
+		{
+			"package": "vite",
+			"severity": "moderate",
+			"title": "vite: `server.fs.deny` bypass on Windows alternate paths",
+			"cves": ["CVE-2026-53571"],
+			"affected": "<=6.4.2",
+			"patched": ">=6.4.3",
+			"url": "https://github.com/advisories/GHSA-fx2h-pf6j-xcff",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "5.4.21",
+					"representativePaths": [
+						". > @vitejs/plugin-react@4.7.0 > vite@5.4.21",
+						". > vite-tsconfig-paths@5.1.4 > vite@5.4.21",
+						". > vitest@2.1.9 > @vitest/mocker@2.1.9 > vite@5.4.21"
+					],
+					"totalPaths": 8
+				}
+			]
+		},
+		{
+			"package": "better-auth",
+			"severity": "high",
+			"title": "better-auth: Device login approval does not show the requesting client or permissions",
+			"cves": [],
+			"affected": ">=1.3.8-beta.3 <1.7.0-rc.3",
+			"patched": ">=1.7.0-rc.3",
+			"url": "https://github.com/advisories/GHSA-q84f-53jg-9ppm",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.4.18",
+					"representativePaths": ["apps/admin > better-auth@1.4.18"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "nodemailer",
+			"severity": "moderate",
+			"title": "Nodemailer: Quadratic backtracking in SMTP AUTH mechanism detection regexes allows pre-auth remote denial of service",
+			"cves": [],
+			"affected": ">=3.0.0 <=10.0.12",
+			"patched": ">=10.0.13",
+			"url": "https://github.com/advisories/GHSA-4ffr-jq9g-5ffx",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "8.0.1",
+					"representativePaths": ["apps/admin > nodemailer@8.0.1"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "nodemailer",
+			"severity": "moderate",
+			"title": "Nodemailer: RFC 5322 comment inside an angle-bracket address is never stripped",
+			"cves": [],
+			"affected": ">=3.0.0 <=10.0.12",
+			"patched": ">=10.0.13",
+			"url": "https://github.com/advisories/GHSA-g73g-hqqh-jr95",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "8.0.1",
+					"representativePaths": ["apps/admin > nodemailer@8.0.1"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "nodemailer",
+			"severity": "moderate",
+			"title": "Nodemailer: Quadratic (O(n^2)) SMTP client reply parsing lets a malicious server or MITM cause a pre-auth remote denial of service",
+			"cves": [],
+			"affected": ">=3.0.0 <=10.0.9",
+			"patched": ">=10.0.10",
+			"url": "https://github.com/advisories/GHSA-4g23-2xm8-66gc",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "8.0.1",
+					"representativePaths": ["apps/admin > nodemailer@8.0.1"],
+					"totalPaths": 1
+				}
+			]
+		},
+		{
+			"package": "better-auth",
+			"severity": "critical",
+			"title": "better-auth: OAuth state can be used as a Magic Link to sign in as another user",
+			"cves": ["CVE-2026-114607"],
+			"affected": ">=1.4.0-beta.18 <1.7.7",
+			"patched": ">=1.7.7",
+			"url": "https://github.com/advisories/GHSA-965c-763c-88jm",
+			"inProductionAudit": true,
+			"findings": [
+				{
+					"version": "1.4.18",
+					"representativePaths": ["apps/admin > better-auth@1.4.18"],
+					"totalPaths": 1
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,49 @@
+{
+	"date": "2026-10-29",
+	"productionDeployed": false,
+	"node": "24.22.1",
+	"fullAudit": {
+		"info": 0,
+		"low": 0,
+		"moderate": 2,
+		"high": 0,
+		"critical": 0
+	},
+	"productionAudit": {
+		"info": 0,
+		"low": 0,
+		"moderate": 2,
+		"high": 0,
+		"critical": 0
+	},
+	"remainingAdvisories": [
+		{
+			"package": "esbuild",
+			"severity": "moderate",
+			"url": "https://github.com/advisories/GHSA-67mh-4wv8-2f99"
+		},
+		{
+			"package": "uuid",
+			"severity": "moderate",
+			"url": "https://github.com/advisories/GHSA-w5hq-g745-h8pq"
+		}
+	],
+	"tests": {
+		"admin": 61,
+		"types": 11,
+		"ui": 27,
+		"total": 99
+	},
+	"checks": {
+		"typecheck": "passed",
+		"lint": "passed with warnings",
+		"actionlint": "passed",
+		"dockerBuild": ["linux/arm64", "linux/amd64"],
+		"trivyGate": "HIGH,CRITICAL; passed for both apps on both architectures",
+		"httpSmoke": "admin health 200; uninvited signup 400 EMAIL_PASSWORD_SIGN_UP_DISABLED"
+	},
+	"amd64Images": {
+		"admin": "sha256:82b7e11161e7400db7794fb89555ad4950df0af75b26c771a5cd532591f2fc23",
+		"public": "sha256:7fb8e2d60d097128b1eb81da5e20b18079347d5a41ac6cdac3aab39c7707f14e"
+	}
+}

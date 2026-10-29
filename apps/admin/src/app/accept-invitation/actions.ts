@@ -1,34 +1,26 @@
 "use server"
 
 import { auth } from "@/lib/auth"
-import { acceptInvitation, validateInvitation } from "@/lib/invitation"
+import { registerInvitedUser } from "@/lib/invitation"
 
 export async function signUpWithInvitation(token: string, name: string, password: string) {
-	const invitation = await validateInvitation(token)
-	if (!invitation) {
-		return { success: false, error: "This invitation is invalid or has expired." }
-	}
-
-	const result = await auth.api.signUpEmail({
-		body: {
-			email: invitation.email,
-			password,
-			name,
-		},
-	})
-
-	if (!result?.user) {
-		return { success: false, error: "Account creation failed." }
-	}
-
-	const accepted = await acceptInvitation(token)
-	if (!accepted) {
+	let email: string
+	try {
+		;({ email } = await registerInvitedUser(token, name, password))
+	} catch {
 		return {
 			success: false,
 			error:
-				"Your account was created but the invitation could not be accepted. Please contact an administrator.",
+				"Account creation failed. Check your invitation and use a password between 8 and 128 characters.",
 		}
 	}
-
+	try {
+		await auth.api.signInEmail({ body: { email, password } })
+	} catch {
+		return {
+			success: false,
+			error: "Your account was created. Please sign in from the login page.",
+		}
+	}
 	return { success: true }
 }

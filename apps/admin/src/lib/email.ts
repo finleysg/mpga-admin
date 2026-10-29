@@ -1,5 +1,6 @@
+import FormData from "form-data"
+import Mailgun from "mailgun.js"
 import nodemailer from "nodemailer"
-import mailgunTransport from "nodemailer-mailgun-transport"
 
 /**
  * Creates an email transporter based on environment configuration.
@@ -8,15 +9,29 @@ import mailgunTransport from "nodemailer-mailgun-transport"
  */
 function createTransporter() {
 	if (process.env.MAILGUN_API_KEY && process.env.MAILGUN_DOMAIN) {
-		// Production: Mailgun HTTP API (avoids SMTP port blocking in cloud environments)
-		return nodemailer.createTransport(
-			mailgunTransport({
-				auth: {
-					api_key: process.env.MAILGUN_API_KEY,
-					domain: process.env.MAILGUN_DOMAIN,
-				},
-			}),
-		)
+		const domain = process.env.MAILGUN_DOMAIN
+		const client = new Mailgun(FormData).client({
+			username: "api",
+			key: process.env.MAILGUN_API_KEY,
+		})
+		return {
+			sendMail: (message: {
+				from: string
+				to: string | string[]
+				subject: string
+				text: string
+				html: string
+				replyTo?: string
+			}) =>
+				client.messages.create(domain, {
+					from: message.from,
+					to: message.to,
+					subject: message.subject,
+					text: message.text,
+					html: message.html,
+					...(message.replyTo ? { "h:Reply-To": message.replyTo } : {}),
+				}),
+		}
 	}
 
 	// Development / testing SMTP (Mailpit, Mailtrap, etc.)

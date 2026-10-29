@@ -12,3 +12,9 @@
 .github
 .claude/
 e2e/
+
+.pnpm-store
+.playwright
+.playwright-cli
+plans
+**/*.tsbuildinfo

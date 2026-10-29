@@ -36,10 +36,16 @@ import {
 	TextQuote,
 } from "lucide-react"
 import { useCallback, useEffect, useRef, useState } from "react"
-import { Markdown } from "tiptap-markdown"
+import { Markdown, type MarkdownStorage } from "tiptap-markdown"
 
 import { Admonition, type AdmonitionType } from "@/lib/tiptap/admonition"
 import { HighlightWithMarkdown } from "@/lib/tiptap/highlight"
+
+declare module "@tiptap/core" {
+	interface Storage {
+		markdown: MarkdownStorage
+	}
+}
 
 interface MarkdownEditorProps {
 	value: string
@@ -91,7 +97,7 @@ export function MarkdownEditor({
 
 	const editor = useEditor({
 		extensions: [
-			StarterKit,
+			StarterKit.configure({ link: false, trailingNode: false }),
 			Markdown,
 			Link.configure({
 				openOnClick: false,
@@ -121,7 +127,7 @@ export function MarkdownEditor({
 	useEffect(() => {
 		if (editor && !initialized.current) {
 			initialized.current = true
-			editor.commands.setContent(value)
+			editor.commands.setContent(value, { emitUpdate: false })
 			lastEmittedRef.current = value
 		}
 	}, [editor, value])
@@ -131,7 +137,7 @@ export function MarkdownEditor({
 		if (!editor || !initialized.current) return
 		if (value !== lastEmittedRef.current) {
 			lastEmittedRef.current = value
-			editor.commands.setContent(value)
+			editor.commands.setContent(value, { emitUpdate: false })
 		}
 	}, [editor, value])
 

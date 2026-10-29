@@ -2,3 +2,10 @@ packages:
   - "apps/*"
   - "packages/*"
   - "tooling/*"
+
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
+  - "@posthog/cli"
+ignoredBuiltDependencies:
+  - core-js

@@ -1,6 +1,7 @@
 import crypto from "crypto"
 
-import { invitation } from "@mpga/database"
+import { invitation, user, account } from "@mpga/database"
+import { hashPassword } from "better-auth/crypto"
 import { eq, and, gt } from "drizzle-orm"
 
 import { db } from "./db"
@@ -85,4 +86,52 @@ export async function acceptInvitation(token: string): Promise<boolean> {
 		)
 
 	return result[0].affectedRows > 0
+}
+
+/** Provision an account and consume its invitation atomically. Public auth signup is disabled. */
+export async function registerInvitedUser(token: string, name: string, password: string) {
+	if (!name.trim() || name.length > 255 || password.length < 8 || password.length > 128) {
+		throw new Error("Enter a name and a password between 8 and 128 characters.")
+	}
+	if (!token || token.length > 256) throw new Error("This invitation is invalid or has expired.")
+	const passwordHash = await hashPassword(password)
+	return db.transaction(async (tx) => {
+		const now = new Date()
+		const [inv] = await tx
+			.select()
+			.from(invitation)
+			.where(
+				and(
+					eq(invitation.token, hashToken(token)),
+					eq(invitation.status, "pending"),
+					gt(invitation.expiresAt, now),
+				),
+			)
+			.for("update")
+		if (!inv || inv.role !== "admin") throw new Error("This invitation is invalid or has expired.")
+		const id = crypto.randomUUID()
+		await tx.insert(user).values({
+			id,
+			name: name.trim(),
+			email: inv.email.toLowerCase(),
+			emailVerified: true,
+			role: "admin",
+			createdAt: now,
+			updatedAt: now,
+		})
+		await tx.insert(account).values({
+			id: crypto.randomUUID(),
+			userId: id,
+			accountId: id,
+			providerId: "credential",
+			password: passwordHash,
+			createdAt: now,
+			updatedAt: now,
+		})
+		await tx
+			.update(invitation)
+			.set({ status: "accepted", acceptedAt: now })
+			.where(eq(invitation.id, inv.id))
+		return { email: inv.email.toLowerCase() }
+	})
 }

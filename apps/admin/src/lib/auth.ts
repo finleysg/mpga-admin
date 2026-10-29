@@ -18,6 +18,7 @@ export const auth = betterAuth({
 	}),
 	emailAndPassword: {
 		enabled: true,
+		disableSignUp: true,
 	},
 	session: {
 		expiresIn: 60 * 60 * 24 * 7, // 7 days
@@ -25,15 +26,17 @@ export const auth = betterAuth({
 	},
 	plugins: [
 		admin({
-			defaultRole: "admin",
+			defaultRole: "user",
 			adminRoles: ["super_admin", "admin"],
 			ac,
 			roles: {
+				user: ac.newRole({}),
 				super_admin: superAdminRole,
 				admin: adminRole,
 			},
 		}),
 		emailOTP({
+			disableSignUp: true,
 			otpLength: 6,
 			expiresIn: 600,
 			sendVerificationOTP: async ({ email, otp, type }) => {

@@ -6,7 +6,7 @@ import { Admonition } from "../admonition"
 
 function createEditor(content = "<p>Hello world</p>") {
 	return new Editor({
-		extensions: [StarterKit, Admonition],
+		extensions: [StarterKit.configure({ trailingNode: false }), Admonition],
 		content,
 	})
 }
