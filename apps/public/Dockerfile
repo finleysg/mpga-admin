@@ -30,8 +30,10 @@ RUN if [ -n "$POSTHOG_PERSONAL_API_KEY" ]; then \
       POSTHOG_CLI_API_KEY=$POSTHOG_PERSONAL_API_KEY \
       POSTHOG_CLI_PROJECT_ID=$POSTHOG_PROJECT_ID \
       POSTHOG_CLI_HOST=${NEXT_PUBLIC_POSTHOG_HOST:-https://us.i.posthog.com} \
-      pnpm exec posthog-cli sourcemap upload --directory ./apps/public/.next/static --release-name mpga-public; \
+      pnpm exec posthog-cli sourcemap upload --directory ./apps/public/.next/static --release-name mpga-public --delete-after; \
     fi
+# Also keep source maps out of images built without PostHog credentials.
+RUN find ./apps/public/.next/static -type f -name '*.map' -delete
 
 FROM base AS runner
 # The standalone server needs Node only. Do not ship package managers and their dependency trees.

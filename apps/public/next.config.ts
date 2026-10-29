@@ -4,6 +4,8 @@ const bucketName = process.env.S3_BUCKET_NAME ?? "mpgagolf"
 
 const nextConfig: NextConfig = {
 	output: "standalone",
+	// PostHog consumes these during the image build; Docker removes them before serving.
+	productionBrowserSourceMaps: true,
 	transpilePackages: ["@mpga/database", "@mpga/types", "@mpga/ui"],
 	experimental: {
 		optimizePackageImports: ["@mpga/ui"],
