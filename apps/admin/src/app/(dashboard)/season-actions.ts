@@ -31,6 +31,7 @@ export async function setPublicTournamentSeasonAction(year: number): Promise<Act
 	try {
 		await setDisplayedSeason(year)
 		revalidatePath("/")
+		revalidatePath("/tournaments", "layout")
 		await revalidatePublicSite("/tournaments", "layout")
 		return { success: true }
 	} catch (error) {

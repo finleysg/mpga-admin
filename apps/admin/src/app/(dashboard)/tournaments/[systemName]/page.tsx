@@ -23,7 +23,7 @@ export default async function TournamentInstancePage({
 	searchParams: Promise<{ year?: string }>
 }) {
 	const { systemName } = await params
-	const year = selectedTournamentYear((await searchParams).year)
+	const year = await selectedTournamentYear((await searchParams).year)
 
 	const [instanceResult, coursesResult] = await Promise.all([
 		getTournamentInstanceAction(systemName, year),

@@ -1,4 +1,10 @@
-import { content, TOURNAMENT_SEASON_KEY, tournament, tournamentInstance } from "@mpga/database"
+import {
+	getDisplayedTournamentSeason,
+	content,
+	TOURNAMENT_SEASON_KEY,
+	tournament,
+	tournamentInstance,
+} from "@mpga/database"
 import { asc, eq, like } from "drizzle-orm"
 
 import { db } from "./db"
@@ -12,8 +18,12 @@ export function seasonToday(now = new Date()): string {
 	}).format(now)
 }
 
-export function selectedTournamentYear(value?: string): number {
-	return value && /^\d{4}$/.test(value) ? Number(value) : Number(seasonToday().slice(0, 4))
+export async function selectedTournamentYear(value?: string): Promise<number> {
+	if (value && /^\d{4}$/.test(value)) return Number(value)
+	return getDisplayedTournamentSeason(
+		db,
+		Number(process.env.SEASON_YEAR) || Number(seasonToday().slice(0, 4)),
+	)
 }
 
 export function nextYearDate(value: string): string {

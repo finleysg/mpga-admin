@@ -18,7 +18,7 @@ export default async function PhotosPage({
 
 	const instanceResult = await getTournamentInstanceAction(
 		systemName,
-		selectedTournamentYear((await searchParams).year),
+		await selectedTournamentYear((await searchParams).year),
 	)
 	if (!instanceResult.success || !instanceResult.data) {
 		notFound()

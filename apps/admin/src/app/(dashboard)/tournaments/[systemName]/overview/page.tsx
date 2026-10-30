@@ -13,7 +13,7 @@ export default async function EditOverviewPage({
 	searchParams: Promise<{ year?: string }>
 }) {
 	const { systemName } = await params
-	const year = selectedTournamentYear((await searchParams).year)
+	const year = await selectedTournamentYear((await searchParams).year)
 
 	async function loadContent() {
 		"use server"

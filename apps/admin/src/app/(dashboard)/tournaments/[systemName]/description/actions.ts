@@ -11,7 +11,7 @@ import { selectedTournamentYear } from "@/lib/tournament-season"
 
 export async function getInstanceDescriptionAction(
 	systemName: string,
-	year = selectedTournamentYear(),
+	year?: number,
 ): Promise<ActionResult<{ id: number; title: string; description: string }>> {
 	const userId = await requireAuth()
 	if (!userId) {
@@ -19,7 +19,7 @@ export async function getInstanceDescriptionAction(
 	}
 
 	try {
-		const currentYear = year
+		const currentYear = year ?? (await selectedTournamentYear())
 		const results = await db
 			.select({
 				id: tournamentInstance.id,

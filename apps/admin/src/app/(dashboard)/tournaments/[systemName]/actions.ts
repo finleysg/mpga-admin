@@ -31,7 +31,7 @@ export interface TournamentInstanceData {
 
 export async function getTournamentInstanceAction(
 	systemName: string,
-	year = selectedTournamentYear(),
+	year?: number,
 ): Promise<ActionResult<TournamentInstanceData>> {
 	const userId = await requireAuth()
 	if (!userId) {
@@ -39,7 +39,7 @@ export async function getTournamentInstanceAction(
 	}
 
 	try {
-		const currentYear = year
+		const currentYear = year ?? (await selectedTournamentYear())
 		const results = await db
 			.select({
 				id: tournamentInstance.id,

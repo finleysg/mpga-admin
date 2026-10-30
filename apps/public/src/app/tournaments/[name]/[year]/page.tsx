@@ -16,12 +16,9 @@ import {
 	getTournamentDocuments,
 } from "@/lib/queries/tournaments"
 
-export const revalidate = 86400 // 24 hours — safety net; admin triggers on-demand revalidation
-export const dynamicParams = true
-
-export async function generateStaticParams() {
-	return []
-}
+// Document uploads can originate from several admin screens. Always read the
+// latest records rather than relying on cross-app cache invalidation.
+export const dynamic = "force-dynamic"
 
 type Params = Promise<{ name: string; year: string }>
 
