@@ -14,7 +14,7 @@ import { requireAuth } from "@/lib/require-auth"
 import { revalidatePublicSite } from "@/lib/revalidate"
 
 function revalidateTournamentYearPage(systemName: string) {
-	return revalidatePublicSite(`/tournaments/${systemName}/${new Date().getFullYear()}`)
+	return revalidatePublicSite(`/tournaments/${systemName}`, "layout")
 }
 
 export async function listDocumentsAction(

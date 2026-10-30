@@ -7,9 +7,10 @@ import { and, asc, eq, like } from "drizzle-orm"
 import { db } from "@/lib/db"
 import { requireAuth } from "@/lib/require-auth"
 import { revalidatePublicSite } from "@/lib/revalidate"
+import { selectedTournamentYear } from "@/lib/tournament-season"
 
 function revalidateTournamentYearPage(systemName: string) {
-	return revalidatePublicSite(`/tournaments/${systemName}/${new Date().getFullYear()}`)
+	return revalidatePublicSite(`/tournaments/${systemName}`, "layout")
 }
 
 // ---------- Tournament Instance ----------
@@ -30,6 +31,7 @@ export interface TournamentInstanceData {
 
 export async function getTournamentInstanceAction(
 	systemName: string,
+	year = selectedTournamentYear(),
 ): Promise<ActionResult<TournamentInstanceData>> {
 	const userId = await requireAuth()
 	if (!userId) {
@@ -37,7 +39,7 @@ export async function getTournamentInstanceAction(
 	}
 
 	try {
-		const currentYear = new Date().getFullYear()
+		const currentYear = year
 		const results = await db
 			.select({
 				id: tournamentInstance.id,

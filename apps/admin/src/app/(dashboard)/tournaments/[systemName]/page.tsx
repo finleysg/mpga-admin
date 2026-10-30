@@ -3,6 +3,8 @@ import { ImageIcon, Pencil, Trophy } from "lucide-react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
+import { selectedTournamentYear } from "@/lib/tournament-season"
+
 import {
 	getTournamentInstanceAction,
 	listGolfCoursesAction,
@@ -15,13 +17,16 @@ import { LinksCard } from "./links-card"
 
 export default async function TournamentInstancePage({
 	params,
+	searchParams,
 }: {
 	params: Promise<{ systemName: string }>
+	searchParams: Promise<{ year?: string }>
 }) {
 	const { systemName } = await params
+	const year = selectedTournamentYear((await searchParams).year)
 
 	const [instanceResult, coursesResult] = await Promise.all([
-		getTournamentInstanceAction(systemName),
+		getTournamentInstanceAction(systemName, year),
 		listGolfCoursesAction(),
 	])
 
@@ -44,30 +49,30 @@ export default async function TournamentInstancePage({
 	return (
 		<div className="mx-auto max-w-6xl">
 			<H1 variant="secondary" className="mb-6">
-				{instance.tournamentName}
+				{year} {instance.tournamentName}
 			</H1>
 
 			<div className="mb-6 flex flex-wrap gap-2">
 				<Button variant="secondaryoutline" asChild>
-					<Link href={`${basePath}/overview`}>
+					<Link href={`${basePath}/overview?year=${year}`}>
 						<Pencil className="mr-2 h-4 w-4" />
-						Edit Overview
+						Edit Overview (all seasons)
 					</Link>
 				</Button>
 				<Button variant="secondaryoutline" asChild>
-					<Link href={`${basePath}/description`}>
+					<Link href={`${basePath}/description?year=${year}`}>
 						<Pencil className="mr-2 h-4 w-4" />
 						Edit Description
 					</Link>
 				</Button>
 				<Button variant="secondaryoutline" asChild>
-					<Link href={`${basePath}/results`}>
+					<Link href={`${basePath}/results?year=${year}`}>
 						<Trophy className="mr-2 h-4 w-4" />
 						Enter Results
 					</Link>
 				</Button>
 				<Button variant="secondaryoutline" asChild>
-					<Link href={`${basePath}/photos`}>
+					<Link href={`${basePath}/photos?year=${year}`}>
 						<ImageIcon className="mr-2 h-4 w-4" />
 						Upload Photos
 					</Link>
@@ -75,7 +80,12 @@ export default async function TournamentInstancePage({
 			</div>
 
 			<div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-				<InstanceForm instance={instance} courses={courses} systemName={systemName} />
+				<InstanceForm
+					key={instance.id}
+					instance={instance}
+					courses={courses}
+					systemName={systemName}
+				/>
 				<DocumentsCard
 					initialDocuments={documents}
 					tournamentId={instance.tournamentId}

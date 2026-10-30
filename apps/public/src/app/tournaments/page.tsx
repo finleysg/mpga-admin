@@ -1,13 +1,17 @@
+import { getDisplayedTournamentSeason } from "@mpga/database"
 import { getMediaUrl } from "@mpga/types"
 import { H1, TournamentCard, TournamentPoliciesBanner } from "@mpga/ui"
 
+import { db } from "@/lib/db"
 import { getTournamentsForYear, formatTournamentDates } from "@/lib/queries/tournaments"
 import { getCurrentSeason } from "@/lib/season"
 
+// Read the admin-selected season from the database on every request.
+// Do not cache this route: publishing a season must apply on the next page load.
 export const dynamic = "force-dynamic"
 
 export default async function TournamentsPage() {
-	const currentYear = getCurrentSeason()
+	const currentYear = await getDisplayedTournamentSeason(db, getCurrentSeason())
 	const tournaments = await getTournamentsForYear(currentYear)
 
 	return (

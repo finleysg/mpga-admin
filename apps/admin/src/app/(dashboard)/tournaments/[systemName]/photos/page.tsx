@@ -1,14 +1,25 @@
 import { H1 } from "@mpga/ui"
 import { notFound } from "next/navigation"
 
+import { selectedTournamentYear } from "@/lib/tournament-season"
+
 import { getTournamentInstanceAction } from "../actions"
 import { listPhotosAction } from "../photo-actions"
 import { PhotosCard } from "../photos-card"
 
-export default async function PhotosPage({ params }: { params: Promise<{ systemName: string }> }) {
+export default async function PhotosPage({
+	params,
+	searchParams,
+}: {
+	params: Promise<{ systemName: string }>
+	searchParams: Promise<{ year?: string }>
+}) {
 	const { systemName } = await params
 
-	const instanceResult = await getTournamentInstanceAction(systemName)
+	const instanceResult = await getTournamentInstanceAction(
+		systemName,
+		selectedTournamentYear((await searchParams).year),
+	)
 	if (!instanceResult.success || !instanceResult.data) {
 		notFound()
 	}

@@ -7,9 +7,11 @@ import { eq } from "drizzle-orm"
 import { db } from "@/lib/db"
 import { requireAuth } from "@/lib/require-auth"
 import { revalidatePublicSite } from "@/lib/revalidate"
+import { selectedTournamentYear } from "@/lib/tournament-season"
 
 export async function getInstanceDescriptionAction(
 	systemName: string,
+	year = selectedTournamentYear(),
 ): Promise<ActionResult<{ id: number; title: string; description: string }>> {
 	const userId = await requireAuth()
 	if (!userId) {
@@ -17,7 +19,7 @@ export async function getInstanceDescriptionAction(
 	}
 
 	try {
-		const currentYear = new Date().getFullYear()
+		const currentYear = year
 		const results = await db
 			.select({
 				id: tournamentInstance.id,
@@ -62,7 +64,7 @@ export async function saveInstanceDescriptionAction(data: {
 			.set({ description: data.description })
 			.where(eq(tournamentInstance.id, data.instanceId))
 
-		await revalidatePublicSite(`/tournaments/${data.systemName}/${new Date().getFullYear()}`)
+		await revalidatePublicSite(`/tournaments/${data.systemName}`, "layout")
 
 		return { success: true, data: { id: data.instanceId } }
 	} catch (error) {

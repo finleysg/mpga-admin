@@ -1,15 +1,19 @@
 import { H1 } from "@mpga/ui"
 
 import { ContentEditor } from "@/components/content-editor"
+import { selectedTournamentYear } from "@/lib/tournament-season"
 
 import { getTournamentDescriptionAction, saveTournamentDescriptionAction } from "./actions"
 
 export default async function EditOverviewPage({
 	params,
+	searchParams,
 }: {
 	params: Promise<{ systemName: string }>
+	searchParams: Promise<{ year?: string }>
 }) {
 	const { systemName } = await params
+	const year = selectedTournamentYear((await searchParams).year)
 
 	async function loadContent() {
 		"use server"
@@ -46,7 +50,7 @@ export default async function EditOverviewPage({
 				page.
 			</p>
 			<ContentEditor
-				backHref={`/tournaments/${systemName}`}
+				backHref={`/tournaments/${systemName}?year=${year}`}
 				loadContent={loadContent}
 				saveContent={saveContent}
 				showTitle={false}
