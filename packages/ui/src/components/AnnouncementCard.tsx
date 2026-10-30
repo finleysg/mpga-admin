@@ -1,6 +1,8 @@
 import { Calendar, ArrowRight, ExternalLink } from "lucide-react"
 import Link from "next/link"
 
+import { Markdown } from "./Markdown"
+
 import { Card, CardContent } from "./ui/card"
 import { H3 } from "./ui/heading"
 
@@ -40,7 +42,10 @@ export function AnnouncementCard({
 					<span>{formatDate(createDate)}</span>
 				</div>
 				<H3 className="mb-3 font-bold">{title}</H3>
-				<p className={`mb-4 flex-1 text-gray-600${truncate ? " line-clamp-3" : ""}`}>{text}</p>
+				<Markdown
+					content={text}
+					className={`mb-4 min-w-0 flex-1 text-gray-600${truncate ? " max-h-40 overflow-hidden" : ""}`}
+				/>
 				{externalUrl && (
 					<a
 						href={externalUrl}
