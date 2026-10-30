@@ -79,6 +79,13 @@ export function Markdown({ content, className }: MarkdownProps) {
 	return (
 		<div className={cn("prose", className)}>
 			<ReactMarkdown
+				components={{
+					table: ({ children }) => (
+						<div className="markdown-table-scroll" role="region" aria-label="Table" tabIndex={0}>
+							<table>{children}</table>
+						</div>
+					),
+				}}
 				remarkPlugins={[remarkGfm, remarkDirective, remarkAdmonitions]}
 				rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeSchema]]}
 			>

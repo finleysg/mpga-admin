@@ -82,3 +82,31 @@ describe("Markdown component", () => {
 		expect(mark!.textContent).toBe("highlighted inside note")
 	})
 })
+
+it("renders Markdown tables with headers, inline formatting, and a scroll container", () => {
+	const { container } = render(
+		<Markdown
+			content={
+				"| Team | Score |\n| --- | ---: |\n| **Winners** | 72 |\n| [Results](https://example.com) | 73 |"
+			}
+		/>,
+	)
+	expect(container.querySelectorAll("th")).toHaveLength(2)
+	expect(container.querySelectorAll("tbody tr")).toHaveLength(2)
+	expect(container.querySelector("td strong")).toHaveTextContent("Winners")
+	expect(container.querySelector("td a")).toHaveAttribute("href", "https://example.com")
+	expect(container.querySelector("table")?.parentElement).toHaveClass("markdown-table-scroll")
+})
+
+it("sanitizes unsafe HTML inside table cells", () => {
+	const { container } = render(
+		<Markdown
+			content={
+				'<table><tr><td onclick="alert(1)"><script>alert(1)</script><a href="javascript:alert(1)">Unsafe</a></td></tr></table>'
+			}
+		/>,
+	)
+	expect(container.querySelector("td")).not.toHaveAttribute("onclick")
+	expect(container.querySelector("script")).toBeNull()
+	expect(container.querySelector("td a")).not.toHaveAttribute("href")
+})

@@ -3,6 +3,8 @@
 import {
 	DropdownMenu,
 	DropdownMenuContent,
+	DropdownMenuGroup,
+	Button,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 	Textarea,
@@ -12,7 +14,7 @@ import {
 	TooltipTrigger,
 } from "@mpga/ui"
 import Link from "@tiptap/extension-link"
-import { EditorContent, useEditor } from "@tiptap/react"
+import { EditorContent, useEditor, useEditorState } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import {
 	AlertTriangle,
@@ -34,12 +36,14 @@ import {
 	RemoveFormatting,
 	ShieldAlert,
 	TextQuote,
+	Table as TableIcon,
 } from "lucide-react"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Markdown, type MarkdownStorage } from "tiptap-markdown"
 
 import { Admonition, type AdmonitionType } from "@/lib/tiptap/admonition"
 import { HighlightWithMarkdown } from "@/lib/tiptap/highlight"
+import { tableExtensions } from "@/lib/tiptap/table"
 
 declare module "@tiptap/core" {
 	interface Storage {
@@ -99,6 +103,7 @@ export function MarkdownEditor({
 		extensions: [
 			StarterKit.configure({ link: false, trailingNode: false }),
 			Markdown,
+			...tableExtensions,
 			Link.configure({
 				openOnClick: false,
 				HTMLAttributes: {
@@ -120,6 +125,11 @@ export function MarkdownEditor({
 			lastEmittedRef.current = md
 			onChange(md)
 		},
+	})
+
+	const inTable = useEditorState({
+		editor,
+		selector: ({ editor: current }) => current?.isActive("table") ?? false,
 	})
 
 	// Set initial content once the editor is ready
@@ -254,6 +264,76 @@ export function MarkdownEditor({
 							>
 								<TextQuote className="h-4 w-4" />
 							</ToolbarButton>
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<Button type="button" variant="ghost" size="sm" aria-label="Table options">
+										<TableIcon />
+										Table
+										<ChevronDown />
+									</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent
+									align="start"
+									onCloseAutoFocus={(event) => event.preventDefault()}
+								>
+									<DropdownMenuGroup>
+										<DropdownMenuItem
+											disabled={!!inTable}
+											onSelect={() =>
+												editor
+													.chain()
+													.focus()
+													.insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+													.run()
+											}
+										>
+											Insert table (3 × 3)
+										</DropdownMenuItem>
+										<DropdownMenuItem
+											disabled={!inTable}
+											onSelect={() => editor.chain().focus().addRowBefore().run()}
+										>
+											Add row above
+										</DropdownMenuItem>
+										<DropdownMenuItem
+											disabled={!inTable}
+											onSelect={() => editor.chain().focus().addRowAfter().run()}
+										>
+											Add row below
+										</DropdownMenuItem>
+										<DropdownMenuItem
+											disabled={!inTable}
+											onSelect={() => editor.chain().focus().addColumnBefore().run()}
+										>
+											Add column before
+										</DropdownMenuItem>
+										<DropdownMenuItem
+											disabled={!inTable}
+											onSelect={() => editor.chain().focus().addColumnAfter().run()}
+										>
+											Add column after
+										</DropdownMenuItem>
+										<DropdownMenuItem
+											disabled={!inTable}
+											onSelect={() => editor.chain().focus().deleteRow().run()}
+										>
+											Delete row
+										</DropdownMenuItem>
+										<DropdownMenuItem
+											disabled={!inTable}
+											onSelect={() => editor.chain().focus().deleteColumn().run()}
+										>
+											Delete column
+										</DropdownMenuItem>
+										<DropdownMenuItem
+											disabled={!inTable}
+											onSelect={() => editor.chain().focus().deleteTable().run()}
+										>
+											Delete table
+										</DropdownMenuItem>
+									</DropdownMenuGroup>
+								</DropdownMenuContent>
+							</DropdownMenu>
 							<AdmonitionDropdown
 								onSelect={(type) => editor.chain().focus().toggleAdmonition({ type }).run()}
 								active={editor.isActive("admonition")}
