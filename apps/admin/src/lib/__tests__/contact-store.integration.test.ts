@@ -29,13 +29,7 @@ describe.skipIf(!process.env.TEST_DATABASE_PORT)("contact guards (MySQL)", () =>
 			new URL("../../../../../packages/database/drizzle/0006_wet_microbe.sql", import.meta.url),
 			"utf8",
 		)
-		await db.execute(
-			sql.raw(
-				migration
-					.split("--> statement-breakpoint")[0]!
-					.replace("CREATE TABLE", "CREATE TABLE IF NOT EXISTS"),
-			),
-		)
+		await db.execute(sql.raw(migration.split("--> statement-breakpoint")[0]!))
 		await db.execute(
 			sql.raw(
 				"CREATE TABLE IF NOT EXISTS message (id INT AUTO_INCREMENT PRIMARY KEY, messageDate DATETIME(6) NOT NULL, contactEmail VARCHAR(254) NOT NULL, contactName VARCHAR(100) NOT NULL, contactPhone VARCHAR(20) NOT NULL, course VARCHAR(100), message LONGTEXT NOT NULL)",

@@ -28,10 +28,17 @@ sits in front of Nginx, configure trusted proxy real-IP handling first; otherwis
 all visitors may appear to share the CDN's IP. The admin endpoint trusts only the
 IP forwarded with `CONTACT_FORM_SECRET`, not headers from direct browser calls.
 
-Apply `packages/database/drizzle/0006_wet_microbe.sql` through the normal production
-Drizzle migration process **before deploying the updated admin app**, then deploy
-both apps with the environment variables above. This migration adds only the
-`contactGuard` table and its expiry index. Do not use `db:push` on production.
+Admin startup automatically applies only `0006_wet_microbe` before starting the
+server. This additive migration creates `contactGuard` and its expiry index,
+records completion, and uses a database lock to serialize rolling deployments.
+It is safe to retry if startup is interrupted. The database user needs CREATE
+permission. Migration failure prevents the new admin container from serving.
+Deploy admin successfully before deploying public.
+
+Historical migrations are not automatically replayed: startup migrations were
+previously disabled, so the older production migration history must be reconciled
+before enabling the full runner. The public app does not run migrations. No
+CapRover migration hook or GitHub Turnstile secrets are required.
 
 The shared MySQL guards allow three accepted messages per IP and per email in a
 ten-minute window. Matching normalized email/message pairs are suppressed for
