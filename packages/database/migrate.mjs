@@ -7,6 +7,11 @@ const migrationsDir = join(process.cwd(), "packages/database/drizzle")
 async function migrate() {
 	const journal = JSON.parse(readFileSync(join(migrationsDir, "meta/_journal.json"), "utf-8"))
 	const args = process.argv.slice(2)
+	// Import dependencies and read the journal without connecting to a database.
+	if (args.length === 1 && args[0] === "--check") {
+		console.log("Migration runtime ready")
+		return
+	}
 	const only = args[0]?.startsWith("--only=") ? args[0].slice("--only=".length) : undefined
 	if (args.length && (args.length !== 1 || !only || !journal.entries.some((e) => e.tag === only))) {
 		throw new Error("Usage: migrate.mjs [--only=<journal migration tag>]")

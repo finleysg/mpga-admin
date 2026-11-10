@@ -24,6 +24,8 @@ COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 RUN pnpm install --frozen-lockfile
 COPY --from=builder /app/out/full/ .
 RUN pnpm turbo build --filter=@mpga/admin
+# The standalone Next.js trace does not include dependencies of the separate migration CLI.
+RUN pnpm --filter @mpga/database deploy --prod --legacy --frozen-lockfile /migration-runtime
 
 FROM base AS runner
 # The standalone server needs Node only. Do not ship package managers and their dependency trees.
@@ -40,9 +42,11 @@ COPY --from=installer --chown=nextjs:nodejs /app/apps/admin/.next/static ./apps/
 COPY --from=installer --chown=nextjs:nodejs /app/apps/admin/public ./apps/admin/public
 COPY --from=installer --chown=nextjs:nodejs /app/packages/database/drizzle ./packages/database/drizzle
 COPY --from=installer --chown=nextjs:nodejs /app/packages/database/migrate.mjs ./packages/database/migrate.mjs
+COPY --from=installer --chown=nextjs:nodejs /migration-runtime/node_modules ./packages/database/node_modules
 COPY --chown=nextjs:nodejs apps/admin/start.sh ./start.sh
 RUN chmod +x start.sh
 USER nextjs
+RUN node packages/database/migrate.mjs --check
 EXPOSE 3001
 ENV PORT=3001
 ENV HOSTNAME="0.0.0.0"
