@@ -2,6 +2,8 @@ import { H1 } from "@mpga/ui"
 
 import { ContactForm } from "./contact-form"
 
+export const dynamic = "force-dynamic"
+
 export default function ContactUsPage() {
 	return (
 		<main className="mx-auto max-w-2xl px-4 py-8">
@@ -10,7 +12,7 @@ export default function ContactUsPage() {
 				Have a question about the MPGA or one of our events? Send us a message and we will get back
 				to you.
 			</p>
-			<ContactForm />
+			<ContactForm siteKey={process.env.TURNSTILE_SITE_KEY ?? ""} />
 		</main>
 	)
 }

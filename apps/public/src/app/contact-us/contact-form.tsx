@@ -9,6 +9,7 @@ import {
 	CardTitle,
 	Field,
 	FieldError,
+	FieldGroup,
 	FieldLabel,
 	Input,
 	Textarea,
@@ -16,8 +17,12 @@ import {
 import { useState } from "react"
 
 import { submitContactForm } from "./actions"
+import { Turnstile } from "./turnstile"
 
-export function ContactForm() {
+export function ContactForm({ siteKey }: { siteKey: string }) {
+	const [website, setWebsite] = useState("")
+	const [turnstileToken, setTurnstileToken] = useState("")
+	const [attempt, setAttempt] = useState(0)
 	const [contactName, setContactName] = useState("")
 	const [contactEmail, setContactEmail] = useState("")
 	const [contactPhone, setContactPhone] = useState("")
@@ -29,6 +34,7 @@ export function ContactForm() {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
+		if (loading || !turnstileToken || !siteKey) return
 		setError("")
 		setLoading(true)
 
@@ -39,6 +45,8 @@ export function ContactForm() {
 				contactPhone,
 				course,
 				message,
+				website,
+				turnstileToken,
 			})
 			if (result.success) {
 				setSent(true)
@@ -49,6 +57,8 @@ export function ContactForm() {
 			setError("An unexpected error occurred")
 		} finally {
 			setLoading(false)
+			setTurnstileToken("")
+			setAttempt((value) => value + 1)
 		}
 	}
 
@@ -75,12 +85,29 @@ export function ContactForm() {
 			</CardHeader>
 			<CardContent>
 				<form onSubmit={handleSubmit}>
-					<div className="grid gap-4">
-						{error && <FieldError>{error}</FieldError>}
+					<FieldGroup className="gap-4">
+						{error && <FieldError role="alert">{error}</FieldError>}
+						{!siteKey && (
+							<FieldError role="alert">
+								The contact form is temporarily unavailable. Please try again later.
+							</FieldError>
+						)}
+						<div hidden aria-hidden="true">
+							<label htmlFor="website">Leave this field empty</label>
+							<input
+								id="website"
+								name="website"
+								tabIndex={-1}
+								autoComplete="off"
+								value={website}
+								onChange={(e) => setWebsite(e.target.value)}
+							/>
+						</div>
 						<Field>
 							<FieldLabel htmlFor="contactName">Name</FieldLabel>
 							<Input
 								id="contactName"
+								maxLength={100}
 								type="text"
 								placeholder="Your name"
 								value={contactName}
@@ -92,6 +119,7 @@ export function ContactForm() {
 							<FieldLabel htmlFor="contactEmail">Email</FieldLabel>
 							<Input
 								id="contactEmail"
+								maxLength={254}
 								type="email"
 								placeholder="your@email.com"
 								value={contactEmail}
@@ -104,6 +132,7 @@ export function ContactForm() {
 								<FieldLabel htmlFor="contactPhone">Phone</FieldLabel>
 								<Input
 									id="contactPhone"
+									maxLength={20}
 									type="tel"
 									placeholder="(555) 555-5555"
 									value={contactPhone}
@@ -114,6 +143,7 @@ export function ContactForm() {
 								<FieldLabel htmlFor="course">Home Course</FieldLabel>
 								<Input
 									id="course"
+									maxLength={100}
 									type="text"
 									placeholder="Course name"
 									value={course}
@@ -125,6 +155,7 @@ export function ContactForm() {
 							<FieldLabel htmlFor="message">Message</FieldLabel>
 							<Textarea
 								id="message"
+								maxLength={5000}
 								placeholder="Your message..."
 								rows={5}
 								value={message}
@@ -132,10 +163,17 @@ export function ContactForm() {
 								required
 							/>
 						</Field>
-						<Button type="submit" className="w-full" disabled={loading}>
+						{siteKey && (
+							<Turnstile siteKey={siteKey} attempt={attempt} onToken={setTurnstileToken} />
+						)}
+						<Button
+							type="submit"
+							className="w-full"
+							disabled={loading || !turnstileToken || !siteKey}
+						>
 							{loading ? "Sending..." : "Send Message"}
 						</Button>
-					</div>
+					</FieldGroup>
 				</form>
 			</CardContent>
 		</Card>
