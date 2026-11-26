@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm"
 import {
 	boolean,
 	datetime,
@@ -17,6 +18,10 @@ import {
 // and the audit trail must survive a user being removed. Links to the legacy `document` table
 // live in `library_publication` so this schema is purely additive (CREATE TABLE only), which
 // keeps the startup migration safe to re-run.
+//
+// Names are unique among live siblings. MySQL has no partial indexes, so each table carries a
+// generated "live key" that is NULL once the row is in Trash (NULLs never collide in a unique
+// index). The default collation makes the check case-insensitive.
 
 export const libraryFolder = mysqlTable(
 	"library_folder",
@@ -31,10 +36,16 @@ export const libraryFolder = mysqlTable(
 		deletedAt: datetime("deleted_at", { fsp: 3 }),
 		deletedBy: varchar("deleted_by", { length: 36 }),
 		deletedBatchId: varchar("deleted_batch_id", { length: 36 }),
+		/** parent_id (0 at the top level) while live, NULL in Trash. */
+		liveParentKey: int("live_parent_key").generatedAlwaysAs(
+			sql.raw("(if(`deleted_at` is null, coalesce(`parent_id`, 0), null))"),
+			{ mode: "stored" },
+		),
 	},
 	(table) => [
 		index("library_folder_parent_idx").on(table.parentId),
 		index("library_folder_batch_idx").on(table.deletedBatchId),
+		uniqueIndex("library_folder_live_name_idx").on(table.liveParentKey, table.name),
 	],
 )
 
@@ -65,10 +76,16 @@ export const libraryFile = mysqlTable(
 		deletedAt: datetime("deleted_at", { fsp: 3 }),
 		deletedBy: varchar("deleted_by", { length: 36 }),
 		deletedBatchId: varchar("deleted_batch_id", { length: 36 }),
+		/** folder_id while live, NULL in Trash. */
+		liveFolderKey: int("live_folder_key").generatedAlwaysAs(
+			sql.raw("(if(`deleted_at` is null, `folder_id`, null))"),
+			{ mode: "stored" },
+		),
 	},
 	(table) => [
 		index("library_file_folder_name_idx").on(table.folderId, table.name),
 		index("library_file_batch_idx").on(table.deletedBatchId),
+		uniqueIndex("library_file_live_name_idx").on(table.liveFolderKey, table.name),
 	],
 )
 

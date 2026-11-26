@@ -29,15 +29,21 @@ export function nameTaken(name: string, existing: readonly string[]): boolean {
 	return existing.some((n) => sameName(n, name))
 }
 
-/** "Minutes.pdf" -> "Minutes (2).pdf", "Minutes (3).pdf", ... until it's free. */
-export function uniqueName(name: string, existing: readonly string[]): string {
+/**
+ * "Minutes.pdf" -> "Minutes (2).pdf", "Minutes (3).pdf", ... until it's free. The stem is
+ * shortened when needed so the result, suffix and extension included, fits in `max` characters.
+ */
+export function uniqueName(name: string, existing: readonly string[], max = MAX_FILE_NAME): string {
 	if (!nameTaken(name, existing)) return name
 	const dot = name.lastIndexOf(".")
 	const hasExt = dot > 0
-	const base = hasExt ? name.slice(0, dot) : name
+	// Work in code points so truncation never splits an emoji or other surrogate pair.
+	const base = Array.from(hasExt ? name.slice(0, dot) : name)
 	const ext = hasExt ? name.slice(dot) : ""
 	for (let n = 2; ; n++) {
-		const candidate = `${base} (${n})${ext}`
+		const suffix = ` (${n})${ext}`
+		const room = Math.max(1, max - Array.from(suffix).length)
+		const candidate = `${base.slice(0, room).join("").trimEnd()}${suffix}`
 		if (!nameTaken(candidate, existing)) return candidate
 	}
 }

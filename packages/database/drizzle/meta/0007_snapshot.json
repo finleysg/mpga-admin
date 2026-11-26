@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "9643aaf2-b798-4f70-9580-1dfb8c8da6d3",
+  "id": "bea88212-7758-4cb1-80ef-ce3f78a882d0",
   "prevId": "2ac44740-f07c-4d1e-8921-01f8aeb0ac09",
   "tables": {
     "announcement": {
@@ -2654,6 +2654,17 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "live_folder_key": {
+          "name": "live_folder_key",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "generated": {
+            "as": "(if(`deleted_at` is null, `folder_id`, null))",
+            "type": "stored"
+          }
         }
       },
       "indexes": {
@@ -2671,6 +2682,14 @@
             "deleted_batch_id"
           ],
           "isUnique": false
+        },
+        "library_file_live_name_idx": {
+          "name": "library_file_live_name_idx",
+          "columns": [
+            "live_folder_key",
+            "name"
+          ],
+          "isUnique": true
         }
       },
       "foreignKeys": {
@@ -2927,6 +2946,17 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "live_parent_key": {
+          "name": "live_parent_key",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "generated": {
+            "as": "(if(`deleted_at` is null, coalesce(`parent_id`, 0), null))",
+            "type": "stored"
+          }
         }
       },
       "indexes": {
@@ -2943,6 +2973,14 @@
             "deleted_batch_id"
           ],
           "isUnique": false
+        },
+        "library_folder_live_name_idx": {
+          "name": "library_folder_live_name_idx",
+          "columns": [
+            "live_parent_key",
+            "name"
+          ],
+          "isUnique": true
         }
       },
       "foreignKeys": {},

@@ -40,6 +40,20 @@ function fail<T>(code: LibraryErrorCode, error: string, extra?: { existingFileId
 
 const NOT_FOUND = "That folder or file doesn't exist, or you don't have access to it."
 
+/**
+ * True for MySQL duplicate-key errors. The live-name unique indexes are the final guard against
+ * two concurrent writes giving siblings the same name (e.g. two top-level folders, which have
+ * no parent row to lock). Drizzle may wrap the driver error, so check the cause chain.
+ */
+export function isDuplicateKeyError(error: unknown): boolean {
+	for (let e: unknown = error, depth = 0; e && depth < 5; depth++) {
+		const err = e as { code?: string; errno?: number; cause?: unknown }
+		if (err.code === "ER_DUP_ENTRY" || err.errno === 1062) return true
+		e = err.cause
+	}
+	return false
+}
+
 export type AuditAction =
 	| "create"
 	| "rename"
@@ -163,32 +177,40 @@ export async function createFolder(
 		}
 	}
 
-	return db.transaction(async (tx) => {
-		if (input.parentId !== null) await lockFolder(tx, input.parentId)
-		if (nameTaken(named.name, await liveFolderNames(tx, input.parentId))) {
-			return fail<{ id: number; name: string }>(
-				"name_conflict",
-				`A folder named "${named.name}" already exists here.`,
-			)
-		}
-		const [inserted] = await tx.insert(libraryFolder).values({
-			parentId: input.parentId,
-			name: named.name,
-			depth,
-			createdBy: viewer.id,
-			createdAt: now,
+	const conflict = fail<{ id: number; name: string }>(
+		"name_conflict",
+		`A folder named "${named.name}" already exists here.`,
+	)
+	const insertFolder = () => {
+		return db.transaction(async (tx) => {
+			if (input.parentId !== null) await lockFolder(tx, input.parentId)
+			if (nameTaken(named.name, await liveFolderNames(tx, input.parentId))) return conflict
+			const [inserted] = await tx.insert(libraryFolder).values({
+				parentId: input.parentId,
+				name: named.name,
+				depth,
+				createdBy: viewer.id,
+				createdAt: now,
+			})
+			const id = inserted.insertId
+			await writeAudit(tx, {
+				actor: viewer.id,
+				action: "create",
+				entityType: "folder",
+				entityId: id,
+				details: { name: named.name, parentId: input.parentId },
+				at: now,
+			})
+			return { ok: true as const, data: { id, name: named.name } }
 		})
-		const id = inserted.insertId
-		await writeAudit(tx, {
-			actor: viewer.id,
-			action: "create",
-			entityType: "folder",
-			entityId: id,
-			details: { name: named.name, parentId: input.parentId },
-			at: now,
-		})
-		return { ok: true as const, data: { id, name: named.name } }
-	})
+	}
+
+	try {
+		return await insertFolder()
+	} catch (error) {
+		if (isDuplicateKeyError(error)) return conflict
+		throw error
+	}
 }
 
 // ---------- Upload ----------
@@ -239,64 +261,81 @@ export async function uploadFile(
 	const s3Key = newObjectKey()
 	await storage.put(s3Key, input.bytes, checked.file.contentType)
 
-	return db.transaction(async (tx): Promise<LibraryResult<UploadedFile>> => {
-		await lockFolder(tx, input.folderId)
-		const siblings = await liveFileNames(tx, input.folderId)
-		const existing = siblings.find((f) => nameTaken(named.name, [f.name]))
+	const saveUpload = () => {
+		return db.transaction(async (tx): Promise<LibraryResult<UploadedFile>> => {
+			await lockFolder(tx, input.folderId)
+			const siblings = await liveFileNames(tx, input.folderId)
+			const existing = siblings.find((f) => nameTaken(named.name, [f.name]))
 
-		if (existing && input.mode === "new") {
-			return fail("name_conflict", `"${named.name}" already exists in this folder.`, {
-				existingFileId: existing.id,
+			if (existing && input.mode === "new") {
+				return fail("name_conflict", `"${named.name}" already exists in this folder.`, {
+					existingFileId: existing.id,
+				})
+			}
+
+			const version = {
+				s3Key,
+				size: input.bytes.byteLength,
+				contentType: checked.file.contentType,
+				originalName: named.name,
+				uploadedBy: viewer.id,
+				uploadedAt: now,
+			}
+
+			if (existing && input.mode === "newVersion") {
+				const added = await insertVersion(tx, viewer, existing.id, version, now)
+				return { ok: true, data: { ...added, fileId: existing.id, name: existing.name } }
+			}
+
+			const name = existing
+				? uniqueName(
+						named.name,
+						siblings.map((f) => f.name),
+						MAX_FILE_NAME,
+					)
+				: named.name
+			const [file] = await tx.insert(libraryFile).values({
+				folderId: input.folderId,
+				name,
+				createdBy: viewer.id,
+				createdAt: now,
+				updatedBy: viewer.id,
+				updatedAt: now,
 			})
-		}
-
-		const version = {
-			s3Key,
-			size: input.bytes.byteLength,
-			contentType: checked.file.contentType,
-			originalName: named.name,
-			uploadedBy: viewer.id,
-			uploadedAt: now,
-		}
-
-		if (existing && input.mode === "newVersion") {
-			const added = await insertVersion(tx, viewer, existing.id, version, now)
-			return { ok: true, data: { ...added, fileId: existing.id, name: existing.name } }
-		}
-
-		const name = existing
-			? uniqueName(
-					named.name,
-					siblings.map((f) => f.name),
-				)
-			: named.name
-		const [file] = await tx.insert(libraryFile).values({
-			folderId: input.folderId,
-			name,
-			createdBy: viewer.id,
-			createdAt: now,
-			updatedBy: viewer.id,
-			updatedAt: now,
+			const fileId = file.insertId
+			const [inserted] = await tx
+				.insert(libraryFileVersion)
+				.values({ ...version, fileId, versionNo: 1 })
+			const versionId = inserted.insertId
+			await tx
+				.update(libraryFile)
+				.set({ currentVersionId: versionId })
+				.where(eq(libraryFile.id, fileId))
+			await writeAudit(tx, {
+				actor: viewer.id,
+				action: "upload",
+				entityType: "file",
+				entityId: fileId,
+				details: { name, folderId: input.folderId, size: version.size },
+				at: now,
+			})
+			return { ok: true, data: { fileId, versionId, versionNo: 1, name } }
 		})
-		const fileId = file.insertId
-		const [inserted] = await tx
-			.insert(libraryFileVersion)
-			.values({ ...version, fileId, versionNo: 1 })
-		const versionId = inserted.insertId
-		await tx
-			.update(libraryFile)
-			.set({ currentVersionId: versionId })
-			.where(eq(libraryFile.id, fileId))
-		await writeAudit(tx, {
-			actor: viewer.id,
-			action: "upload",
-			entityType: "file",
-			entityId: fileId,
-			details: { name, folderId: input.folderId, size: version.size },
-			at: now,
+	}
+
+	try {
+		return await saveUpload()
+	} catch (error) {
+		if (!isDuplicateKeyError(error)) throw error
+		// Another write took the name between our check and insert (the folder lock covers
+		// uploads; this catches anything else). Let the member choose again.
+		const existing = (await liveFileNames(db, input.folderId)).find((f) =>
+			nameTaken(named.name, [f.name]),
+		)
+		return fail("name_conflict", `"${named.name}" already exists in this folder.`, {
+			existingFileId: existing?.id,
 		})
-		return { ok: true, data: { fileId, versionId, versionNo: 1, name } }
-	})
+	}
 }
 
 // ---------- Versions ----------

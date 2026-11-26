@@ -52,6 +52,23 @@ describe("names", () => {
 		expect(uniqueName("Minutes.pdf", ["Minutes.pdf", "Minutes (2).pdf"])).toBe("Minutes (3).pdf")
 		expect(uniqueName("README", ["README"])).toBe("README (2)")
 	})
+
+	it("shortens the stem so keep-both names fit the column", () => {
+		const long = `${"a".repeat(196)}.pdf` // 200 characters, the maximum
+		const second = uniqueName(long, [long])
+		expect(second).toHaveLength(200)
+		expect(second.endsWith("a (2).pdf")).toBe(true)
+		const third = uniqueName(long, [long, second])
+		expect(third).toHaveLength(200)
+		expect(third.endsWith(" (3).pdf")).toBe(true)
+	})
+
+	it("never splits an emoji when shortening", () => {
+		const name = `${"😀".repeat(100)}.pdf`
+		const result = uniqueName(name, [name], 20)
+		expect(Array.from(result)).toHaveLength(20)
+		expect(result).not.toMatch(/[\uD800-\uDBFF](?![\uDC00-\uDFFF])/)
+	})
 })
 
 describe("visibleFolderIds", () => {

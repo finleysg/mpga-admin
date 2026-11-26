@@ -9,7 +9,9 @@ CREATE TABLE IF NOT EXISTS `library_folder` (
 	`deleted_at` datetime(3),
 	`deleted_by` varchar(36),
 	`deleted_batch_id` varchar(36),
+	`live_parent_key` int GENERATED ALWAYS AS ((if(`deleted_at` is null, coalesce(`parent_id`, 0), null))) STORED,
 	CONSTRAINT `library_folder_id` PRIMARY KEY(`id`),
+	CONSTRAINT `library_folder_live_name_idx` UNIQUE(`live_parent_key`,`name`),
 	INDEX `library_folder_parent_idx` (`parent_id`),
 	INDEX `library_folder_batch_idx` (`deleted_batch_id`)
 );
@@ -33,7 +35,9 @@ CREATE TABLE IF NOT EXISTS `library_file` (
 	`deleted_at` datetime(3),
 	`deleted_by` varchar(36),
 	`deleted_batch_id` varchar(36),
+	`live_folder_key` int GENERATED ALWAYS AS ((if(`deleted_at` is null, `folder_id`, null))) STORED,
 	CONSTRAINT `library_file_id` PRIMARY KEY(`id`),
+	CONSTRAINT `library_file_live_name_idx` UNIQUE(`live_folder_key`,`name`),
 	CONSTRAINT `library_file_folder_id_library_folder_id_fk` FOREIGN KEY (`folder_id`) REFERENCES `library_folder`(`id`) ON DELETE no action ON UPDATE no action,
 	INDEX `library_file_folder_name_idx` (`folder_id`,`name`),
 	INDEX `library_file_batch_idx` (`deleted_batch_id`)

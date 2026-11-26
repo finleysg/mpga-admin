@@ -101,6 +101,23 @@ describe.skipIf(!process.env.TEST_DATABASE_PORT)("library service (MySQL)", () =
 			})
 		})
 
+		it("never creates two top-level folders with the same name, even concurrently", async () => {
+			const results = await Promise.all(
+				Array.from({ length: 5 }, () =>
+					createFolder(db, admin, { parentId: null, name: "Minutes" }),
+				),
+			)
+			expect(results.filter((r) => r.ok)).toHaveLength(1)
+			expect(results.filter((r) => !r.ok && r.code === "name_conflict")).toHaveLength(4)
+			expect(await db.select().from(libraryFolder)).toHaveLength(1)
+		})
+
+		it("lets a name be reused once the old folder is in Trash", async () => {
+			const id = await folder("Minutes")
+			await db.update(libraryFolder).set({ deletedAt: new Date() }).where(eq(libraryFolder.id, id))
+			expect((await createFolder(db, admin, { parentId: null, name: "Minutes" })).ok).toBe(true)
+		})
+
 		it("rejects duplicate sibling names regardless of case", async () => {
 			await folder("Minutes")
 			expect(await createFolder(db, admin, { parentId: null, name: "minutes" })).toMatchObject({
@@ -208,6 +225,21 @@ describe.skipIf(!process.env.TEST_DATABASE_PORT)("library service (MySQL)", () =
 				mode: "keepBoth",
 			})
 			expect(both).toMatchObject({ ok: true, data: { name: "Agenda (2).pdf", versionNo: 1 } })
+		})
+
+		it("keeps both for a file name at the length limit", async () => {
+			const id = await folder("Minutes")
+			const long = `${"a".repeat(196)}.pdf`
+			await uploadFile(db, storage, alice, { folderId: id, name: long, bytes: pdf(), mode: "new" })
+			const both = await uploadFile(db, storage, alice, {
+				folderId: id,
+				name: long,
+				bytes: pdf(),
+				mode: "keepBoth",
+			})
+			expect(both.ok).toBe(true)
+			expect(both.ok && both.data.name).toHaveLength(200)
+			expect(both.ok && both.data.name.endsWith(" (2).pdf")).toBe(true)
 		})
 
 		it("never gives two concurrent uploads the same name", async () => {
