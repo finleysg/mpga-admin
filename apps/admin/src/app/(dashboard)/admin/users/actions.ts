@@ -1,10 +1,14 @@
 "use server"
 
+import { user } from "@mpga/database"
 import type { ActionResult } from "@mpga/types"
+import { eq } from "drizzle-orm"
 import { headers } from "next/headers"
 
 import { auth } from "@/lib/auth"
+import { db } from "@/lib/db"
 import { requireSuperAdmin } from "@/lib/require-auth"
+import { isAssignableRole, isRoleDowngrade, type AssignableRole } from "@/lib/roles"
 
 interface UserData {
 	id: string
@@ -55,18 +59,26 @@ export async function banUserAction(userId: string, ban: boolean): Promise<Actio
 	}
 }
 
-export async function setRoleAction(
-	userId: string,
-	role: "admin" | "super_admin",
-): Promise<ActionResult> {
+export async function setRoleAction(userId: string, role: AssignableRole): Promise<ActionResult> {
 	const adminId = await requireSuperAdmin()
 	if (!adminId) {
 		return { success: false, error: "Unauthorized" }
 	}
+	if (!isAssignableRole(role)) {
+		return { success: false, error: "Invalid role" }
+	}
+	if (userId === adminId) {
+		return { success: false, error: "You can't change your own role" }
+	}
 
 	try {
 		const headersList = await headers()
+		const [existing] = await db.select({ role: user.role }).from(user).where(eq(user.id, userId))
 		await auth.api.setRole({ headers: headersList, body: { userId, role } })
+		// Losing access takes effect immediately: end the user's open sessions.
+		if (isRoleDowngrade(existing?.role, role)) {
+			await auth.api.revokeUserSessions({ headers: headersList, body: { userId } })
+		}
 		return { success: true }
 	} catch (error) {
 		console.error("Failed to set role:", error)

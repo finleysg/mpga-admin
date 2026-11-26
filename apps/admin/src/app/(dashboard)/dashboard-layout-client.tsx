@@ -11,11 +11,12 @@ import {
 	SidebarProvider,
 	SidebarTrigger,
 } from "@mpga/ui"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
-import { Fragment } from "react"
+import { Fragment, useEffect } from "react"
 
 import { AppSidebar } from "@/components/app-sidebar"
+import { dashboardRedirect } from "@/lib/roles"
 
 function formatSegment(segment: string) {
 	return segment
@@ -24,14 +25,27 @@ function formatSegment(segment: string) {
 		.join(" ")
 }
 
-export function DashboardLayoutClient({ children }: { children: React.ReactNode }) {
+export function DashboardLayoutClient({
+	children,
+	role,
+}: {
+	children: React.ReactNode
+	role: string | null
+}) {
 	const pathname = usePathname()
+	const router = useRouter()
 	const segments = pathname.split("/").filter(Boolean)
+	// The server layout gates full page loads; this covers client-side navigation.
+	const redirectTo = dashboardRedirect(role, pathname)
+
+	useEffect(() => {
+		if (redirectTo) router.replace(redirectTo)
+	}, [redirectTo, router])
 
 	return (
 		<NuqsAdapter>
 			<SidebarProvider>
-				<AppSidebar />
+				<AppSidebar userRole={role} />
 				<SidebarInset>
 					<header className="flex h-16 shrink-0 items-center gap-2 px-4">
 						<SidebarTrigger className="-ml-1" />
@@ -53,7 +67,7 @@ export function DashboardLayoutClient({ children }: { children: React.ReactNode 
 							</BreadcrumbList>
 						</Breadcrumb>
 					</header>
-					<div className="flex-1 p-4">{children}</div>
+					<div className="flex-1 p-4">{redirectTo ? null : children}</div>
 				</SidebarInset>
 			</SidebarProvider>
 		</NuqsAdapter>

@@ -12,6 +12,9 @@ import {
 	DropdownMenuItem,
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
+	DropdownMenuSub,
+	DropdownMenuSubContent,
+	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 	EmptyState,
 	H1,
@@ -28,6 +31,7 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 import { useSession } from "@/lib/auth-client"
+import { ASSIGNABLE_ROLES, ROLE_LABELS, type AssignableRole } from "@/lib/roles"
 
 import { banUserAction, listUsersAction, removeUserAction, setRoleAction } from "./actions"
 
@@ -107,7 +111,7 @@ export default function UsersPage() {
 		}
 	}
 
-	const handleSetRole = async (userId: string, role: "admin" | "super_admin") => {
+	const handleSetRole = async (userId: string, role: AssignableRole) => {
 		setActionLoading(userId)
 		try {
 			const result = await setRoleAction(userId, role)
@@ -170,7 +174,7 @@ export default function UsersPage() {
 										<TableCell>{user.email}</TableCell>
 										<TableCell>
 											<Badge variant={user.role === "super_admin" ? "default" : "secondary"}>
-												{user.role ?? "admin"}
+												{ROLE_LABELS[user.role ?? "user"] ?? user.role}
 											</Badge>
 										</TableCell>
 										<TableCell>
@@ -190,20 +194,23 @@ export default function UsersPage() {
 												<DropdownMenuContent align="end">
 													<DropdownMenuLabel>Actions</DropdownMenuLabel>
 													<DropdownMenuSeparator />
-													<DropdownMenuItem
-														onClick={() =>
-															handleSetRole(
-																user.id,
-																user.role === "super_admin" ? "admin" : "super_admin",
-															)
-														}
-														disabled={user.id === session?.user?.id}
-													>
-														<UserCog className="mr-2 h-4 w-4" />
-														{user.role === "super_admin"
-															? "Demote to Admin"
-															: "Promote to Super Admin"}
-													</DropdownMenuItem>
+													<DropdownMenuSub>
+														<DropdownMenuSubTrigger disabled={user.id === session?.user?.id}>
+															<UserCog className="mr-2 h-4 w-4" />
+															Change role
+														</DropdownMenuSubTrigger>
+														<DropdownMenuSubContent>
+															{ASSIGNABLE_ROLES.map((role) => (
+																<DropdownMenuItem
+																	key={role}
+																	disabled={user.role === role}
+																	onClick={() => handleSetRole(user.id, role)}
+																>
+																	{ROLE_LABELS[role]}
+																</DropdownMenuItem>
+															))}
+														</DropdownMenuSubContent>
+													</DropdownMenuSub>
 													<DropdownMenuItem
 														onClick={() => handleBanUser(user.id, !user.banned)}
 														disabled={user.id === session?.user?.id}

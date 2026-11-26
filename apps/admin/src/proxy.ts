@@ -26,7 +26,10 @@ export async function proxy(request: NextRequest) {
 		return NextResponse.redirect(new URL("/login", request.url))
 	}
 
-	return NextResponse.next()
+	// Server layouts can't read the URL, so pass it along for role-based page gating.
+	const requestHeaders = new Headers(request.headers)
+	requestHeaders.set("x-pathname", request.nextUrl.pathname)
+	return NextResponse.next({ request: { headers: requestHeaders } })
 }
 
 export const config = {

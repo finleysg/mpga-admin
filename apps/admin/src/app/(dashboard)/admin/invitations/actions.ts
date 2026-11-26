@@ -7,23 +7,31 @@ import { desc, eq } from "drizzle-orm"
 import { db } from "@/lib/db"
 import { createInvitation } from "@/lib/invitation"
 import { requireSuperAdmin } from "@/lib/require-auth"
+import { isInvitableRole, type InvitableRole } from "@/lib/roles"
 
 interface InvitationData {
 	id: string
 	email: string
+	role: string
 	status: string
 	createdAt: Date
 	expiresAt: Date
 }
 
-export async function createInvitationAction(email: string): Promise<ActionResult> {
+export async function createInvitationAction(
+	email: string,
+	role: InvitableRole = "admin",
+): Promise<ActionResult> {
 	const userId = await requireSuperAdmin()
 	if (!userId) {
 		return { success: false, error: "Unauthorized" }
 	}
+	if (!isInvitableRole(role)) {
+		return { success: false, error: "Choose Admin or Board" }
+	}
 
 	try {
-		await createInvitation(email, userId)
+		await createInvitation(email, userId, role)
 		return { success: true }
 	} catch (error) {
 		console.error("Failed to create invitation:", error)
@@ -42,6 +50,7 @@ export async function listInvitationsAction(): Promise<ActionResult<InvitationDa
 			.select({
 				id: invitation.id,
 				email: invitation.email,
+				role: invitation.role,
 				status: invitation.status,
 				createdAt: invitation.createdAt,
 				expiresAt: invitation.expiresAt,

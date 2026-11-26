@@ -11,6 +11,11 @@ import {
 	H1,
 	H2,
 	Input,
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
 	Table,
 	TableBody,
 	TableCell,
@@ -23,12 +28,14 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 import { useSession } from "@/lib/auth-client"
+import { INVITABLE_ROLES, ROLE_LABELS, type InvitableRole } from "@/lib/roles"
 
 import { createInvitationAction, listInvitationsAction, revokeInvitationAction } from "./actions"
 
 interface Invitation {
 	id: string
 	email: string
+	role: string
 	status: string
 	createdAt: Date
 	expiresAt: Date
@@ -40,6 +47,7 @@ export default function InvitationsPage() {
 	const [invitations, setInvitations] = useState<Invitation[]>([])
 	const [loading, setLoading] = useState(true)
 	const [email, setEmail] = useState("")
+	const [role, setRole] = useState<InvitableRole>("board")
 	const [sending, setSending] = useState(false)
 	const [actionLoading, setActionLoading] = useState<string | null>(null)
 	const [error, setError] = useState<string | null>(null)
@@ -81,9 +89,9 @@ export default function InvitationsPage() {
 		setSuccess(null)
 
 		try {
-			const result = await createInvitationAction(email.trim())
+			const result = await createInvitationAction(email.trim(), role)
 			if (result.success) {
-				setSuccess(`Invitation sent to ${email}`)
+				setSuccess(`${ROLE_LABELS[role]} invitation sent to ${email}`)
 				setEmail("")
 				// Refresh invitations list
 				const listResult = await listInvitationsAction()
@@ -163,7 +171,7 @@ export default function InvitationsPage() {
 					</CardTitle>
 				</CardHeader>
 				<CardContent>
-					<form onSubmit={handleSendInvitation} className="flex gap-4">
+					<form onSubmit={handleSendInvitation} className="flex flex-col gap-4 sm:flex-row">
 						<div className="relative flex-1">
 							<Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
 							<Input
@@ -175,6 +183,18 @@ export default function InvitationsPage() {
 								required
 							/>
 						</div>
+						<Select value={role} onValueChange={(value) => setRole(value as InvitableRole)}>
+							<SelectTrigger className="w-32" aria-label="Role">
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								{INVITABLE_ROLES.map((r) => (
+									<SelectItem key={r} value={r}>
+										{ROLE_LABELS[r]}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
 						<Button type="submit" disabled={sending || !email.trim()}>
 							<Send className="mr-2 h-4 w-4" />
 							{sending ? "Sending..." : "Send Invitation"}
@@ -202,6 +222,7 @@ export default function InvitationsPage() {
 							<TableHeader>
 								<TableRow>
 									<TableHead>Email</TableHead>
+									<TableHead>Role</TableHead>
 									<TableHead>Status</TableHead>
 									<TableHead>Created</TableHead>
 									<TableHead>Expires</TableHead>
@@ -212,6 +233,7 @@ export default function InvitationsPage() {
 								{invitations.map((invitation) => (
 									<TableRow key={invitation.id}>
 										<TableCell className="font-medium">{invitation.email}</TableCell>
+										<TableCell>{ROLE_LABELS[invitation.role] ?? invitation.role}</TableCell>
 										<TableCell>
 											<Badge variant={getStatusBadgeVariant(invitation.status)}>
 												{invitation.status}
