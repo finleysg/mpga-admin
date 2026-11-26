@@ -8,19 +8,14 @@ import {
 	getDownloadUrl,
 	uploadFile,
 	type LibraryResult,
-	type UploadedFile,
 	type UploadMode,
 } from "@/lib/library/service"
 import { getLibraryStorage } from "@/lib/library/storage"
+import type { UploadActionResult } from "@/lib/library/types"
 import { requireLibraryUser } from "@/lib/require-auth"
 
 const UNAUTHORIZED = { success: false, error: "Unauthorized" } as const
 const UPLOAD_MODES: readonly UploadMode[] = ["new", "newVersion", "keepBoth"]
-
-export type UploadActionResult = ActionResult<UploadedFile> & {
-	/** Set when a file with the same name exists and the member must choose what to do. */
-	conflict?: { existingFileId: number }
-}
 
 function toActionResult<T>(result: LibraryResult<T>): ActionResult<T> {
 	return result.ok ? { success: true, data: result.data } : { success: false, error: result.error }
