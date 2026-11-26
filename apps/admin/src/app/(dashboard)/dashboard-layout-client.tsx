@@ -34,7 +34,9 @@ export function DashboardLayoutClient({
 }) {
 	const pathname = usePathname()
 	const router = useRouter()
-	const segments = pathname.split("/").filter(Boolean)
+	const allSegments = pathname.split("/").filter(Boolean)
+	// Library pages show their own folder breadcrumb; ids in the URL mean nothing to readers.
+	const segments = allSegments[0] === "library" ? ["library"] : allSegments
 	// The server layout gates full page loads; this covers client-side navigation.
 	const redirectTo = dashboardRedirect(role, pathname)
 

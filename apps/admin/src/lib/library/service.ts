@@ -4,13 +4,15 @@ import {
 	libraryFileVersion,
 	libraryFolder,
 	libraryFolderMember,
+	user,
 	type Database,
 } from "@mpga/database"
-import { and, eq, isNull, max } from "drizzle-orm"
+import { and, count, desc, eq, isNull, max } from "drizzle-orm"
 
-import { visibleFolderIds, type FolderNode, type Viewer } from "./access"
-import { isInlineType, validateFile } from "./file-types"
+import { folderPath, visibleFolderIds, type FolderNode, type Viewer } from "./access"
+import { fileExtension, isInlineType, validateFile } from "./file-types"
 import {
+	cleanName,
 	MAX_FILE_NAME,
 	MAX_FOLDER_DEPTH,
 	MAX_FOLDER_NAME,
@@ -258,28 +260,8 @@ export async function uploadFile(
 		}
 
 		if (existing && input.mode === "newVersion") {
-			const [latestRow] = await tx
-				.select({ latest: max(libraryFileVersion.versionNo) })
-				.from(libraryFileVersion)
-				.where(eq(libraryFileVersion.fileId, existing.id))
-			const versionNo = (latestRow?.latest ?? 0) + 1
-			const [inserted] = await tx
-				.insert(libraryFileVersion)
-				.values({ ...version, fileId: existing.id, versionNo })
-			const versionId = inserted.insertId
-			await tx
-				.update(libraryFile)
-				.set({ currentVersionId: versionId, updatedBy: viewer.id, updatedAt: now })
-				.where(eq(libraryFile.id, existing.id))
-			await writeAudit(tx, {
-				actor: viewer.id,
-				action: "new_version",
-				entityType: "file",
-				entityId: existing.id,
-				details: { versionNo, size: version.size },
-				at: now,
-			})
-			return { ok: true, data: { fileId: existing.id, versionId, versionNo, name: existing.name } }
+			const added = await insertVersion(tx, viewer, existing.id, version, now)
+			return { ok: true, data: { ...added, fileId: existing.id, name: existing.name } }
 		}
 
 		const name = existing
@@ -315,6 +297,284 @@ export async function uploadFile(
 		})
 		return { ok: true, data: { fileId, versionId, versionNo: 1, name } }
 	})
+}
+
+// ---------- Versions ----------
+
+interface NewVersion {
+	s3Key: string
+	size: number
+	contentType: string
+	originalName: string
+	uploadedBy: string
+	uploadedAt: Date
+	restoredFromVersionId?: number | null
+}
+
+/** Append a version and make it current. Caller holds the folder lock. */
+async function insertVersion(
+	tx: Tx,
+	viewer: Viewer,
+	fileId: number,
+	version: NewVersion,
+	now: Date,
+	action: AuditAction = "new_version",
+) {
+	const [latestRow] = await tx
+		.select({ latest: max(libraryFileVersion.versionNo) })
+		.from(libraryFileVersion)
+		.where(eq(libraryFileVersion.fileId, fileId))
+	const versionNo = (latestRow?.latest ?? 0) + 1
+	const [inserted] = await tx.insert(libraryFileVersion).values({ ...version, fileId, versionNo })
+	const versionId = inserted.insertId
+	await tx
+		.update(libraryFile)
+		.set({ currentVersionId: versionId, updatedBy: viewer.id, updatedAt: now })
+		.where(eq(libraryFile.id, fileId))
+	await writeAudit(tx, {
+		actor: viewer.id,
+		action,
+		entityType: "file",
+		entityId: fileId,
+		details: {
+			versionNo,
+			size: version.size,
+			...(version.restoredFromVersionId
+				? { restoredFromVersionId: version.restoredFromVersionId }
+				: {}),
+		},
+		at: now,
+	})
+	return { versionId, versionNo }
+}
+
+/**
+ * "Upload new version" on a file's page. The file keeps its name, so the new upload must be the
+ * same kind of file (same extension).
+ */
+export async function uploadVersion(
+	db: Database,
+	storage: LibraryStorage,
+	viewer: Viewer,
+	input: { fileId: number; name: string; bytes: Uint8Array },
+	now = new Date(),
+): Promise<LibraryResult<UploadedFile>> {
+	const file = await findVisibleFile(db, viewer, input.fileId)
+	if (!file) return fail("not_found", NOT_FOUND)
+	if (fileExtension(input.name) !== fileExtension(file.name)) {
+		const ext = fileExtension(file.name)
+		return fail("invalid", `The new version must be a .${ext} file, like the original.`)
+	}
+	// Validate the contents against the original's type.
+	const checked = validateFile(file.name, input.bytes)
+	if (!checked.ok) return fail("invalid", checked.error.replace(file.name, cleanName(input.name)))
+
+	const s3Key = newObjectKey()
+	await storage.put(s3Key, input.bytes, checked.file.contentType)
+
+	return db.transaction(async (tx): Promise<LibraryResult<UploadedFile>> => {
+		await lockFolder(tx, file.folderId)
+		const [current] = await tx
+			.select({ deletedAt: libraryFile.deletedAt })
+			.from(libraryFile)
+			.where(eq(libraryFile.id, file.id))
+		if (!current || current.deletedAt) return fail("not_found", NOT_FOUND)
+		const added = await insertVersion(
+			tx,
+			viewer,
+			file.id,
+			{
+				s3Key,
+				size: input.bytes.byteLength,
+				contentType: checked.file.contentType,
+				originalName: cleanName(input.name),
+				uploadedBy: viewer.id,
+				uploadedAt: now,
+			},
+			now,
+		)
+		return { ok: true, data: { ...added, fileId: file.id, name: file.name } }
+	})
+}
+
+// ---------- Reads ----------
+
+async function findVisibleFile(db: Executor, viewer: Viewer, fileId: number) {
+	const [file] = await db
+		.select({ id: libraryFile.id, name: libraryFile.name, folderId: libraryFile.folderId })
+		.from(libraryFile)
+		.where(and(eq(libraryFile.id, fileId), isNull(libraryFile.deletedAt)))
+	if (!file) return null
+	const state = await loadFolderState(db, viewer)
+	return state.visible.has(file.folderId) ? file : null
+}
+
+export interface FolderSummary {
+	id: number
+	parentId: number | null
+	name: string
+	isRestricted: boolean
+}
+
+export interface FileSummary {
+	id: number
+	name: string
+	size: number
+	contentType: string
+	updatedAt: Date
+	updatedByName: string | null
+	versionCount: number
+}
+
+export interface FolderView {
+	/** Every folder the viewer can see, for the tree. */
+	tree: FolderSummary[]
+	/** null for the top level. */
+	folder: FolderSummary | null
+	path: FolderSummary[]
+	subfolders: FolderSummary[]
+	files: FileSummary[]
+}
+
+function toSummary(f: FolderState["folders"][number]): FolderSummary {
+	return { id: f.id, parentId: f.parentId, name: f.name, isRestricted: f.isRestricted }
+}
+
+const byName = (a: { name: string }, b: { name: string }) =>
+	a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" })
+
+/** Everything the browse screen needs for one folder (or the top level when folderId is null). */
+export async function getFolderView(
+	db: Database,
+	viewer: Viewer,
+	folderId: number | null,
+): Promise<LibraryResult<FolderView>> {
+	const state = await loadFolderState(db, viewer)
+	const visible = state.folders.filter((f) => state.visible.has(f.id))
+	const tree = visible.map(toSummary).sort(byName)
+	if (folderId !== null && !state.visible.has(folderId)) return fail("not_found", NOT_FOUND)
+
+	const subfolders = tree.filter((f) => f.parentId === folderId)
+	const folder = folderId === null ? null : (tree.find((f) => f.id === folderId) ?? null)
+	const path = folderId === null ? [] : folderPath(visible, folderId).map(toSummary)
+
+	let files: FileSummary[] = []
+	if (folderId !== null) {
+		const versionCounts = db
+			.select({
+				fileId: libraryFileVersion.fileId,
+				versionCount: count().as("version_count"),
+			})
+			.from(libraryFileVersion)
+			.groupBy(libraryFileVersion.fileId)
+			.as("vc")
+		files = await db
+			.select({
+				id: libraryFile.id,
+				name: libraryFile.name,
+				size: libraryFileVersion.size,
+				contentType: libraryFileVersion.contentType,
+				updatedAt: libraryFile.updatedAt,
+				updatedByName: user.name,
+				versionCount: versionCounts.versionCount,
+			})
+			.from(libraryFile)
+			.innerJoin(libraryFileVersion, eq(libraryFileVersion.id, libraryFile.currentVersionId))
+			.innerJoin(versionCounts, eq(versionCounts.fileId, libraryFile.id))
+			.leftJoin(user, eq(user.id, libraryFile.updatedBy))
+			.where(and(eq(libraryFile.folderId, folderId), isNull(libraryFile.deletedAt)))
+		files.sort(byName)
+	}
+
+	return { ok: true, data: { tree, folder, path, subfolders, files } }
+}
+
+export interface VersionSummary {
+	id: number
+	versionNo: number
+	size: number
+	uploadedAt: Date
+	uploadedByName: string | null
+	restoredFromVersionNo: number | null
+}
+
+export interface FileView {
+	id: number
+	name: string
+	folderId: number
+	path: FolderSummary[]
+	createdAt: Date
+	createdByName: string | null
+	current: VersionSummary
+	contentType: string
+	versions: VersionSummary[]
+}
+
+export async function getFileView(
+	db: Database,
+	viewer: Viewer,
+	fileId: number,
+): Promise<LibraryResult<FileView>> {
+	const [file] = await db
+		.select({
+			id: libraryFile.id,
+			name: libraryFile.name,
+			folderId: libraryFile.folderId,
+			currentVersionId: libraryFile.currentVersionId,
+			createdAt: libraryFile.createdAt,
+			createdByName: user.name,
+		})
+		.from(libraryFile)
+		.leftJoin(user, eq(user.id, libraryFile.createdBy))
+		.where(and(eq(libraryFile.id, fileId), isNull(libraryFile.deletedAt)))
+	if (!file) return fail("not_found", NOT_FOUND)
+	const state = await loadFolderState(db, viewer)
+	if (!state.visible.has(file.folderId)) return fail("not_found", NOT_FOUND)
+
+	const rows = await db
+		.select({
+			id: libraryFileVersion.id,
+			versionNo: libraryFileVersion.versionNo,
+			size: libraryFileVersion.size,
+			contentType: libraryFileVersion.contentType,
+			uploadedAt: libraryFileVersion.uploadedAt,
+			uploadedByName: user.name,
+			restoredFromVersionId: libraryFileVersion.restoredFromVersionId,
+		})
+		.from(libraryFileVersion)
+		.leftJoin(user, eq(user.id, libraryFileVersion.uploadedBy))
+		.where(eq(libraryFileVersion.fileId, file.id))
+		.orderBy(desc(libraryFileVersion.versionNo))
+	const numberById = new Map(rows.map((r) => [r.id, r.versionNo]))
+	const versions: VersionSummary[] = rows.map((r) => ({
+		id: r.id,
+		versionNo: r.versionNo,
+		size: r.size,
+		uploadedAt: r.uploadedAt,
+		uploadedByName: r.uploadedByName,
+		restoredFromVersionNo: r.restoredFromVersionId
+			? (numberById.get(r.restoredFromVersionId) ?? null)
+			: null,
+	}))
+	const currentRow = rows.find((r) => r.id === file.currentVersionId) ?? rows[0]
+	const current = versions.find((v) => v.id === currentRow?.id)
+	if (!currentRow || !current) return fail("not_found", NOT_FOUND)
+
+	const visible = state.folders.filter((f) => state.visible.has(f.id))
+	return {
+		ok: true,
+		data: {
+			id: file.id,
+			name: file.name,
+			folderId: file.folderId,
+			path: folderPath(visible, file.folderId).map(toSummary),
+			createdAt: file.createdAt,
+			createdByName: file.createdByName,
+			current,
+			contentType: currentRow.contentType,
+			versions,
+		},
+	}
 }
 
 // ---------- Download ----------

@@ -12,7 +12,14 @@ import { and, eq, sql } from "drizzle-orm"
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest"
 
 import type { Viewer } from "../access"
-import { createFolder, getDownloadUrl, uploadFile } from "../service"
+import {
+	createFolder,
+	getDownloadUrl,
+	getFileView,
+	getFolderView,
+	uploadFile,
+	uploadVersion,
+} from "../service"
 import { MemoryLibraryStorage } from "../storage"
 
 const pdf = (body = "board minutes") => new TextEncoder().encode(`%PDF-1.7 ${body}`)
@@ -318,6 +325,90 @@ describe.skipIf(!process.env.TEST_DATABASE_PORT)("library service (MySQL)", () =
 				.where(eq(libraryFile.id, up.data.fileId))
 			expect((await getDownloadUrl(db, storage, bob, up.data.versionId)).ok).toBe(false)
 			expect((await getDownloadUrl(db, storage, admin, up.data.versionId)).ok).toBe(true)
+		})
+	})
+
+	describe("reading and new versions", () => {
+		it("adds a version from the file page and rejects a different file type", async () => {
+			const id = await folder("Minutes")
+			const up = await uploadFile(db, storage, alice, {
+				folderId: id,
+				name: "Agenda.pdf",
+				bytes: pdf(),
+				mode: "new",
+			})
+			if (!up.ok) throw new Error(up.error)
+			const wrongType = await uploadVersion(db, storage, bob, {
+				fileId: up.data.fileId,
+				name: "agenda.docx",
+				bytes: docx(),
+			})
+			expect(wrongType).toMatchObject({ ok: false, code: "invalid" })
+			const renamed = await uploadVersion(db, storage, bob, {
+				fileId: up.data.fileId,
+				name: "Agenda FINAL.pdf",
+				bytes: pdf("final"),
+			})
+			// The file keeps its name; the upload's own name is kept on the version.
+			expect(renamed).toMatchObject({ ok: true, data: { versionNo: 2, name: "Agenda.pdf" } })
+			const view = await getFileView(db, alice, up.data.fileId)
+			expect(view.ok && view.data.versions.map((v) => v.versionNo)).toEqual([2, 1])
+			expect(view.ok && view.data.current.versionNo).toBe(2)
+		})
+
+		it("lists a folder's subfolders and files, sorted, with version counts", async () => {
+			const board = await folder("Board")
+			await folder("Minutes", board)
+			await folder("Agendas", board)
+			for (const name of ["b.pdf", "a.pdf", "b.pdf"]) {
+				await uploadFile(db, storage, alice, {
+					folderId: board,
+					name,
+					bytes: pdf(),
+					mode: "newVersion",
+				})
+			}
+			const view = await getFolderView(db, alice, board)
+			if (!view.ok) throw new Error(view.error)
+			expect(view.data.subfolders.map((f) => f.name)).toEqual(["Agendas", "Minutes"])
+			expect(view.data.files.map((f) => [f.name, f.versionCount])).toEqual([
+				["a.pdf", 1],
+				["b.pdf", 2],
+			])
+			expect(view.data.path.map((f) => f.name)).toEqual(["Board"])
+			const top = await getFolderView(db, alice, null)
+			expect(top.ok && top.data.subfolders.map((f) => f.name)).toEqual(["Board"])
+		})
+
+		it("keeps restricted folders and their files out of non-members' views", async () => {
+			const board = await folder("Board")
+			const exec = await folder("Executive Committee", board)
+			await db.update(libraryFolder).set({ isRestricted: true }).where(eq(libraryFolder.id, exec))
+			await db.insert(libraryFolderMember).values({ folderId: exec, userId: alice.id })
+			const up = await uploadFile(db, storage, alice, {
+				folderId: exec,
+				name: "Salaries.pdf",
+				bytes: pdf(),
+				mode: "new",
+			})
+			if (!up.ok) throw new Error(up.error)
+
+			const bobBoard = await getFolderView(db, bob, board)
+			expect(bobBoard.ok && bobBoard.data.subfolders).toEqual([])
+			expect(bobBoard.ok && bobBoard.data.tree.map((f) => f.name)).toEqual(["Board"])
+			expect(await getFolderView(db, bob, exec)).toMatchObject({ ok: false, code: "not_found" })
+			expect(await getFileView(db, bob, up.data.fileId)).toMatchObject({
+				ok: false,
+				code: "not_found",
+			})
+			expect(
+				await uploadVersion(db, storage, bob, {
+					fileId: up.data.fileId,
+					name: "x.pdf",
+					bytes: pdf(),
+				}),
+			).toMatchObject({ ok: false, code: "not_found" })
+			expect((await getFileView(db, alice, up.data.fileId)).ok).toBe(true)
 		})
 	})
 })

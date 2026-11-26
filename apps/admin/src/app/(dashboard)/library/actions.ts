@@ -7,6 +7,7 @@ import {
 	createFolder,
 	getDownloadUrl,
 	uploadFile,
+	uploadVersion,
 	type LibraryResult,
 	type UploadMode,
 } from "@/lib/library/service"
@@ -51,6 +52,26 @@ export async function uploadFileAction(formData: FormData): Promise<UploadAction
 		return toActionResult(result)
 	} catch (error) {
 		console.error("Library upload failed:", error)
+		return { success: false, error: `${file.name} couldn't be uploaded. Try again.` }
+	}
+}
+
+/** "Upload new version" from a file's page. */
+export async function uploadVersionAction(formData: FormData): Promise<UploadActionResult> {
+	const viewer = await requireLibraryUser()
+	if (!viewer) return UNAUTHORIZED
+	const file = formData.get("file")
+	const fileId = Number(formData.get("fileId"))
+	if (!(file instanceof File) || !Number.isInteger(fileId)) {
+		return { success: false, error: "Choose a file." }
+	}
+	try {
+		const bytes = new Uint8Array(await file.arrayBuffer())
+		return toActionResult(
+			await uploadVersion(db, getLibraryStorage(), viewer, { fileId, name: file.name, bytes }),
+		)
+	} catch (error) {
+		console.error("Library version upload failed:", error)
 		return { success: false, error: `${file.name} couldn't be uploaded. Try again.` }
 	}
 }
