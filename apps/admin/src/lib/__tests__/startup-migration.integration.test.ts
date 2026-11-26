@@ -27,8 +27,10 @@ describe.skipIf(!process.env.TEST_DATABASE_PORT)("admin startup migration (MySQL
 			await connection.end()
 		}
 	})
-	function run(tag = "0006_wet_microbe") {
-		return exec(process.execPath, ["packages/database/migrate.mjs", `--only=${tag}`], {
+	// Mirrors apps/admin/start.sh.
+	function run(tags = ["0006_wet_microbe", "0007_library"]) {
+		const args = tags.map((tag) => `--only=${tag}`)
+		return exec(process.execPath, ["packages/database/migrate.mjs", ...args], {
 			cwd,
 			env: {
 				...process.env,
@@ -47,6 +49,13 @@ describe.skipIf(!process.env.TEST_DATABASE_PORT)("admin startup migration (MySQL
 		expect(tables.map((r) => Object.values(r)[0]).sort()).toEqual([
 			"__drizzle_migrations",
 			"contactGuard",
+			"library_audit",
+			"library_file",
+			"library_file_text",
+			"library_file_version",
+			"library_folder",
+			"library_folder_member",
+			"library_publication",
 		])
 		const [indexes] = await connection.query<RowDataPacket[]>(
 			`SHOW INDEX FROM ${database}.contactGuard`,
@@ -56,13 +65,16 @@ describe.skipIf(!process.env.TEST_DATABASE_PORT)("admin startup migration (MySQL
 		const [records] = await connection.query<RowDataPacket[]>(
 			`SELECT hash FROM ${database}.__drizzle_migrations`,
 		)
-		expect(records).toEqual([{ hash: "0006_wet_microbe" }])
+		expect(records.map((r) => r.hash).sort()).toEqual(["0006_wet_microbe", "0007_library"])
 	})
 	it("recovers if DDL completed before its journal record was written", async () => {
 		await connection.execute(`DELETE FROM ${database}.__drizzle_migrations`)
-		expect((await run()).stdout).toContain("Applied migration: 0006_wet_microbe")
+		const { stdout } = await run()
+		expect(stdout).toContain("Applied migration: 0006_wet_microbe")
+		expect(stdout).toContain("Applied migration: 0007_library")
 	})
 	it("fails instead of falling back to historical migrations for an invalid tag", async () => {
-		await expect(run("unknown")).rejects.toMatchObject({ code: 1 })
+		await expect(run(["unknown"])).rejects.toMatchObject({ code: 1 })
+		await expect(run(["0007_library", "unknown"])).rejects.toMatchObject({ code: 1 })
 	})
 })
