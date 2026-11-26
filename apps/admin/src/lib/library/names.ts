@@ -20,9 +20,13 @@ export function validateName(
 	return { ok: true, name }
 }
 
+/**
+ * Approximates the name columns' collation, utf8mb4_0900_ai_ci, which ignores case and accents
+ * ("Resume.pdf" = "résumé.PDF"). The database's unique index is the final word; server code
+ * looks up existing names with SQL equality where it needs an exact answer.
+ */
 function sameName(a: string, b: string): boolean {
-	// MySQL's default collation compares names case-insensitively; match that here.
-	return a.localeCompare(b, undefined, { sensitivity: "accent" }) === 0
+	return a.localeCompare(b, undefined, { sensitivity: "base" }) === 0
 }
 
 export function nameTaken(name: string, existing: readonly string[]): boolean {

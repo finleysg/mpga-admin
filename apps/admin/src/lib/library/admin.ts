@@ -21,6 +21,7 @@ import {
 	liveFolderNames,
 	loadFolderState,
 	lockFolder,
+	lockTree,
 	NOT_FOUND,
 	writeAudit,
 	type LibraryResult,
@@ -97,30 +98,38 @@ export async function moveFolder(
 	now = new Date(),
 ): Promise<Ok> {
 	if (!viewer.isDocumentAdmin) return forbidden()
-	const state = await loadFolderState(db, viewer, { includeDeleted: true })
-	const folder = state.folders.find((f) => f.id === folderId && f.deletedAt === null)
-	if (!folder) return fail("not_found", NOT_FOUND)
-	if (folder.parentId === targetParentId) return OK
-
-	const subtree = descendantFolderIds(state.folders, folderId)
-	let newDepth = 1
-	if (targetParentId !== null) {
-		const target = state.folders.find((f) => f.id === targetParentId && f.deletedAt === null)
-		if (!target) return fail("not_found", NOT_FOUND)
-		if (subtree.has(targetParentId)) {
-			return fail("invalid", "A folder can't be moved into itself or one of its subfolders.")
-		}
-		newDepth = target.depth + 1
-	}
-	if (newDepth + subtreeHeight(state.folders, folderId) > MAX_FOLDER_DEPTH) {
-		return fail("invalid", `That would nest folders more than ${MAX_FOLDER_DEPTH} levels deep.`)
-	}
-	const delta = newDepth - folder.depth
+	let folderName = ""
 
 	return guardNames(
 		() =>
-			db.transaction(async (tx) => {
-				if (targetParentId !== null) await lockFolder(tx, targetParentId)
+			db.transaction(async (tx): Promise<Ok> => {
+				// Validate against the tree as it is once we hold the lock, not as it was before:
+				// otherwise two crossing moves (A under B, B under A) could both pass and form a cycle.
+				await lockTree(tx)
+				const state = await loadFolderState(tx, viewer, { includeDeleted: true })
+				const folder = state.folders.find((f) => f.id === folderId && f.deletedAt === null)
+				if (!folder) return fail("not_found", NOT_FOUND)
+				folderName = folder.name
+				if (folder.parentId === targetParentId) return OK
+
+				const subtree = descendantFolderIds(state.folders, folderId)
+				let newDepth = 1
+				if (targetParentId !== null) {
+					const target = state.folders.find((f) => f.id === targetParentId && f.deletedAt === null)
+					if (!target) return fail("not_found", NOT_FOUND)
+					if (subtree.has(targetParentId)) {
+						return fail("invalid", "A folder can't be moved into itself or one of its subfolders.")
+					}
+					newDepth = target.depth + 1
+				}
+				if (newDepth + subtreeHeight(state.folders, folderId) > MAX_FOLDER_DEPTH) {
+					return fail(
+						"invalid",
+						`That would nest folders more than ${MAX_FOLDER_DEPTH} levels deep.`,
+					)
+				}
+				const delta = newDepth - folder.depth
+
 				await tx
 					.update(libraryFolder)
 					.set({ parentId: targetParentId })
@@ -141,7 +150,11 @@ export async function moveFolder(
 				})
 				return OK
 			}),
-		`A folder named "${folder.name}" already exists there.`,
+		`A folder with that name already exists there.`,
+	).then((result) =>
+		!result.ok && result.code === "name_conflict" && folderName
+			? fail<null>("name_conflict", `A folder named "${folderName}" already exists there.`)
+			: result,
 	)
 }
 
@@ -183,12 +196,17 @@ export async function getFolderAccess(
 	const state = await loadFolderState(db, viewer)
 	const folder = state.folders.find((f) => f.id === folderId && state.visible.has(f.id))
 	if (!folder) return fail("not_found", NOT_FOUND)
+	const members = await listLibraryMembers(db)
+	// Drop memberships of people who can no longer be chosen (promoted to admin, banned or
+	// removed). They'd be invisible in the dialog yet make every save fail validation; saving
+	// without them also clears the stale rows.
+	const selectable = new Set(members.filter((m) => !m.isDocumentAdmin).map((m) => m.id))
 	return {
 		ok: true,
 		data: {
 			isRestricted: folder.isRestricted,
-			memberIds: [...(state.memberships.get(folderId) ?? [])],
-			members: await listLibraryMembers(db),
+			memberIds: [...(state.memberships.get(folderId) ?? [])].filter((id) => selectable.has(id)),
+			members,
 		},
 	}
 }
@@ -250,17 +268,18 @@ export async function deleteFolder(
 	now = new Date(),
 ): Promise<Ok> {
 	if (!viewer.isDocumentAdmin) return forbidden()
-	const state = await loadFolderState(db, viewer, { includeDeleted: true })
-	const folder = state.folders.find((f) => f.id === folderId && f.deletedAt === null)
-	if (!folder) return fail("not_found", NOT_FOUND)
-	// Items already in Trash keep their own batch, so they're restored separately.
-	const ids = [...descendantFolderIds(state.folders, folderId)].filter(
-		(id) => state.folders.find((f) => f.id === id)?.deletedAt === null,
-	)
-	const batch = crypto.randomUUID()
-	const mark = { deletedAt: now, deletedBy: viewer.id, deletedBatchId: batch }
-
-	return db.transaction(async (tx) => {
+	return db.transaction(async (tx): Promise<Ok> => {
+		// Under the tree lock the subtree can't change (e.g. a folder moved in) mid-delete.
+		await lockTree(tx)
+		const state = await loadFolderState(tx, viewer, { includeDeleted: true })
+		const folder = state.folders.find((f) => f.id === folderId && f.deletedAt === null)
+		if (!folder) return fail("not_found", NOT_FOUND)
+		// Items already in Trash keep their own batch, so they're restored separately.
+		const ids = [...descendantFolderIds(state.folders, folderId)].filter(
+			(id) => state.folders.find((f) => f.id === id)?.deletedAt === null,
+		)
+		const batch = crypto.randomUUID()
+		const mark = { deletedAt: now, deletedBy: viewer.id, deletedBatchId: batch }
 		await tx
 			.update(libraryFile)
 			.set(mark)
@@ -344,7 +363,7 @@ export async function moveFile(
 	return guardNames(
 		() =>
 			db.transaction(async (tx) => {
-				await lockFolder(tx, targetFolderId)
+				if (!(await lockFolder(tx, targetFolderId))) return fail<null>("not_found", NOT_FOUND)
 				await tx
 					.update(libraryFile)
 					.set({ folderId: targetFolderId, updatedBy: viewer.id, updatedAt: now })
@@ -407,7 +426,9 @@ export async function restoreVersion(
 	if (!version) return fail("not_found", NOT_FOUND)
 
 	return db.transaction(async (tx) => {
-		await lockFolder(tx, file.folderId)
+		if (!(await lockFolder(tx, file.folderId))) {
+			return fail<{ versionNo: number }>("not_found", NOT_FOUND)
+		}
 		// Stored objects are never modified, so the new version can share the old object.
 		const added = await insertVersion(
 			tx,
@@ -536,20 +557,27 @@ export async function restoreFromTrash(
 	target?: number | null,
 	now = new Date(),
 ): Promise<LibraryResult<{ name: string; folderId: number | null }>> {
+	type Result = LibraryResult<{ name: string; folderId: number | null }>
 	if (!viewer.isDocumentAdmin) return forbidden()
-	const state = await loadFolderState(db, viewer, { includeDeleted: true })
-	const isLive = (id: number) => state.folders.find((f) => f.id === id)?.deletedAt === null
 
 	if (item.kind === "file") {
 		const [file] = await db.select().from(libraryFile).where(eq(libraryFile.id, item.id))
 		if (!file?.deletedAt) return fail("not_found", NOT_FOUND)
-		const folderId = isLive(file.folderId) ? file.folderId : target
-		if (folderId === undefined || folderId === null) {
-			return fail("invalid", "Its folder is in Trash. Choose a folder to restore it to.")
-		}
-		if (!isLive(folderId)) return fail("not_found", NOT_FOUND)
-		return db.transaction(async (tx) => {
-			await lockFolder(tx, folderId)
+		return db.transaction(async (tx): Promise<Result> => {
+			// Prefer the original folder; it must still be live once we hold its lock.
+			let folderId: number | null = null
+			if (await lockFolder(tx, file.folderId)) folderId = file.folderId
+			else if (target !== undefined && target !== null) {
+				if (!(await lockFolder(tx, target))) return fail("not_found", NOT_FOUND)
+				folderId = target
+			} else {
+				return fail("invalid", "Its folder is in Trash. Choose a folder to restore it to.")
+			}
+			const [current] = await tx
+				.select({ deletedAt: libraryFile.deletedAt })
+				.from(libraryFile)
+				.where(eq(libraryFile.id, file.id))
+			if (!current?.deletedAt) return fail("not_found", NOT_FOUND)
 			const name = uniqueName(
 				file.name,
 				(await liveFileNames(tx, folderId)).map((f) => f.name),
@@ -567,32 +595,35 @@ export async function restoreFromTrash(
 				details: { folderId, ...(name !== file.name ? { renamedTo: name } : {}) },
 				at: now,
 			})
-			return { ok: true as const, data: { name, folderId } }
+			return { ok: true, data: { name, folderId } }
 		})
 	}
 
-	const folder = state.folders.find((f) => f.id === item.id)
-	if (!folder?.deletedAt) return fail("not_found", NOT_FOUND)
-	const [row] = await db
-		.select({ batch: libraryFolder.deletedBatchId })
-		.from(libraryFolder)
-		.where(eq(libraryFolder.id, folder.id))
-	const batch = row?.batch
-	if (!batch) return fail("not_found", NOT_FOUND)
+	return db.transaction(async (tx): Promise<Result> => {
+		// Depth and placement are checked against the tree as it is under the lock.
+		await lockTree(tx)
+		const state = await loadFolderState(tx, viewer, { includeDeleted: true })
+		const isLive = (id: number) => state.folders.find((f) => f.id === id)?.deletedAt === null
+		const folder = state.folders.find((f) => f.id === item.id)
+		if (!folder?.deletedAt) return fail("not_found", NOT_FOUND)
+		const [row] = await tx
+			.select({ batch: libraryFolder.deletedBatchId })
+			.from(libraryFolder)
+			.where(eq(libraryFolder.id, folder.id))
+		const batch = row?.batch
+		if (!batch) return fail("not_found", NOT_FOUND)
 
-	const parentId =
-		folder.parentId !== null && isLive(folder.parentId) ? folder.parentId : (target ?? null)
-	if (parentId !== null && !isLive(parentId)) return fail("not_found", NOT_FOUND)
-	const parentDepth =
-		parentId === null ? 0 : (state.folders.find((f) => f.id === parentId)?.depth ?? 0)
-	const delta = parentDepth + 1 - folder.depth
-	if (parentDepth + 1 + subtreeHeight(state.folders, folder.id) > MAX_FOLDER_DEPTH) {
-		return fail("invalid", `That would nest folders more than ${MAX_FOLDER_DEPTH} levels deep.`)
-	}
-	const subtree = [...descendantFolderIds(state.folders, folder.id)]
+		const parentId =
+			folder.parentId !== null && isLive(folder.parentId) ? folder.parentId : (target ?? null)
+		if (parentId !== null && !isLive(parentId)) return fail("not_found", NOT_FOUND)
+		const parentDepth =
+			parentId === null ? 0 : (state.folders.find((f) => f.id === parentId)?.depth ?? 0)
+		if (parentDepth + 1 + subtreeHeight(state.folders, folder.id) > MAX_FOLDER_DEPTH) {
+			return fail("invalid", `That would nest folders more than ${MAX_FOLDER_DEPTH} levels deep.`)
+		}
+		const delta = parentDepth + 1 - folder.depth
+		const subtree = [...descendantFolderIds(state.folders, folder.id)]
 
-	return db.transaction(async (tx) => {
-		if (parentId !== null) await lockFolder(tx, parentId)
 		const name = uniqueName(folder.name, await liveFolderNames(tx, parentId), MAX_FOLDER_NAME)
 		const clear = { deletedAt: null, deletedBy: null, deletedBatchId: null }
 		await tx.update(libraryFolder).set({ parentId, name }).where(eq(libraryFolder.id, folder.id))
@@ -612,6 +643,6 @@ export async function restoreFromTrash(
 			details: { parentId, batch, ...(name !== folder.name ? { renamedTo: name } : {}) },
 			at: now,
 		})
-		return { ok: true as const, data: { name, folderId: folder.id } }
+		return { ok: true, data: { name, folderId: folder.id } }
 	})
 }

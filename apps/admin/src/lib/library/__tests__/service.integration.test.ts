@@ -169,6 +169,42 @@ describe.skipIf(!process.env.TEST_DATABASE_PORT)("library service (MySQL)", () =
 			expect(storage.objects.size).toBe(1)
 		})
 
+		it("detects clashes the way the database collation does (accents and case)", async () => {
+			const id = await folder("Minutes")
+			const first = await uploadFile(db, storage, alice, {
+				folderId: id,
+				name: "Resume.pdf",
+				bytes: pdf(),
+				mode: "new",
+			})
+			if (!first.ok) throw new Error(first.error)
+			const clash = await uploadFile(db, storage, bob, {
+				folderId: id,
+				name: "résumé.PDF",
+				bytes: pdf(),
+				mode: "new",
+			})
+			expect(clash).toMatchObject({
+				ok: false,
+				code: "name_conflict",
+				existingFileId: first.data.fileId,
+			})
+			const version = await uploadFile(db, storage, bob, {
+				folderId: id,
+				name: "résumé.PDF",
+				bytes: pdf(),
+				mode: "newVersion",
+			})
+			expect(version).toMatchObject({ ok: true, data: { fileId: first.data.fileId, versionNo: 2 } })
+			const both = await uploadFile(db, storage, bob, {
+				folderId: id,
+				name: "résumé.PDF",
+				bytes: pdf(),
+				mode: "keepBoth",
+			})
+			expect(both).toMatchObject({ ok: true, data: { name: "résumé (2).PDF" } })
+		})
+
 		it("adds a new version and keeps history", async () => {
 			const id = await folder("Minutes")
 			const first = await uploadFile(db, storage, alice, {

@@ -53,6 +53,10 @@ describe("names", () => {
 		expect(uniqueName("README", ["README"])).toBe("README (2)")
 	})
 
+	it("treats names that differ only by accents or case as the same, like the database", () => {
+		expect(uniqueName("résumé.PDF", ["Resume.pdf"])).toBe("résumé (2).PDF")
+	})
+
 	it("shortens the stem so keep-both names fit the column", () => {
 		const long = `${"a".repeat(196)}.pdf` // 200 characters, the maximum
 		const second = uniqueName(long, [long])

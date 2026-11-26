@@ -149,13 +149,46 @@ export async function liveFolderNames(db: Executor, parentId: number | null): Pr
 	return rows.map((r) => r.name)
 }
 
-/** Serialize writes within one folder so name checks and inserts can't interleave. */
-export async function lockFolder(tx: Tx, folderId: number) {
-	await tx
-		.select({ id: libraryFolder.id })
+/**
+ * The live file in `folderId` whose name equals `name` under the column's collation
+ * (utf8mb4_0900_ai_ci: case- and accent-insensitive), i.e. exactly what the unique index sees.
+ */
+export async function findLiveFileByName(db: Executor, folderId: number, name: string) {
+	const [row] = await db
+		.select({ id: libraryFile.id, name: libraryFile.name })
+		.from(libraryFile)
+		.where(
+			and(
+				eq(libraryFile.folderId, folderId),
+				isNull(libraryFile.deletedAt),
+				eq(libraryFile.name, name),
+			),
+		)
+		.limit(1)
+	return row ?? null
+}
+
+/**
+ * Serialize changes to the folder tree (create, move, delete, restore). Locks every folder row,
+ * which is cheap because the table is small. Callers must re-read the tree and repeat their
+ * ancestry and depth checks after taking the lock, so two moves can't both pass checks made
+ * against the same old tree and form a cycle.
+ */
+export async function lockTree(tx: Tx) {
+	await tx.select({ id: libraryFolder.id }).from(libraryFolder).for("update")
+}
+
+/**
+ * Serialize writes within one folder so name checks and inserts can't interleave. Returns
+ * false if the folder no longer exists or has gone to Trash meanwhile; callers must stop then.
+ */
+export async function lockFolder(tx: Tx, folderId: number): Promise<boolean> {
+	const [row] = await tx
+		.select({ deletedAt: libraryFolder.deletedAt })
 		.from(libraryFolder)
 		.where(eq(libraryFolder.id, folderId))
 		.for("update")
+	return !!row && row.deletedAt === null
 }
 
 // ---------- Folders ----------
@@ -170,24 +203,29 @@ export async function createFolder(
 	const named = validateName(input.name, MAX_FOLDER_NAME)
 	if (!named.ok) return fail("invalid", named.error)
 
-	let depth = 1
-	if (input.parentId !== null) {
-		const state = await loadFolderState(db, viewer)
-		const parent = state.folders.find((f) => f.id === input.parentId)
-		if (!parent || !state.visible.has(parent.id)) return fail("not_found", NOT_FOUND)
-		depth = parent.depth + 1
-		if (depth > MAX_FOLDER_DEPTH) {
-			return fail("invalid", `Folders can be nested up to ${MAX_FOLDER_DEPTH} levels deep.`)
-		}
-	}
-
 	const conflict = fail<{ id: number; name: string }>(
 		"name_conflict",
 		`A folder named "${named.name}" already exists here.`,
 	)
 	const insertFolder = () => {
 		return db.transaction(async (tx) => {
-			if (input.parentId !== null) await lockFolder(tx, input.parentId)
+			let depth = 1
+			if (input.parentId !== null) {
+				// The parent may be moving concurrently: check its depth under the tree lock.
+				await lockTree(tx)
+				const state = await loadFolderState(tx, viewer)
+				const parent = state.folders.find((f) => f.id === input.parentId)
+				if (!parent || !state.visible.has(parent.id)) {
+					return fail<{ id: number; name: string }>("not_found", NOT_FOUND)
+				}
+				depth = parent.depth + 1
+				if (depth > MAX_FOLDER_DEPTH) {
+					return fail<{ id: number; name: string }>(
+						"invalid",
+						`Folders can be nested up to ${MAX_FOLDER_DEPTH} levels deep.`,
+					)
+				}
+			}
 			if (nameTaken(named.name, await liveFolderNames(tx, input.parentId))) return conflict
 			const [inserted] = await tx.insert(libraryFolder).values({
 				parentId: input.parentId,
@@ -250,9 +288,7 @@ export async function uploadFile(
 
 	// Early answer for the common conflict case, before storing anything. Rechecked under lock.
 	if (input.mode === "new") {
-		const existing = (await liveFileNames(db, input.folderId)).find((f) =>
-			nameTaken(named.name, [f.name]),
-		)
+		const existing = await findLiveFileByName(db, input.folderId, named.name)
 		if (existing) {
 			return fail("name_conflict", `"${named.name}" already exists in this folder.`, {
 				existingFileId: existing.id,
@@ -267,9 +303,9 @@ export async function uploadFile(
 
 	const saveUpload = () => {
 		return db.transaction(async (tx): Promise<LibraryResult<UploadedFile>> => {
-			await lockFolder(tx, input.folderId)
+			if (!(await lockFolder(tx, input.folderId))) return fail("not_found", NOT_FOUND)
 			const siblings = await liveFileNames(tx, input.folderId)
-			const existing = siblings.find((f) => nameTaken(named.name, [f.name]))
+			const existing = await findLiveFileByName(tx, input.folderId, named.name)
 
 			if (existing && input.mode === "new") {
 				return fail("name_conflict", `"${named.name}" already exists in this folder.`, {
@@ -333,9 +369,7 @@ export async function uploadFile(
 		if (!isDuplicateKeyError(error)) throw error
 		// Another write took the name between our check and insert (the folder lock covers
 		// uploads; this catches anything else). Let the member choose again.
-		const existing = (await liveFileNames(db, input.folderId)).find((f) =>
-			nameTaken(named.name, [f.name]),
-		)
+		const existing = await findLiveFileByName(db, input.folderId, named.name)
 		return fail("name_conflict", `"${named.name}" already exists in this folder.`, {
 			existingFileId: existing?.id,
 		})
@@ -416,7 +450,7 @@ export async function uploadVersion(
 	await storage.put(s3Key, input.bytes, checked.file.contentType)
 
 	return db.transaction(async (tx): Promise<LibraryResult<UploadedFile>> => {
-		await lockFolder(tx, file.folderId)
+		if (!(await lockFolder(tx, file.folderId))) return fail("not_found", NOT_FOUND)
 		const [current] = await tx
 			.select({ deletedAt: libraryFile.deletedAt })
 			.from(libraryFile)

@@ -14,6 +14,7 @@ import type { Viewer } from "../access"
 import {
 	deleteFile,
 	deleteFolder,
+	getFolderAccess,
 	listTrash,
 	moveFile,
 	moveFolder,
@@ -159,6 +160,23 @@ describe.skipIf(!process.env.TEST_DATABASE_PORT)("library admin operations (MySQ
 			expect(moved?.depth).toBe(2)
 		})
 
+		it("never lets two crossing moves create a cycle", async () => {
+			for (let round = 0; round < 5; round++) {
+				const a = await folder(`A${round}`)
+				const b = await folder(`B${round}`)
+				const results = await Promise.all([
+					moveFolder(db, admin, a, b),
+					moveFolder(db, admin, b, a),
+				])
+				expect(results.filter((r) => r.ok)).toHaveLength(1)
+				expect(results.filter((r) => !r.ok && r.code === "invalid")).toHaveLength(1)
+				// Both folders are still reachable from the top level.
+				const view = await getFolderView(db, admin, null)
+				const tree = view.ok ? view.data.tree.map((f) => f.id) : []
+				expect(tree).toEqual(expect.arrayContaining([a, b]))
+			}
+		})
+
 		it("refuses moves into itself, below itself, or past 4 levels", async () => {
 			const one = await folder("One")
 			const two = await folder("Two", one)
@@ -202,6 +220,31 @@ describe.skipIf(!process.env.TEST_DATABASE_PORT)("library admin operations (MySQ
 				(await setFolderRestriction(db, admin, exec, { restricted: false, memberIds: [] })).ok,
 			).toBe(true)
 			expect((await getFileView(db, bob, file.fileId)).ok).toBe(true)
+		})
+
+		it("drops members who are no longer eligible so the folder can still be edited", async () => {
+			const exec = await folder("Executive Committee")
+			await setFolderRestriction(db, admin, exec, {
+				restricted: true,
+				memberIds: [alice.id, bob.id],
+			})
+			await db.update(user).set({ role: "admin" }).where(eq(user.id, alice.id))
+			try {
+				const access = await getFolderAccess(db, admin, exec)
+				if (!access.ok) throw new Error(access.error)
+				expect(access.data.memberIds).toEqual([bob.id])
+				// Saving what the dialog shows works, and clears the stale row.
+				expect(
+					(
+						await setFolderRestriction(db, admin, exec, {
+							restricted: true,
+							memberIds: access.data.memberIds,
+						})
+					).ok,
+				).toBe(true)
+			} finally {
+				await db.update(user).set({ role: "board" }).where(eq(user.id, alice.id))
+			}
 		})
 
 		it("only accepts board members as members", async () => {

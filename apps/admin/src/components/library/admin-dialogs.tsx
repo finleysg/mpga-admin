@@ -37,6 +37,20 @@ import type { FolderSummary } from "@/lib/library/service"
 
 import { FolderPicker } from "./folder-picker"
 
+/**
+ * Run `reset` whenever the dialog opens. The menus open these dialogs by setting the `open`
+ * prop, which never calls Radix's onOpenChange, and the menu stays mounted across folders, so
+ * state must be reset on the actual open transition. Uses React's adjust-state-during-render
+ * pattern instead of an effect, so there's no frame showing the previous item's values.
+ */
+function useResetOnOpen(open: boolean, reset: () => void) {
+	const [wasOpen, setWasOpen] = useState(open)
+	if (wasOpen !== open) {
+		setWasOpen(open)
+		if (open) reset()
+	}
+}
+
 interface DialogProps {
 	open: boolean
 	onOpenChange: (open: boolean) => void
@@ -64,6 +78,10 @@ export function RenameDialog({
 	const [name, setName] = useState(initialName)
 	const [error, setError] = useState<string | null>(null)
 	const [saving, setSaving] = useState(false)
+	useResetOnOpen(open, () => {
+		setName(initialName)
+		setError(null)
+	})
 
 	async function submit(e: React.FormEvent) {
 		e.preventDefault()
@@ -76,16 +94,7 @@ export function RenameDialog({
 	}
 
 	return (
-		<Dialog
-			open={open}
-			onOpenChange={(next) => {
-				onOpenChange(next)
-				if (next) {
-					setName(initialName)
-					setError(null)
-				}
-			}}
-		>
+		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-md">
 				<form onSubmit={submit} className="grid gap-4">
 					<DialogHeader>
@@ -138,6 +147,10 @@ export function MoveDialog({
 	const [target, setTarget] = useState<number | null | undefined>(undefined)
 	const [error, setError] = useState<string | null>(null)
 	const [saving, setSaving] = useState(false)
+	useResetOnOpen(open, () => {
+		setTarget(undefined)
+		setError(null)
+	})
 
 	const nodes = folders.map((f) => ({ ...f, deletedAt: null }))
 	const lost = target === undefined ? [] : restrictionsLostByMove(nodes, currentParentId, target)
@@ -154,16 +167,7 @@ export function MoveDialog({
 	}
 
 	return (
-		<Dialog
-			open={open}
-			onOpenChange={(next) => {
-				onOpenChange(next)
-				if (next) {
-					setTarget(undefined)
-					setError(null)
-				}
-			}}
-		>
+		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
 					<DialogTitle className="font-heading text-secondary-500">Move {itemName}</DialogTitle>
@@ -213,6 +217,7 @@ export function DeleteDialog({
 }) {
 	const [error, setError] = useState<string | null>(null)
 	const [saving, setSaving] = useState(false)
+	useResetOnOpen(open, () => setError(null))
 
 	async function confirm(e: React.MouseEvent) {
 		e.preventDefault()
@@ -225,13 +230,7 @@ export function DeleteDialog({
 	}
 
 	return (
-		<AlertDialog
-			open={open}
-			onOpenChange={(next) => {
-				onOpenChange(next)
-				if (next) setError(null)
-			}}
-		>
+		<AlertDialog open={open} onOpenChange={onOpenChange}>
 			<AlertDialogContent>
 				<AlertDialogHeader>
 					<AlertDialogTitle className="font-heading text-secondary-500">{title}</AlertDialogTitle>
@@ -263,6 +262,10 @@ export function RestrictDialog({
 	const [chosen, setChosen] = useState<Set<string>>(new Set())
 	const [error, setError] = useState<string | null>(null)
 	const [saving, setSaving] = useState(false)
+	useResetOnOpen(open, () => {
+		setAccess(null)
+		setError(null)
+	})
 
 	useEffect(() => {
 		if (!open) return
@@ -305,13 +308,7 @@ export function RestrictDialog({
 	const admins = access?.members.filter((m) => m.isDocumentAdmin) ?? []
 
 	return (
-		<Dialog
-			open={open}
-			onOpenChange={(next) => {
-				onOpenChange(next)
-				if (!next) setAccess(null)
-			}}
-		>
+		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
 					<DialogTitle className="font-heading text-secondary-500">Restrict access</DialogTitle>
