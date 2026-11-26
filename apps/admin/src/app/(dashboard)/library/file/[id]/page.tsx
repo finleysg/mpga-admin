@@ -14,13 +14,18 @@ import {
 } from "@mpga/ui"
 import { notFound, redirect } from "next/navigation"
 
-import { DownloadButton, UploadVersionDialog } from "@/components/library/file-actions"
+import { FileMenu } from "@/components/library/admin-menus"
+import {
+	DownloadButton,
+	RestoreVersionButton,
+	UploadVersionDialog,
+} from "@/components/library/file-actions"
 import { FileIcon } from "@/components/library/file-icon"
 import { LibraryBreadcrumb } from "@/components/library/library-breadcrumb"
 import { LocalDate } from "@/components/library/local-date"
 import { db } from "@/lib/db"
 import { fileTypeInfo, formatBytes } from "@/lib/library/file-types"
-import { getDownloadUrl, getFileView } from "@/lib/library/service"
+import { getDownloadUrl, getFileView, getFolderView } from "@/lib/library/service"
 import { getLibraryStorage } from "@/lib/library/storage"
 import { requireLibraryUser } from "@/lib/require-auth"
 
@@ -33,6 +38,11 @@ export default async function LibraryFilePage({ params }: { params: Promise<{ id
 	const result = await getFileView(db, viewer, fileId)
 	if (!result.ok) notFound()
 	const file = result.data
+
+	// Document admins get Move, which needs the folder tree.
+	const tree = viewer.isDocumentAdmin
+		? await getFolderView(db, viewer, null).then((v) => (v.ok ? v.data.tree : []))
+		: []
 
 	const info = fileTypeInfo(file.name)
 	let previewUrl: string | null = null
@@ -57,6 +67,12 @@ export default async function LibraryFilePage({ params }: { params: Promise<{ id
 				<div className="flex flex-wrap gap-2">
 					<DownloadButton versionId={file.current.id} />
 					<UploadVersionDialog fileId={file.id} fileName={file.name} />
+					{viewer.isDocumentAdmin && (
+						<FileMenu
+							file={{ id: file.id, name: file.name, folderId: file.folderId }}
+							tree={tree}
+						/>
+					)}
 				</div>
 			</div>
 
@@ -147,12 +163,21 @@ export default async function LibraryFilePage({ params }: { params: Promise<{ id
 												</span>
 											</TableCell>
 											<TableCell className="text-right align-top">
-												<DownloadButton
-													versionId={v.id}
-													label="Download"
-													variant="ghost"
-													size="sm"
-												/>
+												<div className="flex flex-col items-end gap-1">
+													<DownloadButton
+														versionId={v.id}
+														label="Download"
+														variant="ghost"
+														size="sm"
+													/>
+													{viewer.isDocumentAdmin && v.id !== file.current.id && (
+														<RestoreVersionButton
+															fileId={file.id}
+															versionId={v.id}
+															versionNo={v.versionNo}
+														/>
+													)}
+												</div>
 											</TableCell>
 										</TableRow>
 									))}

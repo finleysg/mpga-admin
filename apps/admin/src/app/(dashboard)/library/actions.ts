@@ -4,6 +4,19 @@ import type { ActionResult } from "@mpga/types"
 
 import { db } from "@/lib/db"
 import {
+	deleteFile,
+	deleteFolder,
+	getFolderAccess,
+	moveFile,
+	moveFolder,
+	renameFile,
+	renameFolder,
+	restoreFromTrash,
+	restoreVersion,
+	setFolderRestriction,
+	type FolderAccess,
+} from "@/lib/library/admin"
+import {
 	createFolder,
 	getDownloadUrl,
 	uploadFile,
@@ -104,4 +117,71 @@ export async function createFolderAction(
 		console.error("Library folder creation failed:", error)
 		return { success: false, error: "The folder couldn't be created. Try again." }
 	}
+}
+
+// ---------- Document admin actions (the service refuses board members) ----------
+
+type Run<T> = (
+	viewer: NonNullable<Awaited<ReturnType<typeof requireLibraryUser>>>,
+) => Promise<LibraryResult<T>>
+
+async function asLibraryUser<T>(what: string, run: Run<T>): Promise<ActionResult<T>> {
+	const viewer = await requireLibraryUser()
+	if (!viewer) return UNAUTHORIZED
+	try {
+		return toActionResult(await run(viewer))
+	} catch (error) {
+		console.error(`Library ${what} failed:`, error)
+		return { success: false, error: `Couldn't ${what}. Try again.` }
+	}
+}
+
+export async function renameFolderAction(folderId: number, name: string) {
+	return asLibraryUser("rename the folder", (v) => renameFolder(db, v, folderId, name))
+}
+
+export async function moveFolderAction(folderId: number, targetParentId: number | null) {
+	return asLibraryUser("move the folder", (v) => moveFolder(db, v, folderId, targetParentId))
+}
+
+export async function getFolderAccessAction(folderId: number): Promise<ActionResult<FolderAccess>> {
+	return asLibraryUser("load folder access", (v) => getFolderAccess(db, v, folderId))
+}
+
+export async function setFolderRestrictionAction(
+	folderId: number,
+	restricted: boolean,
+	memberIds: string[],
+) {
+	return asLibraryUser("change folder access", (v) =>
+		setFolderRestriction(db, v, folderId, { restricted, memberIds }),
+	)
+}
+
+export async function deleteFolderAction(folderId: number) {
+	return asLibraryUser("delete the folder", (v) => deleteFolder(db, v, folderId))
+}
+
+export async function renameFileAction(fileId: number, name: string) {
+	return asLibraryUser("rename the file", (v) => renameFile(db, v, fileId, name))
+}
+
+export async function moveFileAction(fileId: number, targetFolderId: number) {
+	return asLibraryUser("move the file", (v) => moveFile(db, v, fileId, targetFolderId))
+}
+
+export async function deleteFileAction(fileId: number) {
+	return asLibraryUser("delete the file", (v) => deleteFile(db, v, fileId))
+}
+
+export async function restoreVersionAction(fileId: number, versionId: number) {
+	return asLibraryUser("restore that version", (v) => restoreVersion(db, v, fileId, versionId))
+}
+
+export async function restoreFromTrashAction(
+	kind: "folder" | "file",
+	id: number,
+	target?: number | null,
+) {
+	return asLibraryUser("restore it", (v) => restoreFromTrash(db, v, { kind, id }, target))
 }

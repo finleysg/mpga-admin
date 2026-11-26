@@ -1,7 +1,9 @@
-import { Card, CardContent, H1 } from "@mpga/ui"
-import { Lock } from "lucide-react"
+import { Button, Card, CardContent, H1 } from "@mpga/ui"
+import { Lock, Trash2 } from "lucide-react"
+import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
 
+import { FolderMenu } from "@/components/library/admin-menus"
 import { FolderContents } from "@/components/library/folder-contents"
 import { FolderTree } from "@/components/library/folder-tree"
 import { LibraryBreadcrumb } from "@/components/library/library-breadcrumb"
@@ -41,7 +43,16 @@ export default async function LibraryPage({
 				<H1 variant="secondary">Library</H1>
 				<div className="flex flex-wrap gap-2">
 					{viewer.isDocumentAdmin && canNestHere && <NewFolderDialog parentId={folderId} />}
+					{viewer.isDocumentAdmin && (
+						<Button variant="ghost" asChild>
+							<Link href="/library/trash">
+								<Trash2 className="h-4 w-4" />
+								Trash
+							</Link>
+						</Button>
+					)}
 					{folder && <UploadDialog folderId={folder.id} folderName={folder.name} />}
+					{viewer.isDocumentAdmin && folder && <FolderMenu folder={folder} tree={tree} />}
 				</div>
 			</div>
 

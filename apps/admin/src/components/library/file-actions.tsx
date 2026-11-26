@@ -1,6 +1,15 @@
 "use client"
 
 import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
 	Button,
 	Dialog,
 	DialogContent,
@@ -12,11 +21,15 @@ import {
 	FieldError,
 	toast,
 } from "@mpga/ui"
-import { Download, Loader2, Upload } from "lucide-react"
+import { Download, History, Loader2, Upload } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 
-import { getDownloadUrlAction, uploadVersionAction } from "@/app/(dashboard)/library/actions"
+import {
+	getDownloadUrlAction,
+	restoreVersionAction,
+	uploadVersionAction,
+} from "@/app/(dashboard)/library/actions"
 import { FileDropZone } from "@/components/file-drop-zone"
 import {
 	checkFileBasics,
@@ -134,5 +147,61 @@ export function UploadVersionDialog({ fileId, fileName }: { fileId: number; file
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
+	)
+}
+
+/** Document admins: make an earlier version current again (adds a new version). */
+export function RestoreVersionButton({
+	fileId,
+	versionId,
+	versionNo,
+}: {
+	fileId: number
+	versionId: number
+	versionNo: number
+}) {
+	const router = useRouter()
+	const [open, setOpen] = useState(false)
+	const [busy, setBusy] = useState(false)
+
+	async function restore(e: React.MouseEvent) {
+		e.preventDefault()
+		setBusy(true)
+		const result = await restoreVersionAction(fileId, versionId)
+		setBusy(false)
+		setOpen(false)
+		if (result.success && result.data) {
+			toast.success(`v${versionNo} restored as v${result.data.versionNo}`)
+			router.refresh()
+		} else {
+			toast.error(result.error ?? "Couldn't restore that version.")
+		}
+	}
+
+	return (
+		<AlertDialog open={open} onOpenChange={(next) => !busy && setOpen(next)}>
+			<AlertDialogTrigger asChild>
+				<Button variant="ghost" size="sm">
+					<History className="h-4 w-4" />
+					Restore
+				</Button>
+			</AlertDialogTrigger>
+			<AlertDialogContent>
+				<AlertDialogHeader>
+					<AlertDialogTitle className="font-heading text-secondary-500">
+						Restore v{versionNo}?
+					</AlertDialogTitle>
+					<AlertDialogDescription>
+						It becomes the current version, added as a new version. Nothing is deleted.
+					</AlertDialogDescription>
+				</AlertDialogHeader>
+				<AlertDialogFooter>
+					<AlertDialogCancel disabled={busy}>Cancel</AlertDialogCancel>
+					<AlertDialogAction onClick={restore} disabled={busy}>
+						{busy ? "Restoring…" : "Restore"}
+					</AlertDialogAction>
+				</AlertDialogFooter>
+			</AlertDialogContent>
+		</AlertDialog>
 	)
 }

@@ -69,6 +69,34 @@ export function descendantFolderIds(folders: readonly FolderNode[], rootId: numb
 	return result
 }
 
+/**
+ * Restricted folders that `itemParentId` sits inside today but would not after moving to
+ * `targetParentId`. A non-empty result means the move may show the item to more people.
+ * (A moved folder keeps its own restriction, so only ancestors matter.)
+ */
+export function restrictionsLostByMove<T extends FolderNode>(
+	folders: readonly T[],
+	itemParentId: number | null,
+	targetParentId: number | null,
+): T[] {
+	const before = itemParentId === null ? [] : folderPath(folders, itemParentId)
+	const after = new Set(
+		targetParentId === null ? [] : folderPath(folders, targetParentId).map((f) => f.id),
+	)
+	return before.filter((f) => f.isRestricted && !after.has(f.id))
+}
+
+/** Levels below `rootId` (0 when it has no subfolders). */
+export function subtreeHeight(
+	folders: readonly (FolderNode & { depth: number })[],
+	rootId: number,
+): number {
+	const ids = descendantFolderIds(folders, rootId)
+	const root = folders.find((f) => f.id === rootId)
+	if (!root) return 0
+	return Math.max(0, ...folders.filter((f) => ids.has(f.id)).map((f) => f.depth - root.depth))
+}
+
 /** Ancestor chain from the top-level folder down to `id` (inclusive). */
 export function folderPath<T extends FolderNode>(folders: readonly T[], id: number): T[] {
 	const byId = new Map(folders.map((f) => [f.id, f]))

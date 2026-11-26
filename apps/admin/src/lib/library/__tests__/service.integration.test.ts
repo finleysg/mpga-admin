@@ -1,6 +1,5 @@
 // @vitest-environment node
 import {
-	createDb,
 	libraryAudit,
 	libraryFile,
 	libraryFileVersion,
@@ -21,6 +20,7 @@ import {
 	uploadVersion,
 } from "../service"
 import { MemoryLibraryStorage } from "../storage"
+import { openLibraryTestDb } from "./test-db"
 
 const pdf = (body = "board minutes") => new TextEncoder().encode(`%PDF-1.7 ${body}`)
 const docx = () => new Uint8Array([0x50, 0x4b, 0x03, 0x04, 9, 9, 9])
@@ -32,20 +32,15 @@ const bob: Viewer = { id: "board-bob", isDocumentAdmin: false }
 // Runs only against the disposable integration schema, never the application database.
 describe.skipIf(!process.env.TEST_DATABASE_PORT)("library service (MySQL)", () => {
 	let db: Database
+	let close: () => Promise<void>
 	let storage: MemoryLibraryStorage
 
-	beforeAll(() => {
-		db = createDb({
-			host: "127.0.0.1",
-			port: Number(process.env.TEST_DATABASE_PORT),
-			user: "root",
-			password: "mpga-test-only",
-			database: "mpga_security_test",
-		})
+	beforeAll(async () => {
+		;({ db, close } = await openLibraryTestDb())
 	})
 
 	afterAll(async () => {
-		await db.$client.end()
+		await close()
 	})
 
 	beforeEach(async () => {

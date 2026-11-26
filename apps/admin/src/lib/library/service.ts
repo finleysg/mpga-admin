@@ -25,8 +25,8 @@ import { newObjectKey, type LibraryStorage } from "./storage"
 // All library reads and writes go through here. Callers (server actions) handle sessions;
 // these functions take the viewer explicitly so they can be tested without Next.js.
 
-type Tx = Parameters<Parameters<Database["transaction"]>[0]>[0]
-type Executor = Database | Tx
+export type Tx = Parameters<Parameters<Database["transaction"]>[0]>[0]
+export type Executor = Database | Tx
 
 export type LibraryErrorCode = "forbidden" | "not_found" | "invalid" | "name_conflict"
 
@@ -34,11 +34,15 @@ export type LibraryResult<T> =
 	| { ok: true; data: T }
 	| { ok: false; code: LibraryErrorCode; error: string; existingFileId?: number }
 
-function fail<T>(code: LibraryErrorCode, error: string, extra?: { existingFileId?: number }) {
+export function fail<T>(
+	code: LibraryErrorCode,
+	error: string,
+	extra?: { existingFileId?: number },
+) {
 	return { ok: false, code, error, ...extra } as LibraryResult<T>
 }
 
-const NOT_FOUND = "That folder or file doesn't exist, or you don't have access to it."
+export const NOT_FOUND = "That folder or file doesn't exist, or you don't have access to it."
 
 /**
  * True for MySQL duplicate-key errors. The live-name unique indexes are the final guard against
@@ -122,7 +126,7 @@ export async function loadFolderState(
 	return { folders, memberships, visible: visibleFolderIds(folders, memberships, viewer, options) }
 }
 
-async function liveFileNames(
+export async function liveFileNames(
 	db: Executor,
 	folderId: number,
 ): Promise<{ id: number; name: string }[]> {
@@ -132,7 +136,7 @@ async function liveFileNames(
 		.where(and(eq(libraryFile.folderId, folderId), isNull(libraryFile.deletedAt)))
 }
 
-async function liveFolderNames(db: Executor, parentId: number | null): Promise<string[]> {
+export async function liveFolderNames(db: Executor, parentId: number | null): Promise<string[]> {
 	const rows = await db
 		.select({ name: libraryFolder.name })
 		.from(libraryFolder)
@@ -146,7 +150,7 @@ async function liveFolderNames(db: Executor, parentId: number | null): Promise<s
 }
 
 /** Serialize writes within one folder so name checks and inserts can't interleave. */
-async function lockFolder(tx: Tx, folderId: number) {
+export async function lockFolder(tx: Tx, folderId: number) {
 	await tx
 		.select({ id: libraryFolder.id })
 		.from(libraryFolder)
@@ -351,7 +355,7 @@ interface NewVersion {
 }
 
 /** Append a version and make it current. Caller holds the folder lock. */
-async function insertVersion(
+export async function insertVersion(
 	tx: Tx,
 	viewer: Viewer,
 	fileId: number,
@@ -475,7 +479,7 @@ export interface FolderView {
 	files: FileSummary[]
 }
 
-function toSummary(f: FolderState["folders"][number]): FolderSummary {
+export function toSummary(f: FolderState["folders"][number]): FolderSummary {
 	return { id: f.id, parentId: f.parentId, name: f.name, isRestricted: f.isRestricted }
 }
 
