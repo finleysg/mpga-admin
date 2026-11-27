@@ -76,6 +76,7 @@ export default function AcceptInvitationPage({ params }: AcceptInvitationPagePro
 				setError(result.error ?? "Account creation failed")
 			} else {
 				// Full load: router.push + router.refresh loops forever when "/" redirects (board → /library).
+				// eslint-disable-next-line @next/next/no-location-assign-relative-destination -- see above
 				window.location.assign("/")
 			}
 		} catch {

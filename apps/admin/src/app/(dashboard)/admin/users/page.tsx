@@ -25,15 +25,22 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
+	toast,
 } from "@mpga/ui"
-import { MoreHorizontal, Shield, ShieldOff, Trash2, UserCog } from "lucide-react"
+import { KeyRound, MoreHorizontal, Shield, ShieldOff, Trash2, UserCog } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 import { useSession } from "@/lib/auth-client"
-import { ASSIGNABLE_ROLES, ROLE_LABELS, type AssignableRole } from "@/lib/roles"
+import { ASSIGNABLE_ROLES, isLibraryRole, ROLE_LABELS, type AssignableRole } from "@/lib/roles"
 
-import { banUserAction, listUsersAction, removeUserAction, setRoleAction } from "./actions"
+import {
+	banUserAction,
+	listUsersAction,
+	removeUserAction,
+	sendPasswordResetAction,
+	setRoleAction,
+} from "./actions"
 
 interface User {
 	id: string
@@ -125,6 +132,26 @@ export default function UsersPage() {
 		}
 	}
 
+	const handleSendPasswordReset = async (user: User) => {
+		if (!confirm(`Email ${user.email} a link to set a new password?`)) {
+			return
+		}
+		setActionLoading(user.id)
+		try {
+			const result = await sendPasswordResetAction(user.id)
+			if (result.success) {
+				toast.success(`Password reset link sent to ${user.email}`)
+			} else {
+				toast.error(result.error ?? "Failed to send password reset")
+			}
+		} catch (error) {
+			console.error("Failed to send password reset:", error)
+			toast.error("Failed to send password reset")
+		} finally {
+			setActionLoading(null)
+		}
+	}
+
 	const formatDate = (date: Date) => {
 		return new Date(date).toLocaleDateString("en-US", {
 			year: "numeric",
@@ -211,6 +238,15 @@ export default function UsersPage() {
 															))}
 														</DropdownMenuSubContent>
 													</DropdownMenuSub>
+													{isLibraryRole(user.role) && (
+														<DropdownMenuItem
+															onClick={() => handleSendPasswordReset(user)}
+															disabled={!!user.banned}
+														>
+															<KeyRound className="mr-2 h-4 w-4" />
+															Send password reset
+														</DropdownMenuItem>
+													)}
 													<DropdownMenuItem
 														onClick={() => handleBanUser(user.id, !user.banned)}
 														disabled={user.id === session?.user?.id}

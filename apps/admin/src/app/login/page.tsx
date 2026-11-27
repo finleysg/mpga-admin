@@ -13,6 +13,7 @@ import {
 	Input,
 } from "@mpga/ui"
 import Image from "next/image"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
@@ -59,6 +60,7 @@ export default function LoginPage() {
 				setError("This account doesn't have access to the admin site.")
 			} else {
 				// Full load: router.push + router.refresh loops forever when "/" redirects (board → /library).
+				// eslint-disable-next-line @next/next/no-location-assign-relative-destination -- see above
 				window.location.assign("/")
 			}
 		} catch {
@@ -120,7 +122,15 @@ export default function LoginPage() {
 									/>
 								</Field>
 								<Field>
-									<FieldLabel htmlFor="password">Password</FieldLabel>
+									<div className="flex items-center justify-between">
+										<FieldLabel htmlFor="password">Password</FieldLabel>
+										<Link
+											href="/forgot-password"
+											className="text-muted-foreground hover:text-foreground text-sm underline-offset-4 hover:underline"
+										>
+											Forgot password?
+										</Link>
+									</div>
 									<Input
 										id="password"
 										type="password"

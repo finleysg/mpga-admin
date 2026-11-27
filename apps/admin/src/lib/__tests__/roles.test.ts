@@ -16,6 +16,13 @@ describe("dashboardRedirect", () => {
 		expect(dashboardRedirect("board", "/library-other")).toBe("/library")
 	})
 
+	it("lets board members manage their own account", () => {
+		expect(dashboardRedirect("board", "/account")).toBeNull()
+		expect(dashboardRedirect("board", "/account/password")).toBeNull()
+		expect(dashboardRedirect("board", "/accounts")).toBe("/library")
+		expect(dashboardRedirect("user", "/account")).toBe("/login?denied=1")
+	})
+
 	it("turns away portal users and users without a role", () => {
 		expect(dashboardRedirect("user", "/")).toBe("/login?denied=1")
 		expect(dashboardRedirect(null, "/library")).toBe("/login?denied=1")

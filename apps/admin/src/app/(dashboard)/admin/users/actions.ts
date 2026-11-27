@@ -8,7 +8,7 @@ import { headers } from "next/headers"
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { requireSuperAdmin } from "@/lib/require-auth"
-import { isAssignableRole, isRoleDowngrade, type AssignableRole } from "@/lib/roles"
+import { isAssignableRole, isLibraryRole, isRoleDowngrade, type AssignableRole } from "@/lib/roles"
 
 interface UserData {
 	id: string
@@ -83,6 +83,39 @@ export async function setRoleAction(userId: string, role: AssignableRole): Promi
 	} catch (error) {
 		console.error("Failed to set role:", error)
 		return { success: false, error: "Failed to set role" }
+	}
+}
+
+/** Emails the user a single-use link to set a new password. */
+export async function sendPasswordResetAction(userId: string): Promise<ActionResult> {
+	const adminId = await requireSuperAdmin()
+	if (!adminId) {
+		return { success: false, error: "Unauthorized" }
+	}
+
+	try {
+		const [target] = await db
+			.select({ email: user.email, role: user.role, banned: user.banned })
+			.from(user)
+			.where(eq(user.id, userId))
+		if (!target) {
+			return { success: false, error: "User not found" }
+		}
+		if (!isLibraryRole(target.role)) {
+			return {
+				success: false,
+				error: "This account signs in with an emailed code, not a password",
+			}
+		}
+		if (target.banned) {
+			return { success: false, error: "Unban this user before sending a password reset" }
+		}
+
+		await auth.api.requestPasswordReset({ body: { email: target.email } })
+		return { success: true }
+	} catch (error) {
+		console.error("Failed to send password reset:", error)
+		return { success: false, error: "Failed to send password reset" }
 	}
 }
 

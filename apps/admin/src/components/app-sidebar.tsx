@@ -13,13 +13,13 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from "@mpga/ui"
-import { LogOut } from "lucide-react"
+import { KeyRound, LogOut } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 import { signOut, useSession } from "@/lib/auth-client"
-import { isBoardOnly, LIBRARY_PATH } from "@/lib/roles"
+import { ACCOUNT_PATH, isBoardOnly, LIBRARY_PATH } from "@/lib/roles"
 
 const libraryNavGroup = {
 	title: "Board",
@@ -171,9 +171,17 @@ export function AppSidebar({
 			</SidebarContent>
 			<SidebarFooter>
 				<div className="flex items-center justify-between gap-2 px-2 py-2">
-					<span className="text-sm text-muted-foreground truncate">
-						{session?.user?.name ?? session?.user?.email ?? "User"}
-					</span>
+					<Link
+						href={ACCOUNT_PATH}
+						title="Account & password"
+						aria-current={pathname === ACCOUNT_PATH ? "page" : undefined}
+						className="flex min-w-0 items-center gap-2 rounded-md text-sm text-muted-foreground hover:text-foreground aria-[current=page]:text-foreground"
+					>
+						<KeyRound className="h-4 w-4 shrink-0" aria-hidden />
+						<span className="truncate">
+							{session?.user?.name ?? session?.user?.email ?? "User"}
+						</span>
+					</Link>
 					<Button variant="ghost" size="icon" onClick={handleSignOut}>
 						<LogOut className="h-4 w-4" />
 						<span className="sr-only">Sign out</span>

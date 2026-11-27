@@ -14,6 +14,12 @@ export const ROLE_LABELS: Record<string, string> = {
 }
 
 export const LIBRARY_PATH = "/library"
+/** Signed-in account settings (change password). Open to every admin-site role. */
+export const ACCOUNT_PATH = "/account"
+
+function isUnder(pathname: string, base: string): boolean {
+	return pathname === base || pathname.startsWith(`${base}/`)
+}
 
 /** Admins and super admins: full admin access, and document admins in the library. */
 export function isAdminRole(role: string | null | undefined): boolean {
@@ -52,8 +58,8 @@ export function dashboardRedirect(
 ): string | null {
 	if (isAdminRole(role)) return null
 	if (isBoardOnly(role)) {
-		const inLibrary = pathname === LIBRARY_PATH || pathname.startsWith(`${LIBRARY_PATH}/`)
-		return inLibrary ? null : LIBRARY_PATH
+		const allowed = isUnder(pathname, LIBRARY_PATH) || isUnder(pathname, ACCOUNT_PATH)
+		return allowed ? null : LIBRARY_PATH
 	}
 	// Portal users (club contacts, captains) and users without a role have no dashboard access.
 	return "/login?denied=1"

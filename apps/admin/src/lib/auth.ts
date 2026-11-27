@@ -4,8 +4,9 @@ import { nextCookies } from "better-auth/next-js"
 import { admin, emailOTP } from "better-auth/plugins"
 
 import { db } from "./db"
-import { sendSignInOtpEmail } from "./email"
+import { sendPasswordResetEmail, sendSignInOtpEmail } from "./email"
 import { ac, adminRole, boardRole, superAdminRole } from "./permissions"
+import { isLibraryRole } from "./roles"
 
 export const auth = betterAuth({
 	logger: {
@@ -19,6 +20,25 @@ export const auth = betterAuth({
 	emailAndPassword: {
 		enabled: true,
 		disableSignUp: true,
+		// Requested from /forgot-password or by a super admin on the users page.
+		sendResetPassword: async ({ user, token }) => {
+			const { role, banned } = user as { role?: string | null; banned?: boolean | null }
+			// Portal users sign in with an emailed code. A reset would give them a password.
+			if (!isLibraryRole(role) || banned) {
+				console.warn(`Password reset skipped for ${user.id}: not an active admin-site account`)
+				return
+			}
+			const appUrl = (process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:4100").replace(
+				/\/$/,
+				"",
+			)
+			await sendPasswordResetEmail(
+				user.email,
+				`${appUrl}/reset-password?token=${encodeURIComponent(token)}`,
+			)
+		},
+		resetPasswordTokenExpiresIn: 60 * 60 * 24, // 24 hours, single use
+		revokeSessionsOnPasswordReset: true,
 	},
 	session: {
 		expiresIn: 60 * 60 * 24 * 7, // 7 days

@@ -12,6 +12,8 @@ export async function proxy(request: NextRequest) {
 		request.nextUrl.pathname.startsWith("/api/invitations/validate") ||
 		request.nextUrl.pathname.startsWith("/api/invitations/accept") ||
 		request.nextUrl.pathname.startsWith("/accept-invitation") ||
+		request.nextUrl.pathname.startsWith("/reset-password") ||
+		request.nextUrl.pathname.startsWith("/forgot-password") ||
 		request.nextUrl.pathname.startsWith("/club-contact") ||
 		request.nextUrl.pathname.startsWith("/match-play-captain") ||
 		request.nextUrl.pathname.startsWith("/stripe/webhook") ||

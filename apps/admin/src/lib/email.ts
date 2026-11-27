@@ -92,6 +92,25 @@ export async function sendSignInOtpEmail(email: string, otp: string): Promise<vo
 }
 
 /**
+ * Sends a single-use link for setting a new admin-site password.
+ */
+export async function sendPasswordResetEmail(email: string, resetLink: string): Promise<void> {
+	await transporter.sendMail({
+		from: process.env.MAIL_FROM ?? "noreply@mpga.net",
+		to: email,
+		subject: "Reset your MPGA Admin password",
+		text: `A password reset was requested for your MPGA Admin account.\n\nOpen the link below to choose a new password:\n${resetLink}\n\nThis link expires in 24 hours and can only be used once. If you weren't expecting it, you can ignore this email and your password won't change.`,
+		html: emailLayout(`
+			<h1 style="font-size: 22px; color: #333;">Reset your password</h1>
+			<p>A password reset was requested for your MPGA Admin account.</p>
+			<p><a href="${resetLink}" style="display: inline-block; padding: 10px 20px; background-color: #2563eb; color: #fff; text-decoration: none; border-radius: 4px;">Choose a new password</a></p>
+			<p style="font-size: 13px; color: #666;">Or copy this link: ${resetLink}</p>
+			<p style="font-size: 13px; color: #999;"><em>This link expires in 24 hours and can only be used once. If you weren't expecting it, you can ignore this email and your password won't change.</em></p>
+		`),
+	})
+}
+
+/**
  * Sends a dues payment confirmation email to all club contacts.
  */
 export async function sendDuesPaymentEmail(
