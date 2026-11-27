@@ -101,7 +101,7 @@ export default async function PayDuesPage({ params }: { params: Promise<{ clubId
 		<ClubContactPageLayout systemName={systemName}>
 			<Card>
 				<CardHeader className="text-center">
-					<CardTitle className="font-heading text-xl">
+					<CardTitle className="font-heading text-xl leading-snug">
 						Pay {year} Dues — {clubName}
 					</CardTitle>
 				</CardHeader>

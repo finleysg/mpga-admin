@@ -32,7 +32,7 @@
 		]
 	},
 	"devDependencies": {
-		"@playwright/test": "^1.58.2",
+		"@playwright/test": "^1.64.1",
 		"@posthog/cli": "0.19.0",
 		"@testing-library/jest-dom": "^6.6.3",
 		"@testing-library/react": "^16.1.0",
@@ -40,7 +40,7 @@
 		"eslint": "^9.17.0",
 		"husky": "^9.1.7",
 		"jsdom": "^25.0.1",
-		"lint-staged": "^16.2.7",
+		"lint-staged": "^17.6.0",
 		"mysql2": "^3.24.6",
 		"prettier": "^3.5.0",
 		"react": "^19.2.3",
@@ -79,7 +79,7 @@
 			"fflate@0.4": "0.4.9",
 			"baseline-browser-mapping@2": "2.11.0",
 			"source-map-js@1": "1.2.2",
-			"zod@4": "4.6.6",
+			"zod@4": "4.6.7",
 			"postcss-selector-parser@6": "6.1.5",
 			"esbuild@0.27": "0.28.2"
 		}
