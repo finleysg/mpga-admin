@@ -9,6 +9,9 @@ const config = {
 	database: "mpga_security_test",
 }
 
+/** Setup waits for the shared lock while other library test files run; allow for that. */
+export const LOCK_WAIT_MS = 300_000
+
 /**
  * Library integration test files truncate the same tables, and Vitest runs files in parallel.
  * Each file holds this named lock (on its own connection) for its whole run, so they take turns.

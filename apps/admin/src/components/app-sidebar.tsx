@@ -95,6 +95,7 @@ const adminNavGroup = {
 	items: [
 		{ title: "Users", url: "/admin/users" },
 		{ title: "Invitations", url: "/admin/invitations" },
+		{ title: "Import documents", url: "/admin/import-documents" },
 	],
 }
 

@@ -21,7 +21,7 @@ import {
 	uploadVersion,
 } from "../service"
 import { MemoryLibraryStorage } from "../storage"
-import { openLibraryTestDb } from "./test-db"
+import { LOCK_WAIT_MS, openLibraryTestDb } from "./test-db"
 
 const pdf = (body = "board minutes") => new TextEncoder().encode(`%PDF-1.7 ${body}`)
 const docx = () => new Uint8Array([0x50, 0x4b, 0x03, 0x04, 9, 9, 9])
@@ -38,7 +38,7 @@ describe.skipIf(!process.env.TEST_DATABASE_PORT)("library service (MySQL)", () =
 
 	beforeAll(async () => {
 		;({ db, close } = await openLibraryTestDb())
-	})
+	}, LOCK_WAIT_MS)
 
 	afterAll(async () => {
 		await close()

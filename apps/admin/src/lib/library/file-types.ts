@@ -136,6 +136,45 @@ function isPlainText(bytes: Uint8Array): boolean {
 export type ValidatedFile = { contentType: string; label: string }
 
 /**
+ * Allowed extension and contents that really are that type, without the upload size limit.
+ * Used when importing documents that are already on the public site.
+ */
+export function validateFileContents(
+	name: string,
+	bytes: Uint8Array,
+): { ok: true; file: ValidatedFile } | { ok: false; error: string } {
+	const info = fileTypeInfo(name)
+	if (!info) return { ok: false, error: `${name}: this file type isn't supported in the library.` }
+	if (bytes.byteLength === 0) return { ok: false, error: `${name} is empty.` }
+	if (!matchesSignature(bytes, info.signature)) {
+		return { ok: false, error: `${name} doesn't look like a ${info.label} file.` }
+	}
+	return { ok: true, file: { contentType: info.contentType, label: info.label } }
+}
+
+/**
+ * Best guess at the extension of a file whose name has none, from its contents. Office Open XML
+ * files are told apart by the part names near the start of the zip.
+ */
+export function sniffExtension(bytes: Uint8Array): string | null {
+	if (matchesSignature(bytes, "pdf")) return "pdf"
+	if (matchesSignature(bytes, "png")) return "png"
+	if (matchesSignature(bytes, "jpeg")) return "jpg"
+	if (matchesSignature(bytes, "gif")) return "gif"
+	if (matchesSignature(bytes, "zip")) {
+		const head = new TextDecoder("latin1").decode(bytes.subarray(0, 64 * 1024))
+		if (head.includes("word/")) return "docx"
+		if (head.includes("xl/")) return "xlsx"
+		if (head.includes("ppt/")) return "pptx"
+		return null
+	}
+	// Legacy .doc/.xls/.ppt share one container format and can't be told apart cheaply.
+	if (matchesSignature(bytes, "ole")) return null
+	if (matchesSignature(bytes.subarray(0, 4096), "text")) return "txt"
+	return null
+}
+
+/**
  * Full server-side check: allowed extension, size, and that the contents really are that type.
  * The browser's reported type is never trusted.
  */

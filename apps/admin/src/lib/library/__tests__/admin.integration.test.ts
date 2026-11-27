@@ -27,7 +27,7 @@ import {
 import { indexVersion, searchLibrary } from "../search"
 import { createFolder, getFileView, getFolderView, uploadFile } from "../service"
 import { MemoryLibraryStorage } from "../storage"
-import { openLibraryTestDb } from "./test-db"
+import { LOCK_WAIT_MS, openLibraryTestDb } from "./test-db"
 
 const pdf = (body = "x") => new TextEncoder().encode(`%PDF-1.7 ${body}`)
 
@@ -50,7 +50,7 @@ describe.skipIf(!process.env.TEST_DATABASE_PORT)("library admin operations (MySQ
 			{ id: alice.id, name: "Alice", email: `${alice.id}@example.com`, role: "board" },
 			{ id: bob.id, name: "Bob", email: `${bob.id}@example.com`, role: "board" },
 		])
-	})
+	}, LOCK_WAIT_MS)
 
 	afterAll(async () => {
 		await db.delete(user).where(inArray(user.id, [admin.id, alice.id, bob.id]))

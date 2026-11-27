@@ -19,7 +19,7 @@ vi.mock("../../db", async () => {
 })
 vi.mock("../../s3", () => ({ uploadToS3: vi.fn(), deleteFromS3: vi.fn() }))
 
-import { openLibraryTestDb } from "./test-db"
+import { LOCK_WAIT_MS, openLibraryTestDb } from "./test-db"
 import { db } from "../../db"
 import { deleteDocument, uploadDocumentFile } from "../../documents"
 import { deleteFromS3 } from "../../s3"
@@ -31,7 +31,7 @@ describe.skipIf(!process.env.TEST_DATABASE_PORT)(
 		let release: () => Promise<void>
 		beforeAll(async () => {
 			;({ close: release } = await openLibraryTestDb())
-		})
+		}, LOCK_WAIT_MS)
 		afterAll(async () => {
 			await release()
 		})

@@ -75,7 +75,8 @@ async function run() {
 	const bytes = new Uint8Array(workerData.bytes)
 	if (workerData.kind === "pdf") {
 		const { extractText, getDocumentProxy } = await load("unpdf")
-		const pdf = await getDocumentProxy(bytes)
+		// verbosity 0 = errors only: pdf.js otherwise logs harmless font warnings per file.
+		const pdf = await getDocumentProxy(bytes, { verbosity: 0 })
 		try {
 			return (await extractText(pdf, { mergePages: true })).text
 		} finally {

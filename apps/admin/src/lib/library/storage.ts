@@ -1,8 +1,14 @@
 import crypto from "node:crypto"
-import { mkdir, readFile, writeFile } from "node:fs/promises"
+import { mkdir, readFile, stat, writeFile } from "node:fs/promises"
 import path from "node:path"
 
-import { CopyObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3"
+import {
+	CopyObjectCommand,
+	GetObjectCommand,
+	HeadObjectCommand,
+	PutObjectCommand,
+	S3Client,
+} from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 
 /** Download and preview links stop working after this many seconds. */
@@ -23,6 +29,23 @@ export interface LibraryStorage {
 	signedUrl(key: string, options: SignedUrlOptions): Promise<string>
 	/** Copy a private object into the public media bucket (publishing). Returns the public key. */
 	copyToPublic(key: string, publicKey: string, contentType: string): Promise<void>
+	/** Read a library object (e.g. to extract search text). */
+	read(key: string): Promise<Uint8Array>
+	/** Size of an object in the public media bucket, or null if it's missing or unreadable. */
+	headPublic(publicKey: string): Promise<{ size: number } | null>
+	/** Read an object from the public media bucket, or just its first `maxBytes`. */
+	readPublic(publicKey: string, maxBytes?: number): Promise<Uint8Array>
+}
+
+function publicBucketName(): string {
+	const bucket = process.env.S3_BUCKET_NAME
+	if (!bucket) throw new Error("S3_BUCKET_NAME environment variable is not set")
+	return bucket
+}
+
+/** CopySource is "bucket/key" with the key URL-encoded. */
+function copySource(bucket: string, key: string): string {
+	return `${bucket}/${key.split("/").map(encodeURIComponent).join("/")}`
 }
 
 export function newObjectKey(): string {
@@ -66,18 +89,51 @@ class S3LibraryStorage implements LibraryStorage {
 	}
 
 	async copyToPublic(key: string, publicKey: string, contentType: string) {
-		const publicBucket = process.env.S3_BUCKET_NAME
-		if (!publicBucket) throw new Error("S3_BUCKET_NAME environment variable is not set")
 		await this.client.send(
 			new CopyObjectCommand({
-				Bucket: publicBucket,
+				Bucket: publicBucketName(),
 				Key: publicKey,
-				CopySource: `${this.bucket}/${key}`,
+				CopySource: copySource(this.bucket, key),
 				ContentType: contentType,
 				MetadataDirective: "REPLACE",
 				CacheControl: "max-age=86400",
 			}),
 		)
+	}
+
+	private async getBytes(bucket: string, key: string, maxBytes?: number): Promise<Uint8Array> {
+		const result = await this.client.send(
+			new GetObjectCommand({
+				Bucket: bucket,
+				Key: key,
+				...(maxBytes ? { Range: `bytes=0-${maxBytes - 1}` } : {}),
+			}),
+		)
+		if (!result.Body) throw new Error(`Empty object ${bucket}/${key}`)
+		return result.Body.transformToByteArray()
+	}
+
+	read(key: string) {
+		return this.getBytes(this.bucket, key)
+	}
+
+	async headPublic(publicKey: string) {
+		try {
+			const head = await this.client.send(
+				new HeadObjectCommand({ Bucket: publicBucketName(), Key: publicKey }),
+			)
+			return { size: head.ContentLength ?? 0 }
+		} catch (error) {
+			// Missing objects are 404, or 403 when the caller may not list the bucket.
+			const status = (error as { $metadata?: { httpStatusCode?: number } }).$metadata
+				?.httpStatusCode
+			if (status === 404 || status === 403) return null
+			throw error
+		}
+	}
+
+	readPublic(publicKey: string, maxBytes?: number) {
+		return this.getBytes(publicBucketName(), publicKey, maxBytes)
 	}
 }
 
@@ -162,6 +218,20 @@ export class LocalLibraryStorage implements LibraryStorage {
 		await mkdir(path.dirname(target), { recursive: true })
 		await writeFile(target, await this.read(key))
 	}
+
+	// The "public bucket" is the public/ folder under the storage root.
+	async headPublic(publicKey: string) {
+		try {
+			return { size: (await stat(this.filePath(`public/${publicKey}`))).size }
+		} catch {
+			return null
+		}
+	}
+
+	async readPublic(publicKey: string, maxBytes?: number): Promise<Uint8Array> {
+		const body = await readFile(this.filePath(`public/${publicKey}`))
+		return maxBytes ? body.subarray(0, maxBytes) : body
+	}
 }
 
 // ---------- In-memory fake (tests) ----------
@@ -170,6 +240,8 @@ export class MemoryLibraryStorage implements LibraryStorage {
 	readonly kind = "memory"
 	readonly objects = new Map<string, { body: Uint8Array; contentType: string }>()
 	readonly published = new Map<string, string>()
+	/** Objects in the fake public media bucket, keyed by full public key. */
+	readonly publicObjects = new Map<string, Uint8Array>()
 	failNextPut = false
 
 	async put(key: string, body: Uint8Array, contentType: string) {
@@ -191,8 +263,27 @@ export class MemoryLibraryStorage implements LibraryStorage {
 	}
 
 	async copyToPublic(key: string, publicKey: string) {
-		if (!this.objects.has(key)) throw new Error(`No object ${key}`)
+		const object = this.objects.get(key)
+		if (!object) throw new Error(`No object ${key}`)
 		this.published.set(publicKey, key)
+		this.publicObjects.set(publicKey, object.body)
+	}
+
+	async read(key: string) {
+		const object = this.objects.get(key)
+		if (!object) throw new Error(`No object ${key}`)
+		return object.body
+	}
+
+	async headPublic(publicKey: string) {
+		const body = this.publicObjects.get(publicKey)
+		return body ? { size: body.byteLength } : null
+	}
+
+	async readPublic(publicKey: string, maxBytes?: number) {
+		const body = this.publicObjects.get(publicKey)
+		if (!body) throw new Error(`No public object ${publicKey}`)
+		return maxBytes ? body.subarray(0, maxBytes) : body
 	}
 }
 
