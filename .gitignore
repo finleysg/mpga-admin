@@ -50,3 +50,8 @@ e2e/.auth/
 
 # Answers remembered by scripts/setup-aws-library.sh between runs
 scripts/.setup-aws-library.state
+
+# Database dumps (production data): never commit
+/backup_*.sql
+/backup_*.sql.gz
+*.dump

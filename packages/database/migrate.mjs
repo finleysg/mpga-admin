@@ -45,6 +45,21 @@ async function migrate() {
 		`)
 		const [rows] = await connection.execute("SELECT hash FROM __drizzle_migrations")
 		const applied = new Set(rows.map((r) => r.hash))
+		if (!selected && applied.size === 0) {
+			// Replaying the whole journal is only safe on an empty database or one that records
+			// its migrations. A database with tables but no records was set up some other way;
+			// replaying 0000 over it would fail part-way. Stop before changing anything.
+			const [tables] = await connection.execute(
+				"SELECT COUNT(*) AS n FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name <> '__drizzle_migrations'",
+			)
+			if (Number(tables[0]?.n) > 0) {
+				throw new Error(
+					"This database has tables but no recorded migrations, so the full journal can't be " +
+						"replayed safely. Record the migrations it already has in __drizzle_migrations " +
+						"(or apply specific ones with --only=<tag>) and run again.",
+				)
+			}
+		}
 		for (const entry of journal.entries) {
 			if (selected && !selected.has(entry.tag)) continue
 			if (applied.has(entry.tag)) continue

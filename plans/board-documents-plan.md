@@ -145,7 +145,7 @@ Decisions:
 | 11  | Restoring folders and items from Trash wasn't defined.                                                                                                                            | Folder deletes are batched, and orphaned items restore to the root or a chosen folder.                                                                                                                                                                      |
 | 12  | Name collisions on rename and move weren't handled.                                                                                                                               | Names are unique within a folder among items not in Trash.                                                                                                                                                                                                  |
 | 13  | "Documents" collides with the existing menu entries of the same name.                                                                                                             | Call it **Library**, at `/library`.                                                                                                                                                                                                                         |
-| 14  | `apps/admin/start.sh` applies only `--only=0006_wet_microbe`, so the new tables would never reach production.                                                                     | Add the new migration tag to `start.sh`.                                                                                                                                                                                                                    |
+| 14  | `apps/admin/start.sh` applies only `--only=0006_wet_microbe`, so the new tables would never reach production.                                                                     | `start.sh` now applies every unrecorded journal migration (production records `0000` onward), so new migrations deploy automatically. `migrate.mjs` refuses to replay over a database with tables but no records.                                           |
 | 15  | "Access ends on next request" depends on how sessions are cached.                                                                                                                 | No better-auth `cookieCache` is used today. Also revoke the user's sessions when their role is removed.                                                                                                                                                     |
 | 16  | The draft didn't say who can publish files or what happens to restricted files.                                                                                                   | Only document admins can publish, and files from restricted folders need a confirmation first.                                                                                                                                                              |
 | 17  | Text extracted from very large files could be very large.                                                                                                                         | Truncate extracted text at about 1 MB.                                                                                                                                                                                                                      |
@@ -163,7 +163,7 @@ New file `packages/database/src/schema/library.ts`, using MySQL and drizzle. It'
 - **`library_audit`:** `id`, `actor_user_id`, `action`, `entity_type`, `entity_id`, `details` (JSON), `created_at`
 - **`document`:** gains `library_file_version_id`, a nullable foreign key that records which snapshot was published.
 
-Generate the migration with `pnpm db:generate`, then add the new tag to `apps/admin/start.sh`.
+Generate the migration with `pnpm db:generate`. `apps/admin/start.sh` applies any unrecorded migration on deploy; keep migrations re-runnable (`CREATE TABLE IF NOT EXISTS`).
 
 ### 3.2 Roles and access
 
@@ -294,7 +294,7 @@ The script `packages/database/scripts/migrate-documents-to-library.ts` copies ev
 
 1. Create the private bucket (Block Public Access on) and an IAM policy that lets the admin app read from and write to it.
 2. Set `S3_LIBRARY_BUCKET` and `S3_LIBRARY_REGION` in CapRover.
-3. Deploy the admin app. The new migration tag runs from `start.sh`.
+3. Deploy the admin app. `start.sh` applies `0007_library` (validated against a restored production dump).
 4. Run the migration script with `--dry-run`, review the output, then run it for real.
 5. Invite board users with the `board` role.
 

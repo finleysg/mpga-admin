@@ -1,8 +1,10 @@
 #!/bin/sh
 set -e
-# Older schema changes were managed outside startup. Apply only these additive
-# migrations; do not replay the historical journal against production.
-echo "Ensuring contact spam protection and board library schema..."
-node packages/database/migrate.mjs --only=0006_wet_microbe --only=0007_library
+# Apply any migrations in the journal that this database hasn't recorded yet. Production records
+# every migration it has (0000 onward) in __drizzle_migrations, so only new ones run. migrate.mjs
+# serializes concurrent starts with a database lock and refuses to replay the journal over a
+# database that has tables but no migration records.
+echo "Applying database migrations..."
+node packages/database/migrate.mjs
 echo "Starting admin app..."
 exec node apps/admin/server.js
