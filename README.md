@@ -65,3 +65,23 @@ TEST_DATABASE_PORT=25062 pnpm exec vitest run apps/admin/src/lib/__tests__/conta
 
 The integration database must use the test-only root password `mpga-test-only`;
 these tests must never point at application data.
+
+## AWS storage
+
+| Bucket                  | Purpose                               | Access                                    |
+| ----------------------- | ------------------------------------- | ----------------------------------------- |
+| `mpgagolf`              | Live public media (documents, photos) | Public read on `media/*`                  |
+| `mpgagolf-library`      | Board library files in production     | Private; served via 5-minute signed links |
+| `mpgagolf-test`         | Dev/test copy of public media         | Public read on `media/*`                  |
+| `mpgagolf-library-test` | Dev/test board library                | Private                                   |
+
+Development uses only the test buckets, through the `mpga-dev` IAM user, which can't touch
+the live buckets. To create or repair this setup (buckets, the dev user, dev `.env.docker`
+values, and production library access), run the interactive wizard:
+
+```sh
+scripts/setup-aws-library.sh
+```
+
+It asks before every change and is safe to re-run. Production needs `S3_LIBRARY_BUCKET` and
+`S3_LIBRARY_REGION` set in CapRover before the board library is deployed.
