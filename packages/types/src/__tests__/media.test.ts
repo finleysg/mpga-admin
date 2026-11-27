@@ -3,23 +3,22 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest"
 import { getMediaUrl } from "../media"
 
 describe("getMediaUrl", () => {
+	const KEYS = [
+		"S3_BUCKET_NAME",
+		"S3_MEDIA_PREFIX",
+		"NEXT_PUBLIC_S3_BUCKET_NAME",
+		"NEXT_PUBLIC_S3_MEDIA_PREFIX",
+	] as const
 	const originalEnv = { ...process.env }
 
 	beforeEach(() => {
-		delete process.env.S3_BUCKET_NAME
-		delete process.env.S3_MEDIA_PREFIX
+		for (const key of KEYS) delete process.env[key]
 	})
 
 	afterEach(() => {
-		if (originalEnv.S3_BUCKET_NAME !== undefined) {
-			process.env.S3_BUCKET_NAME = originalEnv.S3_BUCKET_NAME
-		} else {
-			delete process.env.S3_BUCKET_NAME
-		}
-		if (originalEnv.S3_MEDIA_PREFIX !== undefined) {
-			process.env.S3_MEDIA_PREFIX = originalEnv.S3_MEDIA_PREFIX
-		} else {
-			delete process.env.S3_MEDIA_PREFIX
+		for (const key of KEYS) {
+			if (originalEnv[key] !== undefined) process.env[key] = originalEnv[key]
+			else delete process.env[key]
 		}
 	})
 
@@ -74,5 +73,14 @@ describe("getMediaUrl", () => {
 		process.env.S3_BUCKET_NAME = "my-bucket"
 		process.env.S3_MEDIA_PREFIX = "files"
 		expect(getMediaUrl("test.jpg")).toBe("https://my-bucket.s3.amazonaws.com/files/test.jpg")
+	})
+
+	it("prefers the NEXT_PUBLIC_ settings, which client components can read", () => {
+		process.env.S3_BUCKET_NAME = "server-bucket"
+		process.env.NEXT_PUBLIC_S3_BUCKET_NAME = "mpgagolf-test"
+		process.env.NEXT_PUBLIC_S3_MEDIA_PREFIX = "media"
+		expect(getMediaUrl("documents/a.pdf")).toBe(
+			"https://mpgagolf-test.s3.amazonaws.com/media/documents/a.pdf",
+		)
 	})
 })

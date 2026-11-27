@@ -219,6 +219,8 @@ TEST_LIBRARY_BUCKET="mpgagolf-library-test"
 DEV_USER="mpga-dev"
 ADMIN_ENV="apps/admin/.env.docker"
 PUBLIC_ENV="apps/public/.env.docker"
+# Answers worth remembering between runs that don't belong in app config (git-ignored).
+STATE_FILE="scripts/.setup-aws-library.state"
 
 # run CMD...: show a command, then run it. Output stays on screen.
 run() {
@@ -264,8 +266,29 @@ create_private_bucket() {
 
 # as_dev CMD...: run a command with the mpga-dev keys instead of the admin profile.
 as_dev() {
-  env -u AWS_PROFILE AWS_ACCESS_KEY_ID="$DEV_KEY_ID" AWS_SECRET_ACCESS_KEY="$DEV_SECRET" \
+  # Drop any session token inherited from the shell: sent alongside the dev user's permanent
+  # keys it would make every request fail authentication.
+  env -u AWS_PROFILE -u AWS_SESSION_TOKEN -u AWS_SECURITY_TOKEN \
+    AWS_ACCESS_KEY_ID="$DEV_KEY_ID" AWS_SECRET_ACCESS_KEY="$DEV_SECRET" \
     AWS_DEFAULT_REGION="$REGION" "$@"
+}
+
+# same_user A B: IAM user names are case-insensitive.
+same_user() {
+  [[ "$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')" == "$(printf '%s' "$2" | tr '[:upper:]' '[:lower:]')" ]]
+}
+
+# remember KEY VALUE: save a wizard answer to the state file (not an app .env file).
+# Same KEY='VALUE' format as write_env (so ask/_existing read it back), but kept out of the
+# summary of app settings written.
+remember() {
+  local key="$1" value="$2" tmp sq="'\\''"
+  [[ -e "$STATE_FILE" ]] || (umask 077 && : > "$STATE_FILE")
+  tmp=$(mktemp)
+  grep -vE "^${key}=" "$STATE_FILE" > "$tmp" || true
+  printf "%s='%s'\n" "$key" "${value//\'/$sq}" >> "$tmp"
+  cat "$tmp" > "$STATE_FILE"
+  rm -f "$tmp"
 }
 
 run_wizard() {
@@ -303,6 +326,11 @@ note "Don't use the app's own keys from $ADMIN_ENV here."
 printf '\n'
 ask ADMIN_PROFILE "AWS CLI profile name (Enter for mpga-admin; created if new):"
 ADMIN_PROFILE="${ADMIN_PROFILE:-mpga-admin}"
+# Credentials in the environment would override the profile; make sure the profile is used.
+if [[ -n "${AWS_ACCESS_KEY_ID:-}${AWS_SECRET_ACCESS_KEY:-}${AWS_SESSION_TOKEN:-}" ]]; then
+  note "Ignoring AWS credentials set in this shell so profile '$ADMIN_PROFILE' is used."
+fi
+unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN AWS_SECURITY_TOKEN
 export AWS_PROFILE="$ADMIN_PROFILE" AWS_DEFAULT_REGION="$REGION"
 if ! aws sts get-caller-identity >/dev/null 2>&1; then
   say "No working credentials for profile '$ADMIN_PROFILE' yet."
@@ -339,8 +367,16 @@ APP_USER=""
 if [[ -n "$APP_KEY_ID" ]]; then
   APP_USER=$(aws iam get-access-key-last-used --access-key-id "$APP_KEY_ID" --query UserName --output text 2>/dev/null || true)
   say "The key currently in $ADMIN_ENV (${APP_KEY_ID:0:8}…) belongs to IAM user: ${BOLD}${APP_USER:-unknown}${RESET}"
-  note "Dev has been using this key, which can write to the live bucket. Stage 8 replaces it in dev."
+  if [[ -n "$APP_USER" ]] && same_user "$APP_USER" "$DEV_USER"; then
+    note "That's the dev user from an earlier run, so it says nothing about production."
+    APP_USER=""
+  elif [[ -n "$APP_USER" && "$APP_USER" != "None" ]]; then
+    note "Dev has been using this key, which can write to the live bucket. Stage 8 replaces it in dev."
+    remember LIVE_KEY_USER "$APP_USER"
+  fi
 fi
+# A production user found on an earlier run (before dev switched keys) is still the best guess.
+[[ -z "$APP_USER" ]] && APP_USER=$(ENV_FILE="$STATE_FILE" _existing LIVE_KEY_USER || true)
 pause
 
 # ── 4 ────────────────────────────────────────────────────────────────────────
@@ -481,6 +517,9 @@ JSON
   fi
   write_env S3_BUCKET_NAME "$TEST_MEDIA_BUCKET"
   write_env S3_MEDIA_PREFIX "$MEDIA_PREFIX"
+  # Client components build media links from these (browsers can't read S3_*).
+  write_env NEXT_PUBLIC_S3_BUCKET_NAME "$TEST_MEDIA_BUCKET"
+  write_env NEXT_PUBLIC_S3_MEDIA_PREFIX "$MEDIA_PREFIX"
   write_env S3_REGION "$REGION"
   write_env S3_LIBRARY_BUCKET "$TEST_LIBRARY_BUCKET"
   write_env S3_LIBRARY_REGION "$REGION"
@@ -493,10 +532,12 @@ pause
 stage "Point the public dev site at $TEST_MEDIA_BUCKET"
 say "The public site builds document and photo links (and allowed image hosts) from"
 say "S3_BUCKET_NAME, so dev links must use the test bucket too."
-if confirm "Write S3_BUCKET_NAME=$TEST_MEDIA_BUCKET to $PUBLIC_ENV?"; then
+if confirm "Write S3_BUCKET_NAME / NEXT_PUBLIC_S3_BUCKET_NAME=$TEST_MEDIA_BUCKET to $PUBLIC_ENV?"; then
   ENV_FILE="$PUBLIC_ENV"
   write_env S3_BUCKET_NAME "$TEST_MEDIA_BUCKET"
   write_env S3_MEDIA_PREFIX "$MEDIA_PREFIX"
+  write_env NEXT_PUBLIC_S3_BUCKET_NAME "$TEST_MEDIA_BUCKET"
+  write_env NEXT_PUBLIC_S3_MEDIA_PREFIX "$MEDIA_PREFIX"
   ENV_FILE="$ADMIN_ENV"
 else
   SKIPPED+=("S3_BUCKET_NAME in $PUBLIC_ENV")
@@ -509,11 +550,19 @@ say "The production app reads and writes library files and copies published vers
 say "$LIVE_BUCKET (which it can already write to). This adds only the library bucket."
 note "Nothing else about the production user changes. Its keys stay the same."
 printf '\n'
-[[ -n "$APP_USER" && "$APP_USER" != "None" ]] && say "Stage 3 found the app key belongs to: ${BOLD}$APP_USER${RESET}"
+[[ -n "$APP_USER" && "$APP_USER" != "None" ]] && say "Best guess from the live key: ${BOLD}$APP_USER${RESET}"
+# Defaults to the answer saved on an earlier run (kept in the state file, not app config).
+ENV_FILE="$STATE_FILE"
 ask PROD_APP_USER "IAM user name the production app runs as (Enter to use ${APP_USER:-none found}):"
+ENV_FILE="$ADMIN_ENV"
 PROD_APP_USER="${PROD_APP_USER:-$APP_USER}"
+if [[ -n "$PROD_APP_USER" ]] && same_user "$PROD_APP_USER" "$DEV_USER"; then
+  warn "$DEV_USER is the development user. It must never get production library access."
+  PROD_APP_USER=""
+fi
 if [[ -n "$PROD_APP_USER" ]] && aws iam get-user --user-name "$PROD_APP_USER" >/dev/null 2>&1 \
    && confirm "Add read/write on $PROD_LIBRARY_BUCKET to $PROD_APP_USER?"; then
+  remember PROD_APP_USER "$PROD_APP_USER"
   POLICY_FILE=$(mktemp)
   cat > "$POLICY_FILE" <<JSON
 {
@@ -571,6 +620,13 @@ SIM=$(aws iam simulate-principal-policy \
   --query 'EvaluationResults[].EvalDecision' --output text 2>/dev/null || echo error)
 check "dev can't write to or delete from $LIVE_BUCKET (IAM simulation: $SIM)" ok \
   bash -c '[[ "$1" != *allowed* && "$1" != error ]]' _ "$SIM"
+SIM_LIB=$(aws iam simulate-principal-policy \
+  --policy-source-arn "arn:aws:iam::$ACCOUNT_ID:user/$DEV_USER" \
+  --action-names s3:GetObject s3:PutObject s3:DeleteObject s3:ListBucket \
+  --resource-arns "arn:aws:s3:::$PROD_LIBRARY_BUCKET/library/anything" "arn:aws:s3:::$PROD_LIBRARY_BUCKET" \
+  --query 'EvaluationResults[].EvalDecision' --output text 2>/dev/null || echo error)
+check "dev can't read, write or list $PROD_LIBRARY_BUCKET (IAM simulation: $SIM_LIB)" ok \
+  bash -c '[[ "$1" != *allowed* && "$1" != error ]]' _ "$SIM_LIB"
 check "public files in $TEST_MEDIA_BUCKET open over HTTPS" ok \
   bash -c '[[ "$(curl -s -o /dev/null -w "%{http_code}" "$1")" == 200 ]]' _ \
   "https://$TEST_MEDIA_BUCKET.s3.amazonaws.com/$MEDIA_PREFIX/wizard-check.txt"
@@ -600,7 +656,8 @@ say "${BOLD}Production (CapRover, admin app)${RESET}: add these app variables ${
 say "board library branch. Without S3_LIBRARY_BUCKET the library refuses to store files."
 note "  S3_LIBRARY_BUCKET=$PROD_LIBRARY_BUCKET"
 note "  S3_LIBRARY_REGION=$REGION"
-note "  (keep S3_BUCKET_NAME=$LIVE_BUCKET and the existing AWS keys as they are)"
+note "  (keep S3_BUCKET_NAME=$LIVE_BUCKET and the existing AWS keys as they are; leave"
+note "  NEXT_PUBLIC_S3_BUCKET_NAME unset: it's baked in at build time and defaults to $LIVE_BUCKET)"
 printf '\n'
 if [[ -n "${CURRENT_DEV_KEY:-}" && "${CURRENT_DEV_KEY:-}" != "${DEV_KEY_ID:-}" ]]; then
   say "${BOLD}Old dev key${RESET}: ${CURRENT_DEV_KEY:0:8}… (user ${APP_USER:-unknown}) is no longer used by dev."
