@@ -1,3 +1,5 @@
+import crypto from "node:crypto"
+
 import {
 	document,
 	libraryFile,
@@ -18,10 +20,15 @@ import type { LibraryStorage } from "./storage"
 
 const ADMIN_ONLY = "Only document admins can publish library files."
 
-/** Public key relative to the media prefix, the format `document.file` stores. */
-function publicKeyFor(fileName: string, now: Date): string {
+/**
+ * Public key relative to the media prefix, the format `document.file` stores. Unique per
+ * publish: a timestamp alone repeats when several documents are re-published at once, and
+ * documents must never share an object, since deleting a document deletes its file.
+ */
+export function publicKeyFor(fileName: string, documentId: number, now: Date): string {
 	const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, "_")
-	return `documents/${now.getTime()}-${safeName}`
+	const unique = crypto.randomUUID().slice(0, 8)
+	return `documents/${now.getTime()}-${documentId}-${unique}-${safeName}`
 }
 
 function mediaPrefix(): string {
@@ -106,7 +113,7 @@ export async function publishToDocument(
 
 	// Copy first (S3 can't join the transaction). A failed transaction leaves an unused public
 	// copy with an unguessable timestamped name, which is harmless.
-	const key = publicKeyFor(version.fileName, now)
+	const key = publicKeyFor(version.fileName, input.documentId, now)
 	await storage.copyToPublic(version.s3Key, `${mediaPrefix()}/${key}`, version.contentType)
 
 	return db.transaction(async (tx) => {

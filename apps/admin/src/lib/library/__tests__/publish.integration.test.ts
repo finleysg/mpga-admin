@@ -96,7 +96,7 @@ describe.skipIf(!process.env.TEST_DATABASE_PORT)("library publishing (MySQL)", (
 		const result = await publishToDocument(db, storage, admin, { documentId, fileId })
 		expect(result).toMatchObject({ ok: true, data: { versionNo: 1 } })
 		if (!result.ok) return
-		expect(result.data.file).toMatch(/^documents\/\d+-Entry_Form\.pdf$/)
+		expect(result.data.file).toMatch(/^documents\/\d+-\d+-[0-9a-f]{8}-Entry_Form\.pdf$/)
 		expect(storage.published.has(`media/${result.data.file}`)).toBe(true)
 		const [doc] = await db.select().from(document).where(eq(document.id, documentId))
 		expect(doc?.file).toBe(result.data.file)
@@ -129,6 +129,31 @@ describe.skipIf(!process.env.TEST_DATABASE_PORT)("library publishing (MySQL)", (
 			ok: true,
 			data: { updated: 0 },
 		})
+	})
+
+	it("gives every document its own public object, even when re-published together", async () => {
+		const { folderId, fileId, documentId } = await setup()
+		const [second] = await db.insert(document).values({
+			title: "Mid Am Entry Form",
+			documentType: "Registration",
+			year: 2026,
+			lastUpdate: "2026-01-01 00:00:00",
+			createdBy: admin.id,
+		})
+		const sameMoment = new Date("2026-03-01T12:00:00Z")
+		for (const id of [documentId, second.insertId]) {
+			expect(
+				(await publishToDocument(db, storage, admin, { documentId: id, fileId }, sameMoment)).ok,
+			).toBe(true)
+		}
+		await newVersion(folderId, "v2")
+		expect(await republishLatest(db, storage, admin, fileId, sameMoment)).toMatchObject({
+			ok: true,
+			data: { updated: 2 },
+		})
+		const files = (await db.select({ file: document.file }).from(document)).map((d) => d.file)
+		expect(new Set(files).size).toBe(2)
+		for (const file of files) expect(storage.published.has(`media/${file}`)).toBe(true)
 	})
 
 	it("lets only document admins publish, and records restricted-folder publishing", async () => {

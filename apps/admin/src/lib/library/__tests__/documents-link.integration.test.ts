@@ -22,6 +22,7 @@ vi.mock("../../s3", () => ({ uploadToS3: vi.fn(), deleteFromS3: vi.fn() }))
 import { openLibraryTestDb } from "./test-db"
 import { db } from "../../db"
 import { deleteDocument, uploadDocumentFile } from "../../documents"
+import { deleteFromS3 } from "../../s3"
 
 describe.skipIf(!process.env.TEST_DATABASE_PORT)(
 	"legacy document links to the library (MySQL)",
@@ -68,6 +69,16 @@ describe.skipIf(!process.env.TEST_DATABASE_PORT)(
 			await uploadDocumentFile(file, id)
 			expect(await links(id)).toHaveLength(0)
 			await deleteDocument(id)
+		})
+
+		it("keeps a public file that another document still uses", async () => {
+			const first = await publishedDocument()
+			const second = await publishedDocument()
+			vi.mocked(deleteFromS3).mockClear()
+			await deleteDocument(first)
+			expect(deleteFromS3).not.toHaveBeenCalled()
+			await deleteDocument(second)
+			expect(deleteFromS3).toHaveBeenCalledWith("documents/old.pdf")
 		})
 
 		it("drops the library link when the document is deleted", async () => {

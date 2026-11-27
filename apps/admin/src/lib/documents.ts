@@ -1,5 +1,5 @@
 import { document, documentTag, libraryPublication } from "@mpga/database"
-import { and, eq } from "drizzle-orm"
+import { and, eq, ne } from "drizzle-orm"
 
 import { db } from "./db"
 import { deleteFromS3, uploadToS3 } from "./s3"
@@ -87,7 +87,15 @@ export async function uploadDocumentFile(file: File, documentId: number): Promis
 
 export async function deleteDocument(id: number): Promise<void> {
 	const [doc] = await db.select({ file: document.file }).from(document).where(eq(document.id, id))
-	if (doc?.file) {
+	// Only delete the public object if no other document still points at it.
+	const shared = doc?.file
+		? await db
+				.select({ id: document.id })
+				.from(document)
+				.where(and(eq(document.file, doc.file), ne(document.id, id)))
+				.limit(1)
+		: []
+	if (doc?.file && shared.length === 0) {
 		try {
 			await deleteFromS3(doc.file)
 		} catch (err) {
