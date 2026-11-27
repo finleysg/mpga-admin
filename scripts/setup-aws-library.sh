@@ -320,8 +320,9 @@ pause
 
 # ── 2 ────────────────────────────────────────────────────────────────────────
 stage "Sign in with an AWS admin profile"
-say "This wizard needs an AWS user that can manage S3 and IAM (an administrator)."
-say "It's stored only in your AWS CLI config (~/.aws), never in this repo."
+say "This wizard needs an AWS sign-in that can manage S3 and IAM (an administrator)."
+say "The profile name is just a local label in your AWS CLI config (~/.aws), not an IAM user,"
+say "and nothing from it is stored in this repo."
 note "Don't use the app's own keys from $ADMIN_ENV here."
 printf '\n'
 ask ADMIN_PROFILE "AWS CLI profile name (Enter for mpga-admin; created if new):"
@@ -333,12 +334,31 @@ fi
 unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN AWS_SECURITY_TOKEN
 export AWS_PROFILE="$ADMIN_PROFILE" AWS_DEFAULT_REGION="$REGION"
 if ! aws sts get-caller-identity >/dev/null 2>&1; then
-  say "No working credentials for profile '$ADMIN_PROFILE' yet."
-  open_url "https://us-east-1.console.aws.amazon.com/iam/home#/security_credentials"
-  step "In the AWS console, create an access key for your admin user (Security credentials →"
-  step "Access keys → Create access key → Command Line Interface), then answer the prompts:"
-  step "paste the key ID and secret, region $REGION, output json."
-  run aws configure --profile "$ADMIN_PROFILE"
+  say "No working sign-in for profile '$ADMIN_PROFILE' yet."
+  say "We'll use ${BOLD}aws login${RESET}: it signs the CLI in with your normal AWS console login and"
+  say "issues short-lived credentials (up to 12 hours), so no access keys are created."
+  note "Sign in as an administrator. Root works, but an IAM user with admin rights is better"
+  note "practice; IAM users also need the SignInLocalDevelopmentAccess policy for aws login."
+  CLI_VERSION=$(aws --version 2>&1 | sed -nE 's#^aws-cli/([0-9]+\.[0-9]+)\..*#\1#p')
+  CLI_MAJOR=${CLI_VERSION%%.*} CLI_MINOR=${CLI_VERSION#*.}
+  if [[ -z "$CLI_VERSION" ]] || (( CLI_MAJOR < 2 || (CLI_MAJOR == 2 && CLI_MINOR < 32) )); then
+    warn "aws login needs AWS CLI 2.32 or newer (you have ${CLI_VERSION:-an unknown version})."
+    if command -v brew >/dev/null 2>&1 && confirm "Upgrade it now with Homebrew (brew upgrade awscli)?"; then
+      run brew upgrade awscli
+    else
+      open_url "https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html"
+      warn "Upgrade the AWS CLI, then re-run this script."
+      exit 1
+    fi
+  fi
+  step "A browser window opens: sign in to the AWS console and approve the CLI request."
+  step "If asked for a default region, enter $REGION."
+  run aws login --profile "$ADMIN_PROFILE"
+  if ! aws sts get-caller-identity >/dev/null 2>&1; then
+    warn "Still no working sign-in for '$ADMIN_PROFILE'. Run: aws login --profile $ADMIN_PROFILE"
+    warn "then re-run this script."
+    exit 1
+  fi
 fi
 IDENTITY=$(aws sts get-caller-identity --query Arn --output text)
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
