@@ -6,6 +6,7 @@ import ExcelJS from "exceljs"
 import { describe, expect, it } from "vitest"
 
 import { extractText } from "../extract"
+import { runInWorker } from "../extract-worker"
 import { highlight } from "../highlight"
 import { escapeLike, parseQuery, tidySnippet } from "../search"
 
@@ -51,6 +52,28 @@ describe("extractText", () => {
 		expect(await extractText("photo.png", new Uint8Array([0x89, 0x50]))).toBeNull()
 		expect(await extractText("broken.pdf", new TextEncoder().encode("%PDF-1.7 garbage"))).toBeNull()
 		expect(await extractText("broken.docx", new Uint8Array([0x50, 0x4b, 3, 4, 0]))).toBeNull()
+	})
+})
+
+describe("extraction worker", () => {
+	it("stops a parser that never finishes, without blocking this thread", async () => {
+		let ticks = 0
+		const ticker = setInterval(() => ticks++, 20)
+		const started = Date.now()
+		const outcome = await runInWorker("while (true) {}", null, [], 300).then(
+			(text) => `resolved ${JSON.stringify(text)}`,
+			(error: Error) => `rejected ${error.message}`,
+		)
+		expect(outcome).toBe("rejected Text extraction took longer than 300 ms")
+		clearInterval(ticker)
+		expect(Date.now() - started).toBeLessThan(2000)
+		// The busy loop ran in the worker, so timers here kept firing.
+		expect(ticks).toBeGreaterThan(5)
+	})
+
+	it("stops a parser that uses too much memory", async () => {
+		const hog = "const keep = []; while (true) keep.push(new Array(1e6).fill(Math.random()))"
+		await expect(runInWorker(hog, null, [], 20_000)).rejects.toThrow()
 	})
 })
 

@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "bea88212-7758-4cb1-80ef-ce3f78a882d0",
+  "id": "880cedb5-8ad6-4246-9591-d7c5b5abd05b",
   "prevId": "2ac44740-f07c-4d1e-8921-01f8aeb0ac09",
   "tables": {
     "announcement": {
@@ -2831,6 +2831,13 @@
         },
         "restored_from_version_id": {
           "name": "restored_from_version_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "content_version_id": {
+          "name": "content_version_id",
           "type": "int",
           "primaryKey": false,
           "notNull": false,

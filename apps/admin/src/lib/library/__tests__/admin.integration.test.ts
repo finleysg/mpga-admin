@@ -24,6 +24,7 @@ import {
 	restoreVersion,
 	setFolderRestriction,
 } from "../admin"
+import { indexVersion, searchLibrary } from "../search"
 import { createFolder, getFileView, getFolderView, uploadFile } from "../service"
 import { MemoryLibraryStorage } from "../storage"
 import { openLibraryTestDb } from "./test-db"
@@ -326,6 +327,59 @@ describe.skipIf(!process.env.TEST_DATABASE_PORT)("library admin operations (MySQ
 	})
 
 	describe("restore version", () => {
+		it("keeps a restored version searchable even if indexing finishes after the restore", async () => {
+			const board = await folder("Board")
+			const enc = new TextEncoder()
+			const v1 = await uploadFile(db, storage, alice, {
+				folderId: board,
+				name: "agenda.txt",
+				bytes: enc.encode("Original wording about golf carts"),
+				mode: "new",
+			})
+			if (!v1.ok) throw new Error(v1.error)
+			const v2 = await uploadFile(db, storage, alice, {
+				folderId: board,
+				name: "agenda.txt",
+				bytes: enc.encode("New wording about tee times"),
+				mode: "newVersion",
+			})
+			if (!v2.ok) throw new Error(v2.error)
+			await indexVersion(
+				db,
+				v2.data.versionId,
+				"agenda.txt",
+				enc.encode("New wording about tee times"),
+			)
+
+			// Restore v1 while its indexing is still pending, then let indexing finish.
+			const restored = await restoreVersion(db, admin, v1.data.fileId, v1.data.versionId)
+			expect(restored).toMatchObject({ ok: true, data: { versionNo: 3 } })
+			await indexVersion(
+				db,
+				v1.data.versionId,
+				"agenda.txt",
+				enc.encode("Original wording about golf carts"),
+			)
+
+			const carts = await searchLibrary(db, alice, "carts")
+			expect(carts.ok && carts.data.map((r) => r.name)).toEqual(["agenda.txt"])
+			const tee = await searchLibrary(db, alice, "tee")
+			expect(tee.ok && tee.data).toEqual([])
+
+			// Restoring the restore still reads the original upload's text.
+			const v3 = (
+				await db
+					.select()
+					.from(libraryFileVersion)
+					.where(eq(libraryFileVersion.fileId, v1.data.fileId))
+			).find((v) => v.versionNo === 3)!
+			expect(v3.contentVersionId).toBe(v1.data.versionId)
+			await restoreVersion(db, admin, v1.data.fileId, v2.data.versionId)
+			await restoreVersion(db, admin, v1.data.fileId, v3.id)
+			const again = await searchLibrary(db, alice, "carts")
+			expect(again.ok && again.data.map((r) => r.name)).toEqual(["agenda.txt"])
+		})
+
 		it("adds the old version back as a new current version", async () => {
 			const board = await folder("Board")
 			const v1 = await upload(board, "Agenda.pdf", "first")

@@ -11,7 +11,7 @@ import { and, eq, sql } from "drizzle-orm"
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest"
 
 import type { Viewer } from "../access"
-import { copyVersionText, indexVersion, searchLibrary } from "../search"
+import { indexVersion, searchLibrary } from "../search"
 import {
 	createFolder,
 	getDownloadUrl,
@@ -534,44 +534,6 @@ describe.skipIf(!process.env.TEST_DATABASE_PORT)("library service (MySQL)", () =
 			expect(forAlice.ok && forAlice.data.map((r) => r.name)).toEqual(["salaries.txt"])
 			const forBob = await searchLibrary(db, bob, "confidential")
 			expect(forBob.ok && forBob.data).toEqual([])
-		})
-
-		it("searches the current version and gives restored versions their text", async () => {
-			const id = await folder("Board")
-			const v1 = await add(id, "agenda.txt", "Original wording about golf carts")
-			const v2 = await uploadFile(db, storage, alice, {
-				folderId: id,
-				name: "agenda.txt",
-				bytes: text("New wording about tee times"),
-				mode: "newVersion",
-			})
-			if (!v2.ok) throw new Error(v2.error)
-			await indexVersion(db, v2.data.versionId, "agenda.txt", text("New wording about tee times"))
-			const old = await searchLibrary(db, alice, "carts")
-			expect(old.ok && old.data).toEqual([])
-
-			// Simulate the copy that restoring v1 performs.
-			const [restored] = await db
-				.insert(libraryFileVersion)
-				.values({
-					fileId: v1.fileId,
-					versionNo: 3,
-					s3Key: "library/x",
-					size: 1,
-					contentType: "text/plain",
-					originalName: "agenda.txt",
-					uploadedBy: admin.id,
-					uploadedAt: new Date(),
-					restoredFromVersionId: v1.versionId,
-				})
-				.$returningId()
-			await copyVersionText(db, v1.versionId, restored!.id)
-			await db
-				.update(libraryFile)
-				.set({ currentVersionId: restored!.id })
-				.where(eq(libraryFile.id, v1.fileId))
-			const again = await searchLibrary(db, alice, "carts")
-			expect(again.ok && again.data.map((r) => r.name)).toEqual(["agenda.txt"])
 		})
 	})
 })

@@ -1,5 +1,6 @@
-import { libraryFile, libraryFileText, type Database } from "@mpga/database"
+import { libraryFile, libraryFileText, libraryFileVersion, type Database } from "@mpga/database"
 import { and, desc, eq, inArray, isNull, like, or, sql, type SQL } from "drizzle-orm"
+import { alias } from "drizzle-orm/mysql-core"
 
 import { folderPath, type Viewer } from "./access"
 import { extractText } from "./extract"
@@ -24,15 +25,6 @@ export async function indexVersion(
 		.values({ versionId, body })
 		.onDuplicateKeyUpdate({ set: { body } })
 	return true
-}
-
-/** A restored version has the same contents as its source, so it gets the same text. */
-export async function copyVersionText(db: Executor, fromVersionId: number, toVersionId: number) {
-	await db.execute(sql`
-		INSERT INTO ${libraryFileText} (version_id, body)
-		SELECT ${toVersionId}, body FROM ${libraryFileText} WHERE version_id = ${fromVersionId}
-		ON DUPLICATE KEY UPDATE body = VALUES(body)
-	`)
 }
 
 // ---------- Searching ----------
@@ -96,6 +88,7 @@ export async function searchLibrary(
 	const visible = [...state.visible]
 	if (visible.length === 0) return { ok: true, data: [] }
 
+	const current = alias(libraryFileVersion, "current_version")
 	const patterns = terms.map((t) => `%${escapeLike(t)}%`)
 	const body = libraryFileText.body
 	const eachTerm = patterns.map((p) => or(like(libraryFile.name, p), like(body, p))!)
@@ -125,7 +118,12 @@ export async function searchLibrary(
 			bodyLength: sql<number>`char_length(${body})`,
 		})
 		.from(libraryFile)
-		.leftJoin(libraryFileText, eq(libraryFileText.versionId, libraryFile.currentVersionId))
+		.leftJoin(current, eq(current.id, libraryFile.currentVersionId))
+		// A restored version reads the text of the original upload it repeats.
+		.leftJoin(
+			libraryFileText,
+			eq(libraryFileText.versionId, sql`coalesce(${current.contentVersionId}, ${current.id})`),
+		)
 		.where(and(isNull(libraryFile.deletedAt), inArray(libraryFile.folderId, visible), ...eachTerm))
 		.orderBy(desc(sql`(${nameMatches})`), desc(libraryFile.updatedAt))
 		.limit(MAX_RESULTS)

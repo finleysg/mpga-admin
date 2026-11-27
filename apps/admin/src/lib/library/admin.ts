@@ -13,7 +13,6 @@ import { and, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm"
 import { descendantFolderIds, folderPath, subtreeHeight, type Viewer } from "./access"
 import { fileExtension } from "./file-types"
 import { MAX_FILE_NAME, MAX_FOLDER_DEPTH, MAX_FOLDER_NAME, uniqueName, validateName } from "./names"
-import { copyVersionText } from "./search"
 import {
 	fail,
 	insertVersion,
@@ -443,11 +442,14 @@ export async function restoreVersion(
 				uploadedBy: viewer.id,
 				uploadedAt: now,
 				restoredFromVersionId: version.id,
+				// Same contents as the original upload, whose text search reads. Pointing at the
+				// original (not at `version`, which may itself be a restore) keeps lookups one step,
+				// and works even if that upload is still being indexed.
+				contentVersionId: version.contentVersionId ?? version.id,
 			},
 			now,
 			"restore_version",
 		)
-		await copyVersionText(tx, version.id, added.versionId)
 		return { ok: true as const, data: { versionNo: added.versionNo } }
 	})
 }

@@ -104,6 +104,11 @@ export const libraryFileVersion = mysqlTable(
 		uploadedBy: varchar("uploaded_by", { length: 36 }).notNull(),
 		uploadedAt: datetime("uploaded_at", { fsp: 3 }).notNull(),
 		restoredFromVersionId: int("restored_from_version_id"),
+		/**
+		 * For a restored version, the original upload whose contents it repeats (its text for
+		 * search lives there). NULL for uploads, which are their own content.
+		 */
+		contentVersionId: int("content_version_id"),
 	},
 	(table) => [uniqueIndex("library_file_version_no_idx").on(table.fileId, table.versionNo)],
 )

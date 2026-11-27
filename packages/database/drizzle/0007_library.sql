@@ -54,6 +54,7 @@ CREATE TABLE IF NOT EXISTS `library_file_version` (
 	`uploaded_by` varchar(36) NOT NULL,
 	`uploaded_at` datetime(3) NOT NULL,
 	`restored_from_version_id` int,
+	`content_version_id` int,
 	CONSTRAINT `library_file_version_id` PRIMARY KEY(`id`),
 	CONSTRAINT `library_file_version_no_idx` UNIQUE(`file_id`,`version_no`),
 	CONSTRAINT `library_file_version_file_id_library_file_id_fk` FOREIGN KEY (`file_id`) REFERENCES `library_file`(`id`) ON DELETE no action ON UPDATE no action

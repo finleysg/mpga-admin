@@ -386,6 +386,7 @@ interface NewVersion {
 	uploadedBy: string
 	uploadedAt: Date
 	restoredFromVersionId?: number | null
+	contentVersionId?: number | null
 }
 
 /** Append a version and make it current. Caller holds the folder lock. */
