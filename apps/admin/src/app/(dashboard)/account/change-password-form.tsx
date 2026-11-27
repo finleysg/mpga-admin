@@ -13,6 +13,7 @@ import {
 	Input,
 	toast,
 } from "@mpga/ui"
+import { CircleCheck } from "lucide-react"
 import { useState } from "react"
 
 import { authClient } from "@/lib/auth-client"
@@ -24,9 +25,17 @@ export function ChangePasswordForm() {
 	const [confirm, setConfirm] = useState("")
 	const [error, setError] = useState("")
 	const [loading, setLoading] = useState(false)
+	const [changed, setChanged] = useState(false)
+
+	// Editing the form again clears the previous outcome.
+	const edit = (setter: (value: string) => void) => (e: React.ChangeEvent<HTMLInputElement>) => {
+		setter(e.target.value)
+		setChanged(false)
+	}
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
+		setChanged(false)
 		const problem = passwordProblem(newPassword, confirm)
 		if (problem) {
 			setError(problem)
@@ -55,7 +64,8 @@ export function ChangePasswordForm() {
 				setCurrentPassword("")
 				setNewPassword("")
 				setConfirm("")
-				toast.success("Password changed. You've been signed out on other devices.")
+				setChanged(true)
+				toast.success("Password changed")
 			}
 		} catch {
 			setError("An unexpected error occurred")
@@ -77,6 +87,18 @@ export function ChangePasswordForm() {
 				<form onSubmit={handleSubmit}>
 					<div className="grid gap-6">
 						{error && <FieldError role="alert">{error}</FieldError>}
+						{changed && (
+							<div
+								role="status"
+								className="flex items-start gap-2 rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-800"
+							>
+								<CircleCheck className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+								<p>
+									<span className="font-semibold">Your password has been changed.</span> Use it the
+									next time you sign in. You&apos;ve been signed out on your other devices.
+								</p>
+							</div>
+						)}
 						<Field>
 							<FieldLabel htmlFor="current-password">Current password</FieldLabel>
 							<Input
@@ -84,7 +106,7 @@ export function ChangePasswordForm() {
 								type="password"
 								autoComplete="current-password"
 								value={currentPassword}
-								onChange={(e) => setCurrentPassword(e.target.value)}
+								onChange={edit(setCurrentPassword)}
 								required
 							/>
 						</Field>
@@ -95,7 +117,7 @@ export function ChangePasswordForm() {
 								type="password"
 								autoComplete="new-password"
 								value={newPassword}
-								onChange={(e) => setNewPassword(e.target.value)}
+								onChange={edit(setNewPassword)}
 								required
 							/>
 						</Field>
@@ -106,7 +128,7 @@ export function ChangePasswordForm() {
 								type="password"
 								autoComplete="new-password"
 								value={confirm}
-								onChange={(e) => setConfirm(e.target.value)}
+								onChange={edit(setConfirm)}
 								required
 							/>
 						</Field>

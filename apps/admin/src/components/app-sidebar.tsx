@@ -109,6 +109,9 @@ export function AppSidebar({
 
 	const handleSignOut = async () => {
 		await signOut()
+		// Full load so no signed-in pages linger in the client router cache.
+		// eslint-disable-next-line @next/next/no-location-assign-relative-destination -- see above
+		window.location.assign("/login")
 	}
 
 	return (
@@ -182,7 +185,7 @@ export function AppSidebar({
 							{session?.user?.name ?? session?.user?.email ?? "User"}
 						</span>
 					</Link>
-					<Button variant="ghost" size="icon" onClick={handleSignOut}>
+					<Button variant="ghost" size="icon" onClick={handleSignOut} title="Sign out">
 						<LogOut className="h-4 w-4" />
 						<span className="sr-only">Sign out</span>
 					</Button>
