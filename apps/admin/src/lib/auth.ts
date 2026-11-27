@@ -5,7 +5,7 @@ import { admin, emailOTP } from "better-auth/plugins"
 
 import { db } from "./db"
 import { sendSignInOtpEmail } from "./email"
-import { ac, adminRole, superAdminRole } from "./permissions"
+import { ac, adminRole, boardRole, superAdminRole } from "./permissions"
 
 export const auth = betterAuth({
 	logger: {
@@ -33,6 +33,7 @@ export const auth = betterAuth({
 				user: ac.newRole({}),
 				super_admin: superAdminRole,
 				admin: adminRole,
+				board: boardRole,
 			},
 		}),
 		emailOTP({

@@ -283,17 +283,23 @@ export async function sendCaptainNoteEmail(args: {
 /**
  * Sends an invitation email to the specified address with an accept link.
  */
-export async function sendInvitationEmail(email: string, token: string): Promise<void> {
+export async function sendInvitationEmail(
+	email: string,
+	token: string,
+	role: string = "admin",
+): Promise<void> {
 	const appUrl = process.env.NEXT_PUBLIC_ADMIN_URL ?? "http://localhost:4100"
 	const acceptLink = `${appUrl}/accept-invitation/${token}`
+	const invitedTo =
+		role === "board" ? "the MPGA board document library" : "the MPGA Administration site"
 
 	await transporter.sendMail({
 		from: process.env.MAIL_FROM ?? "noreply@mpga.net",
 		to: email,
 		subject: "You've been invited to MPGA Admin",
-		text: `You've been invited to join the MPGA Administration site.\n\nClick the link below to create your account:\n${acceptLink}\n\nThis invitation expires in 7 days.`,
+		text: `You've been invited to join ${invitedTo}.\n\nClick the link below to create your account:\n${acceptLink}\n\nThis invitation expires in 7 days.`,
 		html: emailLayout(`
-			<p>You've been invited to join the MPGA Administration site.</p>
+			<p>You've been invited to join ${invitedTo}.</p>
 			<p><a href="${acceptLink}" style="display: inline-block; padding: 10px 20px; background-color: #2563eb; color: #fff; text-decoration: none; border-radius: 4px;">Click here to create your account</a></p>
 			<p style="font-size: 13px; color: #666;">Or copy this link: ${acceptLink}</p>
 			<p style="font-size: 13px; color: #999;"><em>This invitation expires in 7 days.</em></p>

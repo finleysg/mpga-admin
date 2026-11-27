@@ -145,7 +145,7 @@ Decisions:
 | 11  | Restoring folders and items from Trash wasn't defined.                                                                                                                            | Folder deletes are batched, and orphaned items restore to the root or a chosen folder.                                                                                                                                                                      |
 | 12  | Name collisions on rename and move weren't handled.                                                                                                                               | Names are unique within a folder among items not in Trash.                                                                                                                                                                                                  |
 | 13  | "Documents" collides with the existing menu entries of the same name.                                                                                                             | Call it **Library**, at `/library`.                                                                                                                                                                                                                         |
-| 14  | `apps/admin/start.sh` applies only `--only=0006_wet_microbe`, so the new tables would never reach production.                                                                     | Add the new migration tag to `start.sh`.                                                                                                                                                                                                                    |
+| 14  | `apps/admin/start.sh` applies only `--only=0006_wet_microbe`, so the new tables would never reach production.                                                                     | `start.sh` now applies every unrecorded journal migration (production records `0000` onward), so new migrations deploy automatically. `migrate.mjs` refuses to replay over a database with tables but no records.                                           |
 | 15  | "Access ends on next request" depends on how sessions are cached.                                                                                                                 | No better-auth `cookieCache` is used today. Also revoke the user's sessions when their role is removed.                                                                                                                                                     |
 | 16  | The draft didn't say who can publish files or what happens to restricted files.                                                                                                   | Only document admins can publish, and files from restricted folders need a confirmation first.                                                                                                                                                              |
 | 17  | Text extracted from very large files could be very large.                                                                                                                         | Truncate extracted text at about 1 MB.                                                                                                                                                                                                                      |
@@ -163,7 +163,7 @@ New file `packages/database/src/schema/library.ts`, using MySQL and drizzle. It'
 - **`library_audit`:** `id`, `actor_user_id`, `action`, `entity_type`, `entity_id`, `details` (JSON), `created_at`
 - **`document`:** gains `library_file_version_id`, a nullable foreign key that records which snapshot was published.
 
-Generate the migration with `pnpm db:generate`, then add the new tag to `apps/admin/start.sh`.
+Generate the migration with `pnpm db:generate`. `apps/admin/start.sh` applies any unrecorded migration on deploy; keep migrations re-runnable (`CREATE TABLE IF NOT EXISTS`).
 
 ### 3.2 Roles and access
 
@@ -274,28 +274,28 @@ Add the shadcn `progress` component, and `scroll-area` if it's needed. Headings 
 
 ## 4. Migration
 
-The script `packages/database/scripts/migrate-documents-to-library.ts` copies every existing `document` row into the library. Run it with `--dry-run` first.
+Existing documents are imported from a super-admin page, **Administration → Import documents** (`/admin/import-documents`), running inside the deployed app with its own database and AWS access. It shows a preview first and changes nothing until you import.
 
-1. **Folders:**
-   - Create one top-level folder for each label in `apps/admin/src/lib/document-types.ts`, with a subfolder for each year (for example `Minutes/2024`).
-   - Put tournament documents under `Tournaments/{tournament name}/{year}`. Both layouts stay within the 4-level limit.
-2. **Files:** for each `document` row:
-   1. Copy the object from the public bucket (`media/{file}`) to the private bucket (`library/{uuid}`). This copy happens inside S3, so the 5 MB upload limit doesn't apply.
-   2. Create a `library_file` and its first `library_file_version`. Set `uploaded_by` to the migration user and `uploaded_at` to the document's `lastUpdate`.
-   3. Set `document.library_file_version_id`, so the existing public document becomes that version's snapshot.
-   4. Handle name collisions with the " (2)" rule.
-   5. Leave the public objects where they are, so public pages don't change.
-3. **Text:** run text extraction for every migrated version, rate-limited.
-4. **Audit:** write one `library_audit` row per file, with the action `migrate`.
-5. **Idempotent:** documents that already have a `library_file_version_id` are skipped, so the script can be re-run safely. At the end it reports counts, any missing S3 objects, and any extraction failures.
-6. **Rollback:** set `library_file_version_id` back to null, then delete the library rows and the private bucket objects. Nothing public changes.
+1. **Preview:** for every document not yet imported, the target folder and file name, and whether it will be skipped and why (no file, file missing from the public bucket, unsupported type, or contents that don't match the type). It checks each file exists and reads its first 16 KB.
+2. **Folders:** tournament documents go under `Tournaments/{tournament name}/{year}`; everything else under `{document type}/{year}`. Documents without a year go straight into their type folder. Existing folders with the same name are reused.
+3. **Files:** for each document, in batches of 20:
+   1. Read the file from the public bucket and check its contents match its type. Files without an extension are recognised from their contents.
+   2. Store it in the library bucket as version 1, dated from the document's `lastUpdate`.
+   3. Link the document to that version in `library_publication`. `document.file` is unchanged, so public pages keep showing the same file.
+   4. Name collisions in a folder use the " (2)" rule.
+   5. Extract search text.
+4. **Audit:** one `library_audit` row per file with the action `migrate`, plus a `create` row per new folder.
+5. **Idempotent:** documents already linked are skipped, so the import can be stopped and run again.
+6. **Rollback:** delete the `library_publication` rows and the library rows, then the private bucket objects. Nothing public changes.
+
+**Rehearsal (done):** the production image ran against a restored production dump with the test buckets. All 372 documents imported in about 3 minutes: 280 under `Tournaments`, 222 folders, 77.7 MB, both extensionless files recognised as PDFs, versions dated correctly, and the `document` table byte-for-byte unchanged. 341 files have search text; the rest are legacy `.doc` files and PDFs without a text layer. A second run found nothing to import.
 
 **Production runbook**
 
-1. Create the private bucket (Block Public Access on) and an IAM policy that lets the admin app read from and write to it.
-2. Set `S3_LIBRARY_BUCKET` and `S3_LIBRARY_REGION` in CapRover.
-3. Deploy the admin app. The new migration tag runs from `start.sh`.
-4. Run the migration script with `--dry-run`, review the output, then run it for real.
+1. Run `scripts/setup-aws-library.sh` (done): private library bucket, IAM access for the production app user.
+2. Set `S3_LIBRARY_BUCKET=mpgagolf-library` and `S3_LIBRARY_REGION=us-west-2` in CapRover.
+3. Deploy the admin app. `start.sh` applies `0007_library` (validated against a restored production dump).
+4. As a super admin, open **Administration → Import documents**, review the preview, then import.
 5. Invite board users with the `board` role.
 
 ## 5. Verification

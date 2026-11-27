@@ -16,7 +16,8 @@ import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
-import { signIn, useSession } from "@/lib/auth-client"
+import { signIn, signOut, useSession } from "@/lib/auth-client"
+import { isLibraryRole } from "@/lib/roles"
 
 export default function LoginPage() {
 	const router = useRouter()
@@ -26,11 +27,15 @@ export default function LoginPage() {
 	const [error, setError] = useState("")
 	const [loading, setLoading] = useState(false)
 
+	// Portal users (club contacts, captains) have a session but no admin access. Don't bounce
+	// them back to the dashboard, which would send them here again.
+	const hasAdminAccess = isLibraryRole(session?.user?.role)
+
 	useEffect(() => {
-		if (!isPending && session) {
+		if (!isPending && hasAdminAccess) {
 			router.push("/")
 		}
-	}, [session, isPending, router])
+	}, [hasAdminAccess, isPending, router])
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
@@ -45,6 +50,13 @@ export default function LoginPage() {
 
 			if (result.error) {
 				setError(result.error.message ?? "Login failed")
+			} else if (
+				!isLibraryRole(
+					result.data?.user && "role" in result.data.user ? String(result.data.user.role) : null,
+				)
+			) {
+				await signOut()
+				setError("This account doesn't have access to the admin site.")
 			} else {
 				router.push("/")
 				router.refresh()
@@ -64,7 +76,7 @@ export default function LoginPage() {
 		)
 	}
 
-	if (session) {
+	if (hasAdminAccess) {
 		return (
 			<div className="bg-muted flex min-h-svh items-center justify-center">
 				<div className="text-muted-foreground">Redirecting...</div>
@@ -93,6 +105,9 @@ export default function LoginPage() {
 						<form onSubmit={handleSubmit}>
 							<div className="grid gap-6">
 								{error && <FieldError>{error}</FieldError>}
+								{!error && session && (
+									<FieldError>This account doesn&apos;t have access to the admin site.</FieldError>
+								)}
 								<Field>
 									<FieldLabel htmlFor="email">Email</FieldLabel>
 									<Input

@@ -12,10 +12,13 @@ async function migrate() {
 		console.log("Migration runtime ready")
 		return
 	}
-	const only = args[0]?.startsWith("--only=") ? args[0].slice("--only=".length) : undefined
-	if (args.length && (args.length !== 1 || !only || !journal.entries.some((e) => e.tag === only))) {
-		throw new Error("Usage: migrate.mjs [--only=<journal migration tag>]")
+	// Each --only=<tag> selects one journal migration; several may be given. Without any, the
+	// whole journal is applied.
+	const only = args.map((a) => (a.startsWith("--only=") ? a.slice("--only=".length) : undefined))
+	if (only.some((tag) => !tag || !journal.entries.some((e) => e.tag === tag))) {
+		throw new Error("Usage: migrate.mjs [--only=<journal migration tag> ...]")
 	}
+	const selected = only.length ? new Set(only) : undefined
 	const connection = await createConnection({
 		host: process.env.DATABASE_HOST,
 		port: parseInt(process.env.DATABASE_PORT || "3306", 10),
@@ -42,8 +45,23 @@ async function migrate() {
 		`)
 		const [rows] = await connection.execute("SELECT hash FROM __drizzle_migrations")
 		const applied = new Set(rows.map((r) => r.hash))
+		if (!selected && applied.size === 0) {
+			// Replaying the whole journal is only safe on an empty database or one that records
+			// its migrations. A database with tables but no records was set up some other way;
+			// replaying 0000 over it would fail part-way. Stop before changing anything.
+			const [tables] = await connection.execute(
+				"SELECT COUNT(*) AS n FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name <> '__drizzle_migrations'",
+			)
+			if (Number(tables[0]?.n) > 0) {
+				throw new Error(
+					"This database has tables but no recorded migrations, so the full journal can't be " +
+						"replayed safely. Record the migrations it already has in __drizzle_migrations " +
+						"(or apply specific ones with --only=<tag>) and run again.",
+				)
+			}
+		}
 		for (const entry of journal.entries) {
-			if (only && entry.tag !== only) continue
+			if (selected && !selected.has(entry.tag)) continue
 			if (applied.has(entry.tag)) continue
 			const sql = readFileSync(join(migrationsDir, `${entry.tag}.sql`), "utf-8")
 			const statements = sql

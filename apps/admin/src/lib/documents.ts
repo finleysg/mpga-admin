@@ -1,7 +1,8 @@
-import { document, documentTag } from "@mpga/database"
-import { and, eq } from "drizzle-orm"
+import { document, documentTag, libraryPublication } from "@mpga/database"
+import { and, eq, ne } from "drizzle-orm"
 
 import { db } from "./db"
+import { documentKey } from "./document-keys"
 import { deleteFromS3, uploadToS3 } from "./s3"
 
 export interface DocumentData {
@@ -71,19 +72,31 @@ export async function saveDocument(data: SaveDocumentInput, userId: string): Pro
 
 export async function uploadDocumentFile(file: File, documentId: number): Promise<string> {
 	const buffer = Buffer.from(await file.arrayBuffer())
-	const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_")
-	const key = `documents/${Date.now()}-${safeName}`
+	// Fits document.file (VARCHAR(200)) however long the uploaded file's name is.
+	const key = documentKey(`documents/${Date.now()}-`, file.name)
 	await uploadToS3(buffer, key, file.type)
 
 	const now = new Date().toISOString().replace("T", " ").replace("Z", "")
-	await db.update(document).set({ file: key, lastUpdate: now }).where(eq(document.id, documentId))
+	await db.transaction(async (tx) => {
+		await tx.update(document).set({ file: key, lastUpdate: now }).where(eq(document.id, documentId))
+		// A directly uploaded file replaces any library snapshot this document showed.
+		await tx.delete(libraryPublication).where(eq(libraryPublication.documentId, documentId))
+	})
 
 	return key
 }
 
 export async function deleteDocument(id: number): Promise<void> {
 	const [doc] = await db.select({ file: document.file }).from(document).where(eq(document.id, id))
-	if (doc?.file) {
+	// Only delete the public object if no other document still points at it.
+	const shared = doc?.file
+		? await db
+				.select({ id: document.id })
+				.from(document)
+				.where(and(eq(document.file, doc.file), ne(document.id, id)))
+				.limit(1)
+		: []
+	if (doc?.file && shared.length === 0) {
 		try {
 			await deleteFromS3(doc.file)
 		} catch (err) {
@@ -92,6 +105,7 @@ export async function deleteDocument(id: number): Promise<void> {
 	}
 
 	await db.transaction(async (tx) => {
+		await tx.delete(libraryPublication).where(eq(libraryPublication.documentId, id))
 		await tx.delete(documentTag).where(eq(documentTag.documentId, id))
 		await tx.delete(document).where(eq(document.id, id))
 	})

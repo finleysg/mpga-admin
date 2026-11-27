@@ -44,3 +44,14 @@ e2e/.auth/
 
 # Misc
 *.tsbuildinfo
+
+# Local stand-in for the private library bucket (development only)
+.library-storage/
+
+# Answers remembered by scripts/setup-aws-library.sh between runs
+scripts/.setup-aws-library.state
+
+# Database dumps (production data): never commit
+/backup_*.sql
+/backup_*.sql.gz
+*.dump

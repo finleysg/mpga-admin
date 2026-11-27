@@ -33,7 +33,8 @@ import {
 import { ExternalLink, Pencil, Plus, Trash2, Upload, X } from "lucide-react"
 import { useRef, useState } from "react"
 
-import { FileDropZone } from "@/components/file-drop-zone"
+import { publishToDocumentAction } from "@/app/(dashboard)/library/actions"
+import { DocumentFileSource, type FileSource } from "@/components/library/document-file-source"
 import { documentTypes } from "@/lib/document-types"
 import type { DocumentData } from "@/lib/documents"
 
@@ -54,7 +55,7 @@ interface EditingDoc {
 	id?: number
 	title: string
 	documentType: string
-	file?: File
+	source?: FileSource | null
 }
 
 export function DocumentsCard({
@@ -101,10 +102,10 @@ export function DocumentsCard({
 				const docId = result.data.id
 				let fileKey: string | null = null
 
-				// Upload file if one was selected
-				if (editing.file) {
+				// Attach the chosen file: published from the library, or uploaded directly.
+				if (editing.source?.kind === "upload") {
 					const formData = new FormData()
-					formData.append("file", editing.file)
+					formData.append("file", editing.source.file)
 					formData.append("documentId", docId.toString())
 					formData.append("systemName", systemName)
 					const uploadResult = await uploadDocumentFileAction(formData)
@@ -112,6 +113,13 @@ export function DocumentsCard({
 						fileKey = uploadResult.data.file
 					} else {
 						toast.error(uploadResult.error ?? "Document saved but file upload failed")
+					}
+				} else if (editing.source?.kind === "library") {
+					const published = await publishToDocumentAction(docId, editing.source.file.fileId)
+					if (published.success && published.data) {
+						fileKey = published.data.file
+					} else {
+						toast.error(published.error ?? "Document saved but the library file wasn't published")
 					}
 				}
 
@@ -352,9 +360,9 @@ function EditForm({
 			</Field>
 			<Field>
 				<FieldLabel>File</FieldLabel>
-				<FileDropZone
-					file={editing.file}
-					onFileChange={(file) => setEditing({ ...editing, file })}
+				<DocumentFileSource
+					value={editing.source ?? null}
+					onChange={(source) => setEditing({ ...editing, source })}
 				/>
 			</Field>
 			<div className="flex justify-end gap-2">

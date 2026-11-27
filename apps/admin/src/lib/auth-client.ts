@@ -1,7 +1,7 @@
 import { adminClient, emailOTPClient } from "better-auth/client/plugins"
 import { createAuthClient } from "better-auth/react"
 
-import { ac, adminRole, superAdminRole } from "./permissions"
+import { ac, adminRole, boardRole, superAdminRole } from "./permissions"
 
 export const authClient = createAuthClient({
 	baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL ?? "http://localhost:4100",
@@ -11,6 +11,7 @@ export const authClient = createAuthClient({
 			roles: {
 				super_admin: superAdminRole,
 				admin: adminRole,
+				board: boardRole,
 			},
 		}),
 		emailOTPClient(),

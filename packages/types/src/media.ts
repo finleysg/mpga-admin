@@ -5,8 +5,11 @@
 export function getMediaUrl(path: string | null | undefined): string | undefined {
 	if (!path) return undefined
 
-	const bucket = process.env.S3_BUCKET_NAME ?? "mpgagolf"
-	const prefix = process.env.S3_MEDIA_PREFIX ?? "media"
+	// Client components can only read NEXT_PUBLIC_* variables (Next inlines them into the browser
+	// bundle; plain S3_* are server-only). Prefer them so server- and client-rendered links agree.
+	// Keep these as literal process.env.NEXT_PUBLIC_* references or Next won't inline them.
+	const bucket = process.env.NEXT_PUBLIC_S3_BUCKET_NAME ?? process.env.S3_BUCKET_NAME ?? "mpgagolf"
+	const prefix = process.env.NEXT_PUBLIC_S3_MEDIA_PREFIX ?? process.env.S3_MEDIA_PREFIX ?? "media"
 
 	// Already a full URL - return as-is
 	if (path.startsWith("http://") || path.startsWith("https://")) {

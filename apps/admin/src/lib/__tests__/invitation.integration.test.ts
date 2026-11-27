@@ -35,7 +35,7 @@ describe.skipIf(!process.env.TEST_DATABASE_PORT)("invitation transactions (MySQL
 			role: "super_admin",
 		})
 	})
-	async function seed(expired = false) {
+	async function seed(expired = false, role = "admin") {
 		const token = randomUUID(),
 			id = randomUUID(),
 			email = `${id}@example.com`
@@ -43,7 +43,7 @@ describe.skipIf(!process.env.TEST_DATABASE_PORT)("invitation transactions (MySQL
 			id,
 			email,
 			invitedBy: inviter,
-			role: "admin",
+			role,
 			status: "pending",
 			token: createHash("sha256").update(token).digest("hex"),
 			createdAt: new Date(),
@@ -75,6 +75,19 @@ describe.skipIf(!process.env.TEST_DATABASE_PORT)("invitation transactions (MySQL
 		expect(response.ok).toBe(true)
 		expect((await response.json()).user.role).toBe("admin")
 		await expect(registerInvitedUser(inv.token, "Replay", "secure-test-password")).rejects.toThrow()
+	})
+	it("creates a board member from a board invitation", async () => {
+		const inv = await seed(false, "board")
+		await registerInvitedUser(inv.token, "Board Member", "secure-test-password")
+		const [created] = await db.select().from(user).where(eq(user.email, inv.email))
+		expect(created).toMatchObject({ role: "board", emailVerified: true })
+	})
+	it("rejects invitations for roles that can't be invited", async () => {
+		const inv = await seed(false, "super_admin")
+		await expect(
+			registerInvitedUser(inv.token, "Escalation", "secure-test-password"),
+		).rejects.toThrow()
+		expect(await db.select().from(user).where(eq(user.email, inv.email))).toHaveLength(0)
 	})
 	it("allows only one concurrent acceptance", async () => {
 		const inv = await seed()

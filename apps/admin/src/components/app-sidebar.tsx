@@ -19,8 +19,15 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 import { signOut, useSession } from "@/lib/auth-client"
+import { isBoardOnly, LIBRARY_PATH } from "@/lib/roles"
+
+const libraryNavGroup = {
+	title: "Board",
+	items: [{ title: "Library", url: LIBRARY_PATH }],
+}
 
 const navGroups = [
+	libraryNavGroup,
 	{
 		title: "Tournaments",
 		items: [
@@ -88,12 +95,17 @@ const adminNavGroup = {
 	items: [
 		{ title: "Users", url: "/admin/users" },
 		{ title: "Invitations", url: "/admin/invitations" },
+		{ title: "Import documents", url: "/admin/import-documents" },
 	],
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({
+	userRole,
+	...props
+}: React.ComponentProps<typeof Sidebar> & { userRole: string | null }) {
 	const pathname = usePathname()
 	const { data: session } = useSession()
+	const groups = isBoardOnly(userRole) ? [libraryNavGroup] : navGroups
 
 	const handleSignOut = async () => {
 		await signOut()
@@ -105,7 +117,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				<SidebarMenu>
 					<SidebarMenuItem>
 						<SidebarMenuButton size="xl" asChild>
-							<Link href="/">
+							<Link href={isBoardOnly(userRole) ? LIBRARY_PATH : "/"}>
 								<div className="w-42 h-16 relative flex items-center">
 									<Image
 										src="/images/mpga-logo.png"
@@ -121,7 +133,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 				</SidebarMenu>
 			</SidebarHeader>
 			<SidebarContent>
-				{navGroups.map((group) => (
+				{groups.map((group) => (
 					<SidebarGroup key={group.title}>
 						<SidebarGroupLabel className="text-primary-300 font-medium text-sm">
 							{group.title}
@@ -129,7 +141,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 						<SidebarMenu className="ml-3">
 							{group.items.map((item) => (
 								<SidebarMenuItem key={item.title}>
-									<SidebarMenuButton asChild isActive={pathname === item.url}>
+									<SidebarMenuButton
+										asChild
+										isActive={pathname === item.url || pathname.startsWith(`${item.url}/`)}
+									>
 										<Link href={item.url}>{item.title}</Link>
 									</SidebarMenuButton>
 								</SidebarMenuItem>
@@ -137,7 +152,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 						</SidebarMenu>
 					</SidebarGroup>
 				))}
-				{session?.user?.role === "super_admin" && (
+				{userRole === "super_admin" && (
 					<SidebarGroup>
 						<SidebarGroupLabel className="text-primary-300 font-medium text-sm">
 							{adminNavGroup.title}

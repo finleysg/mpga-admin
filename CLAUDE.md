@@ -14,7 +14,7 @@ When debugging Docker or Next.js dev server issues, always clear the .next cache
 ## Database
 
 - **Development**: Use `pnpm db:push` for fast iteration (applies schema directly, no migration files)
-- **Production**: Use `pnpm db:generate` to create migration files, then `drizzle-kit migrate` to apply them in order
+- **Production**: Use `pnpm db:generate` to create migration files. The admin container applies every unrecorded migration on startup (`apps/admin/start.sh` runs `packages/database/migrate.mjs`), so deploying applies them; keep migrations re-runnable (e.g. `CREATE TABLE IF NOT EXISTS`)
 
 ## UI Development
 

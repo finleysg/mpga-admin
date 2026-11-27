@@ -6,6 +6,7 @@ import { eq, and, gt } from "drizzle-orm"
 
 import { db } from "./db"
 import { sendInvitationEmail } from "./email"
+import { isInvitableRole, type InvitableRole } from "./roles"
 
 /**
  * Hashes a token using SHA-256 for secure storage.
@@ -19,7 +20,12 @@ function hashToken(token: string): string {
  * Generates a crypto-random token, stores the hashed version,
  * and sends an invitation email with the plain token.
  */
-export async function createInvitation(email: string, invitedByUserId: string): Promise<void> {
+export async function createInvitation(
+	email: string,
+	invitedByUserId: string,
+	role: InvitableRole = "admin",
+): Promise<void> {
+	if (!isInvitableRole(role)) throw new Error(`Invalid invitation role: ${String(role)}`)
 	const id = crypto.randomUUID()
 	const plainToken = crypto.randomBytes(32).toString("hex")
 	const hashedToken = hashToken(plainToken)
@@ -32,13 +38,13 @@ export async function createInvitation(email: string, invitedByUserId: string): 
 		email,
 		token: hashedToken,
 		invitedBy: invitedByUserId,
-		role: "admin",
+		role,
 		status: "pending",
 		expiresAt,
 		createdAt: now,
 	})
 
-	await sendInvitationEmail(email, plainToken)
+	await sendInvitationEmail(email, plainToken, role)
 }
 
 /**
@@ -108,14 +114,16 @@ export async function registerInvitedUser(token: string, name: string, password:
 				),
 			)
 			.for("update")
-		if (!inv || inv.role !== "admin") throw new Error("This invitation is invalid or has expired.")
+		if (!inv || !isInvitableRole(inv.role)) {
+			throw new Error("This invitation is invalid or has expired.")
+		}
 		const id = crypto.randomUUID()
 		await tx.insert(user).values({
 			id,
 			name: name.trim(),
 			email: inv.email.toLowerCase(),
 			emailVerified: true,
-			role: "admin",
+			role: inv.role,
 			createdAt: now,
 			updatedAt: now,
 		})

@@ -8,6 +8,7 @@ const statements = {
 	user: ["create", "list", "get", "set-role", "ban", "delete"],
 	session: ["list", "revoke"],
 	invitation: ["create", "list", "revoke"],
+	library: ["view", "upload", "manage"],
 } as const
 
 /**
@@ -22,11 +23,20 @@ export const superAdminRole = ac.newRole({
 	user: ["create", "list", "get", "set-role", "ban", "delete"],
 	session: ["list", "revoke"],
 	invitation: ["create", "list", "revoke"],
+	library: ["view", "upload", "manage"],
 })
 
 /**
- * Admin role with minimal read-only user permissions.
+ * Admin role with minimal read-only user permissions. Admins are document admins in the library.
  */
 export const adminRole = ac.newRole({
 	user: ["get"],
+	library: ["view", "upload", "manage"],
+})
+
+/**
+ * Board role: library members who can view, download, upload and add versions.
+ */
+export const boardRole = ac.newRole({
+	library: ["view", "upload"],
 })
