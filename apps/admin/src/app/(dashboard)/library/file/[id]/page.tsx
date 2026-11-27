@@ -23,8 +23,10 @@ import {
 import { FileIcon } from "@/components/library/file-icon"
 import { LibraryBreadcrumb } from "@/components/library/library-breadcrumb"
 import { LocalDate } from "@/components/library/local-date"
+import { PublicationsCard } from "@/components/library/publications-card"
 import { db } from "@/lib/db"
 import { fileTypeInfo, formatBytes } from "@/lib/library/file-types"
+import { listPublications } from "@/lib/library/publish"
 import { getDownloadUrl, getFileView, getFolderView } from "@/lib/library/service"
 import { getLibraryStorage } from "@/lib/library/storage"
 import { requireLibraryUser } from "@/lib/require-auth"
@@ -43,6 +45,8 @@ export default async function LibraryFilePage({ params }: { params: Promise<{ id
 	const tree = viewer.isDocumentAdmin
 		? await getFolderView(db, viewer, null).then((v) => (v.ok ? v.data.tree : []))
 		: []
+
+	const publications = await listPublications(db, viewer, file.id).then((r) => (r.ok ? r.data : []))
 
 	const info = fileTypeInfo(file.name)
 	let previewUrl: string | null = null
@@ -127,6 +131,13 @@ export default async function LibraryFilePage({ params }: { params: Promise<{ id
 							</dl>
 						</CardContent>
 					</Card>
+
+					<PublicationsCard
+						fileId={file.id}
+						publications={publications}
+						currentVersionNo={file.current.versionNo}
+						canRepublish={viewer.isDocumentAdmin}
+					/>
 
 					<Card>
 						<CardHeader>

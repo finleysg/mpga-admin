@@ -1,4 +1,4 @@
-import { document, documentTag } from "@mpga/database"
+import { document, documentTag, libraryPublication } from "@mpga/database"
 import { and, eq } from "drizzle-orm"
 
 import { db } from "./db"
@@ -76,7 +76,11 @@ export async function uploadDocumentFile(file: File, documentId: number): Promis
 	await uploadToS3(buffer, key, file.type)
 
 	const now = new Date().toISOString().replace("T", " ").replace("Z", "")
-	await db.update(document).set({ file: key, lastUpdate: now }).where(eq(document.id, documentId))
+	await db.transaction(async (tx) => {
+		await tx.update(document).set({ file: key, lastUpdate: now }).where(eq(document.id, documentId))
+		// A directly uploaded file replaces any library snapshot this document showed.
+		await tx.delete(libraryPublication).where(eq(libraryPublication.documentId, documentId))
+	})
 
 	return key
 }
@@ -92,6 +96,7 @@ export async function deleteDocument(id: number): Promise<void> {
 	}
 
 	await db.transaction(async (tx) => {
+		await tx.delete(libraryPublication).where(eq(libraryPublication.documentId, id))
 		await tx.delete(documentTag).where(eq(documentTag.documentId, id))
 		await tx.delete(document).where(eq(document.id, id))
 	})

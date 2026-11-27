@@ -31,7 +31,12 @@ import { ExternalLink } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
-import { FileDropZone } from "@/components/file-drop-zone"
+import { getDocumentSourceAction, publishToDocumentAction } from "@/app/(dashboard)/library/actions"
+import {
+	type CurrentLibrarySource,
+	DocumentFileSource,
+	type FileSource,
+} from "@/components/library/document-file-source"
 import { documentTypes as baseDocumentTypes } from "@/lib/document-types"
 import type { DocumentDataFull } from "@/lib/documents"
 
@@ -78,8 +83,22 @@ export function DocumentForm({
 	const [documentType, setDocumentType] = useState(existing?.documentType ?? "Other")
 	const [year, setYear] = useState<string>(existing?.year?.toString() ?? "")
 	const [tournamentId, setTournamentId] = useState<number | null>(existing?.tournamentId ?? null)
-	const [file, setFile] = useState<File | undefined>(undefined)
+	const [source, setSource] = useState<FileSource | null>(null)
+	const [librarySource, setLibrarySource] = useState<CurrentLibrarySource | null>(null)
 	const [existingFile, setExistingFile] = useState<string | null>(existing?.file ?? null)
+
+	// Which library file (if any) this document was published from.
+	const existingId = existing?.id
+	useEffect(() => {
+		if (existingId === undefined) return
+		let cancelled = false
+		getDocumentSourceAction(existingId).then((result) => {
+			if (!cancelled && result.success) setLibrarySource(result.data ?? null)
+		})
+		return () => {
+			cancelled = true
+		}
+	}, [existingId])
 
 	const handleSave = async (e: React.FormEvent) => {
 		e.preventDefault()
@@ -111,15 +130,31 @@ export function DocumentForm({
 			if (result.success && result.data) {
 				const docId = result.data.id
 
-				if (file) {
+				if (source?.kind === "upload") {
 					const formData = new FormData()
-					formData.append("file", file)
+					formData.append("file", source.file)
 					formData.append("documentId", docId.toString())
 					const uploadResult = await uploadAction(formData)
 					if (uploadResult.success && uploadResult.data) {
 						setExistingFile(uploadResult.data.file)
+						setLibrarySource(null)
+						setSource(null)
 					} else {
 						toast.error(uploadResult.error ?? "Document saved but file upload failed")
+					}
+				} else if (source?.kind === "library") {
+					const published = await publishToDocumentAction(docId, source.file.fileId)
+					if (published.success && published.data) {
+						setExistingFile(published.data.file)
+						setLibrarySource({
+							fileId: source.file.fileId,
+							fileName: source.file.name,
+							versionNo: published.data.versionNo,
+							isCurrent: true,
+						})
+						setSource(null)
+					} else {
+						toast.error(published.error ?? "Document saved but the library file wasn't published")
 					}
 				}
 
@@ -249,7 +284,7 @@ export function DocumentForm({
 								View current file
 							</a>
 						)}
-						<FileDropZone file={file} onFileChange={(f) => setFile(f)} />
+						<DocumentFileSource value={source} onChange={setSource} current={librarySource} />
 					</Field>
 
 					{error && <FieldError>{error}</FieldError>}

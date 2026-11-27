@@ -1,6 +1,8 @@
 "use server"
 
+import { document, tournament } from "@mpga/database"
 import type { ActionResult } from "@mpga/types"
+import { eq } from "drizzle-orm"
 import { after } from "next/server"
 
 import { db } from "@/lib/db"
@@ -17,10 +19,19 @@ import {
 	setFolderRestriction,
 	type FolderAccess,
 } from "@/lib/library/admin"
+import {
+	getDocumentSource,
+	listPublications,
+	publishToDocument,
+	republishLatest,
+	type Publication,
+} from "@/lib/library/publish"
 import { indexVersion } from "@/lib/library/search"
 import {
 	createFolder,
 	getDownloadUrl,
+	getFolderView,
+	type FolderView,
 	uploadFile,
 	uploadVersion,
 	type LibraryResult,
@@ -29,6 +40,7 @@ import {
 import { getLibraryStorage } from "@/lib/library/storage"
 import type { UploadActionResult } from "@/lib/library/types"
 import { requireLibraryUser } from "@/lib/require-auth"
+import { revalidatePublicSite } from "@/lib/revalidate"
 
 const UNAUTHORIZED = { success: false, error: "Unauthorized" } as const
 const UPLOAD_MODES: readonly UploadMode[] = ["new", "newVersion", "keepBoth"]
@@ -202,4 +214,69 @@ export async function restoreFromTrashAction(
 	target?: number | null,
 ) {
 	return asLibraryUser("restore it", (v) => restoreFromTrash(db, v, { kind, id }, target))
+}
+
+// ---------- Publishing to public pages ----------
+
+/** Folder contents for the library picker in the document forms. */
+export async function pickerFolderAction(
+	folderId: number | null,
+): Promise<ActionResult<FolderView>> {
+	return asLibraryUser("load the library", (v) => getFolderView(db, v, folderId))
+}
+
+/** Refresh the public pages that may show a document. */
+async function revalidateForDocument(documentId: number) {
+	const [row] = await db
+		.select({ systemName: tournament.systemName })
+		.from(document)
+		.leftJoin(tournament, eq(tournament.id, document.tournamentId))
+		.where(eq(document.id, documentId))
+	if (row?.systemName) await revalidatePublicSite(`/tournaments/${row.systemName}`, "layout")
+	// Settings and match play documents appear on several pages; refresh the whole site.
+	else await revalidatePublicSite("/", "layout")
+}
+
+/** Publish a library file's current version to a document (a snapshot). */
+export async function publishToDocumentAction(
+	documentId: number,
+	fileId: number,
+): Promise<ActionResult<{ file: string; versionNo: number }>> {
+	const result = await asLibraryUser("publish the file", (v) =>
+		publishToDocument(db, getLibraryStorage(), v, { documentId, fileId }),
+	)
+	if (result.success) await revalidateForDocument(documentId)
+	return result
+}
+
+export async function listPublicationsAction(fileId: number): Promise<ActionResult<Publication[]>> {
+	return asLibraryUser("load where it's published", (v) => listPublications(db, v, fileId))
+}
+
+/** Re-publish the current version everywhere an older one is shown. */
+export async function republishLatestAction(
+	fileId: number,
+): Promise<ActionResult<{ updated: number }>> {
+	const result = await asLibraryUser("re-publish the file", (v) =>
+		republishLatest(db, getLibraryStorage(), v, fileId),
+	)
+	if (result.success && result.data?.updated) await revalidatePublicSite("/", "layout")
+	return result
+}
+
+/** The library file a document was published from, for the document forms. */
+export async function getDocumentSourceAction(
+	documentId: number,
+): Promise<
+	ActionResult<{ fileId: number; fileName: string; versionNo: number; isCurrent: boolean } | null>
+> {
+	const viewer = await requireLibraryUser()
+	if (!viewer?.isDocumentAdmin) return UNAUTHORIZED
+	try {
+		const sources = await getDocumentSource(db, [documentId])
+		return { success: true, data: sources.get(documentId) ?? null }
+	} catch (error) {
+		console.error("Library document source failed:", error)
+		return { success: false, error: "Couldn't load the document's library file." }
+	}
 }
