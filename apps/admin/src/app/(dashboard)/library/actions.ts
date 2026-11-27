@@ -1,6 +1,7 @@
 "use server"
 
 import type { ActionResult } from "@mpga/types"
+import { after } from "next/server"
 
 import { db } from "@/lib/db"
 import {
@@ -16,6 +17,7 @@ import {
 	setFolderRestriction,
 	type FolderAccess,
 } from "@/lib/library/admin"
+import { indexVersion } from "@/lib/library/search"
 import {
 	createFolder,
 	getDownloadUrl,
@@ -30,6 +32,17 @@ import { requireLibraryUser } from "@/lib/require-auth"
 
 const UNAUTHORIZED = { success: false, error: "Unauthorized" } as const
 const UPLOAD_MODES: readonly UploadMode[] = ["new", "newVersion", "keepBoth"]
+
+/** Extract searchable text after the response is sent, so uploads stay quick. */
+function scheduleIndexing(versionId: number, name: string, bytes: Uint8Array) {
+	after(async () => {
+		try {
+			await indexVersion(db, versionId, name, bytes)
+		} catch (error) {
+			console.error(`Indexing ${name} for search failed:`, error)
+		}
+	})
+}
 
 function toActionResult<T>(result: LibraryResult<T>): ActionResult<T> {
 	return result.ok ? { success: true, data: result.data } : { success: false, error: result.error }
@@ -55,6 +68,7 @@ export async function uploadFileAction(formData: FormData): Promise<UploadAction
 			bytes,
 			mode,
 		})
+		if (result.ok) scheduleIndexing(result.data.versionId, result.data.name, bytes)
 		if (!result.ok && result.code === "name_conflict" && result.existingFileId) {
 			return {
 				success: false,
@@ -80,9 +94,13 @@ export async function uploadVersionAction(formData: FormData): Promise<UploadAct
 	}
 	try {
 		const bytes = new Uint8Array(await file.arrayBuffer())
-		return toActionResult(
-			await uploadVersion(db, getLibraryStorage(), viewer, { fileId, name: file.name, bytes }),
-		)
+		const result = await uploadVersion(db, getLibraryStorage(), viewer, {
+			fileId,
+			name: file.name,
+			bytes,
+		})
+		if (result.ok) scheduleIndexing(result.data.versionId, result.data.name, bytes)
+		return toActionResult(result)
 	} catch (error) {
 		console.error("Library version upload failed:", error)
 		return { success: false, error: `${file.name} couldn't be uploaded. Try again.` }

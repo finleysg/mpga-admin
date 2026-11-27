@@ -57,7 +57,7 @@ export function NewFolderDialog({ parentId }: { parentId: number | null }) {
 					New folder
 				</Button>
 			</DialogTrigger>
-			<DialogContent className="sm:max-w-sm">
+			<DialogContent className="sm:max-w-sm" aria-describedby={undefined}>
 				<form onSubmit={submit} className="grid gap-4">
 					<DialogHeader>
 						<DialogTitle className="font-heading text-secondary-500">New folder</DialogTitle>

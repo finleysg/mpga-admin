@@ -95,7 +95,7 @@ export function RenameDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-md">
+			<DialogContent className="sm:max-w-md" aria-describedby={undefined}>
 				<form onSubmit={submit} className="grid gap-4">
 					<DialogHeader>
 						<DialogTitle className="font-heading text-secondary-500">{title}</DialogTitle>

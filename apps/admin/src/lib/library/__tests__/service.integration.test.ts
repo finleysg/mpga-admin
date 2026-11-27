@@ -11,6 +11,7 @@ import { and, eq, sql } from "drizzle-orm"
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest"
 
 import type { Viewer } from "../access"
+import { copyVersionText, indexVersion, searchLibrary } from "../search"
 import {
 	createFolder,
 	getDownloadUrl,
@@ -472,6 +473,105 @@ describe.skipIf(!process.env.TEST_DATABASE_PORT)("library service (MySQL)", () =
 				}),
 			).toMatchObject({ ok: false, code: "not_found" })
 			expect((await getFileView(db, alice, up.data.fileId)).ok).toBe(true)
+		})
+	})
+
+	describe("search", () => {
+		const text = (s: string) => new TextEncoder().encode(s)
+
+		async function add(folderId: number, name: string, body: string) {
+			const up = await uploadFile(db, storage, alice, {
+				folderId,
+				name,
+				bytes: text(body),
+				mode: "new",
+			})
+			if (!up.ok) throw new Error(up.error)
+			await indexVersion(db, up.data.versionId, name, text(body))
+			return up.data
+		}
+
+		it("finds files by name and by contents, with path and snippet", async () => {
+			const board = await folder("Board")
+			const minutes = await folder("Minutes", board)
+			await add(minutes, "2026-03.txt", "Motion carried: the Clasen Cup moves to Keller.")
+			await add(minutes, "Clasen Cup schedule.txt", "Dates TBD")
+			await add(board, "Unrelated.txt", "Nothing to see")
+
+			const result = await searchLibrary(db, alice, "clasen")
+			if (!result.ok) throw new Error(result.error)
+			expect(result.data.map((r) => r.name)).toEqual(["Clasen Cup schedule.txt", "2026-03.txt"])
+			expect(result.data[1]).toMatchObject({
+				path: "Board / Minutes",
+				snippet: "Motion carried: the Clasen Cup moves to Keller.",
+			})
+			expect(result.data[0]?.snippet).toBeNull()
+		})
+
+		it("requires every term and ignores case and accents", async () => {
+			const id = await folder("Board")
+			await add(id, "a.txt", "The Résumé committee met in June")
+			await add(id, "b.txt", "The resume was filed")
+			const both = await searchLibrary(db, alice, "RESUME june")
+			expect(both.ok && both.data.map((r) => r.name)).toEqual(["a.txt"])
+			const literal = await searchLibrary(db, alice, "50%")
+			expect(literal.ok && literal.data).toEqual([])
+		})
+
+		it("only returns files the searcher can see, and never Trash", async () => {
+			const board = await folder("Board")
+			const exec = await folder("Executive Committee", board)
+			await db.update(libraryFolder).set({ isRestricted: true }).where(eq(libraryFolder.id, exec))
+			await db.insert(libraryFolderMember).values({ folderId: exec, userId: alice.id })
+			await add(exec, "salaries.txt", "Confidential compensation figures")
+			const trashed = await add(board, "old.txt", "Confidential draft")
+			await db
+				.update(libraryFile)
+				.set({ deletedAt: new Date() })
+				.where(eq(libraryFile.id, trashed.fileId))
+
+			const forAlice = await searchLibrary(db, alice, "confidential")
+			expect(forAlice.ok && forAlice.data.map((r) => r.name)).toEqual(["salaries.txt"])
+			const forBob = await searchLibrary(db, bob, "confidential")
+			expect(forBob.ok && forBob.data).toEqual([])
+		})
+
+		it("searches the current version and gives restored versions their text", async () => {
+			const id = await folder("Board")
+			const v1 = await add(id, "agenda.txt", "Original wording about golf carts")
+			const v2 = await uploadFile(db, storage, alice, {
+				folderId: id,
+				name: "agenda.txt",
+				bytes: text("New wording about tee times"),
+				mode: "newVersion",
+			})
+			if (!v2.ok) throw new Error(v2.error)
+			await indexVersion(db, v2.data.versionId, "agenda.txt", text("New wording about tee times"))
+			const old = await searchLibrary(db, alice, "carts")
+			expect(old.ok && old.data).toEqual([])
+
+			// Simulate the copy that restoring v1 performs.
+			const [restored] = await db
+				.insert(libraryFileVersion)
+				.values({
+					fileId: v1.fileId,
+					versionNo: 3,
+					s3Key: "library/x",
+					size: 1,
+					contentType: "text/plain",
+					originalName: "agenda.txt",
+					uploadedBy: admin.id,
+					uploadedAt: new Date(),
+					restoredFromVersionId: v1.versionId,
+				})
+				.$returningId()
+			await copyVersionText(db, v1.versionId, restored!.id)
+			await db
+				.update(libraryFile)
+				.set({ currentVersionId: restored!.id })
+				.where(eq(libraryFile.id, v1.fileId))
+			const again = await searchLibrary(db, alice, "carts")
+			expect(again.ok && again.data.map((r) => r.name)).toEqual(["agenda.txt"])
 		})
 	})
 })

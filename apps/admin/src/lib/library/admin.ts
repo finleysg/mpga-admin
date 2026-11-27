@@ -13,6 +13,7 @@ import { and, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm"
 import { descendantFolderIds, folderPath, subtreeHeight, type Viewer } from "./access"
 import { fileExtension } from "./file-types"
 import { MAX_FILE_NAME, MAX_FOLDER_DEPTH, MAX_FOLDER_NAME, uniqueName, validateName } from "./names"
+import { copyVersionText } from "./search"
 import {
 	fail,
 	insertVersion,
@@ -446,6 +447,7 @@ export async function restoreVersion(
 			now,
 			"restore_version",
 		)
+		await copyVersionText(tx, version.id, added.versionId)
 		return { ok: true as const, data: { versionNo: added.versionNo } }
 	})
 }

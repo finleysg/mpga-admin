@@ -7,6 +7,7 @@ import { FolderMenu } from "@/components/library/admin-menus"
 import { FolderContents } from "@/components/library/folder-contents"
 import { FolderTree } from "@/components/library/folder-tree"
 import { LibraryBreadcrumb } from "@/components/library/library-breadcrumb"
+import { LibrarySearchBox } from "@/components/library/library-search-box"
 import { NewFolderDialog } from "@/components/library/new-folder-dialog"
 import { UploadDialog } from "@/components/library/upload-dialog"
 import { db } from "@/lib/db"
@@ -41,7 +42,8 @@ export default async function LibraryPage({
 		<div className="mx-auto max-w-7xl">
 			<div className="mb-4 flex flex-wrap items-center justify-between gap-3">
 				<H1 variant="secondary">Library</H1>
-				<div className="flex flex-wrap gap-2">
+				<div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
+					<LibrarySearchBox />
 					{viewer.isDocumentAdmin && canNestHere && <NewFolderDialog parentId={folderId} />}
 					{viewer.isDocumentAdmin && (
 						<Button variant="ghost" asChild>
