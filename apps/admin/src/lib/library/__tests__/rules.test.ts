@@ -1,6 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it } from "vitest"
 
+import { documentKey, DOCUMENT_FILE_MAX } from "../../document-keys"
 import { descendantFolderIds, folderPath, visibleFolderIds, type FolderNode } from "../access"
 import { checkFileBasics, MAX_FILE_BYTES, validateFile } from "../file-types"
 import { cleanName, uniqueName, validateName } from "../names"
@@ -162,5 +163,26 @@ describe("local signed links", () => {
 		expect(contentDisposition("attachment", 'Q1 "Report" – final.pdf')).toBe(
 			`attachment; filename="Q1 _Report_ _ final.pdf"; filename*=UTF-8''Q1%20%22Report%22%20%E2%80%93%20final.pdf`,
 		)
+	})
+})
+
+describe("documentKey", () => {
+	const prefix = "documents/1795800000000-1234567-0611e6d7-"
+
+	it("leaves short names alone (but URL-safe)", () => {
+		expect(documentKey(prefix, "Entry Form.pdf")).toBe(`${prefix}Entry_Form.pdf`)
+	})
+
+	it("shortens long names to fit document.file, keeping the prefix and extension", () => {
+		const key = documentKey(prefix, `${"a".repeat(196)}.pdf`)
+		expect(key).toHaveLength(DOCUMENT_FILE_MAX)
+		expect(key.startsWith(prefix)).toBe(true)
+		expect(key.endsWith("a.pdf")).toBe(true)
+	})
+
+	it("doesn't mistake a long dotted tail for an extension", () => {
+		const key = documentKey(prefix, `report.${"x".repeat(300)}`)
+		expect(key).toHaveLength(DOCUMENT_FILE_MAX)
+		expect(key.startsWith(`${prefix}report.`)).toBe(true)
 	})
 })

@@ -8,6 +8,7 @@ import {
 	type Database,
 } from "@mpga/database"
 import { and, eq, sql } from "drizzle-orm"
+import { createConnection } from "mysql2/promise"
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest"
 
 import type { Viewer } from "../access"
@@ -418,6 +419,53 @@ describe.skipIf(!process.env.TEST_DATABASE_PORT)("library service (MySQL)", () =
 			const view = await getFileView(db, alice, up.data.fileId)
 			expect(view.ok && view.data.versions.map((v) => v.versionNo)).toEqual([2, 1])
 			expect(view.ok && view.data.current.versionNo).toBe(2)
+		})
+
+		it("serializes version writes on the file, not just its folder", async () => {
+			const id = await folder("Minutes")
+			const up = await uploadFile(db, storage, alice, {
+				folderId: id,
+				name: "Agenda.pdf",
+				bytes: pdf(),
+				mode: "new",
+			})
+			if (!up.ok) throw new Error(up.error)
+
+			// Another writer (e.g. an upload that started before the file moved, holding a different
+			// folder's lock) has v2 in flight: it holds the file row and hasn't committed yet.
+			const other = await createConnection({
+				host: "127.0.0.1",
+				port: Number(process.env.TEST_DATABASE_PORT),
+				user: "root",
+				password: "mpga-test-only",
+				database: "mpga_security_test",
+			})
+			try {
+				await other.query("START TRANSACTION")
+				await other.query("SELECT id FROM library_file WHERE id = ? FOR UPDATE", [up.data.fileId])
+				await other.query(
+					`INSERT INTO library_file_version
+					 (file_id, version_no, s3_key, size, content_type, original_name, uploaded_by, uploaded_at)
+					 VALUES (?, 2, 'library/in-flight', 1, 'application/pdf', 'Agenda.pdf', 'other', NOW(3))`,
+					[up.data.fileId],
+				)
+
+				let settled = false
+				const pending = uploadVersion(db, storage, bob, {
+					fileId: up.data.fileId,
+					name: "Agenda.pdf",
+					bytes: pdf("v3"),
+				}).finally(() => {
+					settled = true
+				})
+				await new Promise((resolve) => setTimeout(resolve, 500))
+				expect(settled).toBe(false) // waiting for the file lock
+
+				await other.query("COMMIT")
+				expect(await pending).toMatchObject({ ok: true, data: { versionNo: 3 } })
+			} finally {
+				await other.end()
+			}
 		})
 
 		it("lists a folder's subfolders and files, sorted, with version counts", async () => {

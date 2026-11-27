@@ -2,6 +2,7 @@ import { document, documentTag, libraryPublication } from "@mpga/database"
 import { and, eq, ne } from "drizzle-orm"
 
 import { db } from "./db"
+import { documentKey } from "./document-keys"
 import { deleteFromS3, uploadToS3 } from "./s3"
 
 export interface DocumentData {
@@ -71,8 +72,8 @@ export async function saveDocument(data: SaveDocumentInput, userId: string): Pro
 
 export async function uploadDocumentFile(file: File, documentId: number): Promise<string> {
 	const buffer = Buffer.from(await file.arrayBuffer())
-	const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_")
-	const key = `documents/${Date.now()}-${safeName}`
+	// Fits document.file (VARCHAR(200)) however long the uploaded file's name is.
+	const key = documentKey(`documents/${Date.now()}-`, file.name)
 	await uploadToS3(buffer, key, file.type)
 
 	const now = new Date().toISOString().replace("T", " ").replace("Z", "")

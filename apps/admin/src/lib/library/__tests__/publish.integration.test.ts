@@ -156,6 +156,34 @@ describe.skipIf(!process.env.TEST_DATABASE_PORT)("library publishing (MySQL)", (
 		for (const file of files) expect(storage.published.has(`media/${file}`)).toBe(true)
 	})
 
+	it("fits the public key in document.file for a 200-character name", async () => {
+		const folder = await createFolder(db, admin, { parentId: null, name: "Long" })
+		if (!folder.ok) throw new Error(folder.error)
+		const longName = `${"a".repeat(196)}.pdf`
+		const up = await uploadFile(db, storage, alice, {
+			folderId: folder.data.id,
+			name: longName,
+			bytes: pdf("v1"),
+			mode: "new",
+		})
+		if (!up.ok) throw new Error(up.error)
+		await db.insert(document).values({
+			id: 9_999_999,
+			title: "Long name",
+			documentType: "Other",
+			lastUpdate: "2026-01-01 00:00:00",
+			createdBy: admin.id,
+		})
+		const result = await publishToDocument(db, storage, admin, {
+			documentId: 9_999_999,
+			fileId: up.data.fileId,
+		})
+		expect(result.ok).toBe(true)
+		const [doc] = await db.select().from(document).where(eq(document.id, 9_999_999))
+		expect(doc?.file?.length).toBeLessThanOrEqual(200)
+		expect(doc?.file).toMatch(/^documents\/\d+-9999999-[0-9a-f]{8}-a+\.pdf$/)
+	})
+
 	it("lets only document admins publish, and records restricted-folder publishing", async () => {
 		const { fileId, documentId } = await setup(true)
 		expect(await publishToDocument(db, storage, alice, { documentId, fileId })).toMatchObject({

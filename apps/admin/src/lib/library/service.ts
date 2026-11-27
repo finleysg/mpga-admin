@@ -389,7 +389,21 @@ interface NewVersion {
 	contentVersionId?: number | null
 }
 
-/** Append a version and make it current. Caller holds the folder lock. */
+/**
+ * Lock one file's row for this transaction. Every version write takes it before reading the
+ * latest version number, so appends to a file are serialized wherever the file lives (a folder
+ * lock alone isn't enough: the file can move between folders while an upload is in flight).
+ */
+export async function lockFile(tx: Tx, fileId: number) {
+	const [row] = await tx
+		.select({ folderId: libraryFile.folderId, deletedAt: libraryFile.deletedAt })
+		.from(libraryFile)
+		.where(eq(libraryFile.id, fileId))
+		.for("update")
+	return row ?? null
+}
+
+/** Append a version and make it current. Takes the file's row lock (see lockFile). */
 export async function insertVersion(
 	tx: Tx,
 	viewer: Viewer,
@@ -398,6 +412,7 @@ export async function insertVersion(
 	now: Date,
 	action: AuditAction = "new_version",
 ) {
+	await lockFile(tx, fileId)
 	const [latestRow] = await tx
 		.select({ latest: max(libraryFileVersion.versionNo) })
 		.from(libraryFileVersion)
@@ -451,12 +466,15 @@ export async function uploadVersion(
 	await storage.put(s3Key, input.bytes, checked.file.contentType)
 
 	return db.transaction(async (tx): Promise<LibraryResult<UploadedFile>> => {
-		if (!(await lockFolder(tx, file.folderId))) return fail("not_found", NOT_FOUND)
-		const [current] = await tx
-			.select({ deletedAt: libraryFile.deletedAt })
-			.from(libraryFile)
-			.where(eq(libraryFile.id, file.id))
+		// Lock the file itself and re-check where it is now: it may have been moved (or trashed)
+		// while the upload was being stored. Deleting a folder trashes its files, so a live file
+		// is in a live folder.
+		const current = await lockFile(tx, file.id)
 		if (!current || current.deletedAt) return fail("not_found", NOT_FOUND)
+		if (current.folderId !== file.folderId) {
+			const state = await loadFolderState(tx, viewer)
+			if (!state.visible.has(current.folderId)) return fail("not_found", NOT_FOUND)
+		}
 		const added = await insertVersion(
 			tx,
 			viewer,

@@ -16,7 +16,7 @@ import {
 import { Download, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useRef, useState } from "react"
 
 import type { ImportResult } from "@/lib/library/import-documents"
 import { fileHref } from "@/lib/library/links"
@@ -27,28 +27,40 @@ import { importDocumentsBatchAction } from "./actions"
 export function ImportRunner({ total }: { total: number }) {
 	const router = useRouter()
 	const [running, setRunning] = useState(false)
+	const [confirmOpen, setConfirmOpen] = useState(false)
+	// A ref, not state: two clicks in the same tick would both still see running === false.
+	const runningRef = useRef(false)
 	const [results, setResults] = useState<ImportResult[]>([])
 	const [error, setError] = useState<string | null>(null)
 	const [done, setDone] = useState(false)
 
 	async function run(e: React.MouseEvent) {
 		e.preventDefault()
+		setConfirmOpen(false)
+		if (runningRef.current) return
+		runningRef.current = true
 		setRunning(true)
 		setError(null)
 		setDone(false)
 		setResults([])
 		let after: number | null = 0
-		while (after !== null) {
-			const result = await importDocumentsBatchAction(after)
-			if (!result.success || !result.data) {
-				setError(result.error ?? "The import stopped. It's safe to run again.")
-				break
+		try {
+			while (after !== null) {
+				const result = await importDocumentsBatchAction(after)
+				if (!result.success || !result.data) {
+					setError(result.error ?? "The import stopped. It's safe to run again.")
+					break
+				}
+				const batch = result.data
+				setResults((prev) => [...prev, ...batch.results])
+				after = batch.nextAfterDocumentId
 			}
-			const batch = result.data
-			setResults((prev) => [...prev, ...batch.results])
-			after = batch.nextAfterDocumentId
+		} catch {
+			setError("The import stopped (connection problem). It's safe to run again.")
+		} finally {
+			runningRef.current = false
+			setRunning(false)
 		}
-		setRunning(false)
 		if (after === null) setDone(true)
 		router.refresh()
 	}
@@ -58,7 +70,7 @@ export function ImportRunner({ total }: { total: number }) {
 
 	return (
 		<div className="space-y-4">
-			<AlertDialog>
+			<AlertDialog open={confirmOpen} onOpenChange={(next) => !running && setConfirmOpen(next)}>
 				<AlertDialogTrigger asChild>
 					<Button disabled={running || total === 0}>
 						{running ? (
@@ -82,7 +94,9 @@ export function ImportRunner({ total }: { total: number }) {
 					</AlertDialogHeader>
 					<AlertDialogFooter>
 						<AlertDialogCancel>Cancel</AlertDialogCancel>
-						<AlertDialogAction onClick={run}>Import</AlertDialogAction>
+						<AlertDialogAction onClick={run} disabled={running}>
+							Import
+						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>

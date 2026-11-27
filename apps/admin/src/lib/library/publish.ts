@@ -10,6 +10,7 @@ import {
 } from "@mpga/database"
 import { and, eq, inArray, isNull } from "drizzle-orm"
 
+import { documentKey } from "../document-keys"
 import { folderPath, type Viewer } from "./access"
 import { fail, loadFolderState, NOT_FOUND, writeAudit, type LibraryResult } from "./service"
 import type { LibraryStorage } from "./storage"
@@ -26,9 +27,9 @@ const ADMIN_ONLY = "Only document admins can publish library files."
  * documents must never share an object, since deleting a document deletes its file.
  */
 export function publicKeyFor(fileName: string, documentId: number, now: Date): string {
-	const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, "_")
 	const unique = crypto.randomUUID().slice(0, 8)
-	return `documents/${now.getTime()}-${documentId}-${unique}-${safeName}`
+	// Shortened to fit document.file, keeping this unique prefix and the extension.
+	return documentKey(`documents/${now.getTime()}-${documentId}-${unique}-`, fileName)
 }
 
 function mediaPrefix(): string {
