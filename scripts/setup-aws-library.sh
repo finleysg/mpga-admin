@@ -623,7 +623,6 @@ check() { # check "description" expected(ok|fail) CMD...
   if [[ "$got" == "$expect" ]]; then PASS=$((PASS + 1)); printf '  %s✓%s %s\n' "$GREEN" "$RESET" "$what"
   else FAIL=$((FAIL + 1)); printf '  %s✗ %s%s\n' "$YELLOW" "$what" "$RESET"; fi
 }
-http_status() { curl -s -o /dev/null -w '%{http_code}' "$1"; }
 check "dev can write to $TEST_LIBRARY_BUCKET" ok \
   as_dev aws s3api put-object --bucket "$TEST_LIBRARY_BUCKET" --key library/wizard-check.txt --body "$CHECK_FILE"
 check "dev can read from $TEST_LIBRARY_BUCKET" ok \
@@ -647,15 +646,26 @@ SIM_LIB=$(aws iam simulate-principal-policy \
   --query 'EvaluationResults[].EvalDecision' --output text 2>/dev/null || echo error)
 check "dev can't read, write or list $PROD_LIBRARY_BUCKET (IAM simulation: $SIM_LIB)" ok \
   bash -c '[[ "$1" != *allowed* && "$1" != error ]]' _ "$SIM_LIB"
-check "public files in $TEST_MEDIA_BUCKET open over HTTPS" ok \
-  bash -c '[[ "$(curl -s -o /dev/null -w "%{http_code}" "$1")" == 200 ]]' _ \
-  "https://$TEST_MEDIA_BUCKET.s3.amazonaws.com/$MEDIA_PREFIX/wizard-check.txt"
-check "library files in $TEST_LIBRARY_BUCKET are not public (403)" ok \
-  bash -c '[[ "$(curl -s -o /dev/null -w "%{http_code}" "$1")" == 403 ]]' _ \
-  "https://$TEST_LIBRARY_BUCKET.s3.amazonaws.com/library/wizard-check.txt"
-check "library files in $PROD_LIBRARY_BUCKET are not public (403)" ok \
-  bash -c 'c=$(curl -s -o /dev/null -w "%{http_code}" "$1"); [[ "$c" == 403 ]]' _ \
-  "https://$PROD_LIBRARY_BUCKET.s3.amazonaws.com/library/wizard-check.txt"
+# Use the regional address: brand-new buckets outside us-east-1 answer the global
+# <bucket>.s3.amazonaws.com address with a 307 redirect until DNS catches up (hours, up to a day).
+regional_url() { printf 'https://%s.s3.%s.amazonaws.com/%s' "$1" "$REGION" "$2"; }
+expect_status() { # expect_status "description" CODE URL
+  local code; code=$(curl -s -o /dev/null -w '%{http_code}' "$3")
+  if [[ "$code" == "$2" ]]; then PASS=$((PASS + 1)); printf '  %s✓%s %s\n' "$GREEN" "$RESET" "$1"
+  else FAIL=$((FAIL + 1)); printf '  %s✗ %s (got HTTP %s)%s\n' "$YELLOW" "$1" "$code" "$RESET"; fi
+}
+expect_status "public files in $TEST_MEDIA_BUCKET open over HTTPS (200)" 200 \
+  "$(regional_url "$TEST_MEDIA_BUCKET" "$MEDIA_PREFIX/wizard-check.txt")"
+expect_status "library files in $TEST_LIBRARY_BUCKET are not public (403)" 403 \
+  "$(regional_url "$TEST_LIBRARY_BUCKET" library/wizard-check.txt)"
+expect_status "library files in $PROD_LIBRARY_BUCKET are not public (403)" 403 \
+  "$(regional_url "$PROD_LIBRARY_BUCKET" library/wizard-check.txt)"
+GLOBAL_CODE=$(curl -s -o /dev/null -w '%{http_code}' "https://$TEST_MEDIA_BUCKET.s3.amazonaws.com/$MEDIA_PREFIX/wizard-check.txt")
+if [[ "$GLOBAL_CODE" == 307 ]]; then
+  note "The global address for $TEST_MEDIA_BUCKET still redirects (307): normal for a new bucket."
+  note "Browsers follow it, but dev media links may be slow or images may not show until DNS"
+  note "catches up (usually a few hours)."
+fi
 as_dev aws s3api delete-object --bucket "$TEST_LIBRARY_BUCKET" --key library/wizard-check.txt >/dev/null 2>&1 || true
 as_dev aws s3api delete-object --bucket "$TEST_MEDIA_BUCKET" --key "$MEDIA_PREFIX/wizard-check.txt" >/dev/null 2>&1 || true
 printf '\n'
