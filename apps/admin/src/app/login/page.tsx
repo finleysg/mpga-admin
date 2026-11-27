@@ -58,8 +58,8 @@ export default function LoginPage() {
 				await signOut()
 				setError("This account doesn't have access to the admin site.")
 			} else {
-				router.push("/")
-				router.refresh()
+				// Full load: router.push + router.refresh loops forever when "/" redirects (board → /library).
+				window.location.assign("/")
 			}
 		} catch {
 			setError("An unexpected error occurred")

@@ -12,7 +12,6 @@ import {
 	Input,
 } from "@mpga/ui"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 import { signUpWithInvitation } from "../actions"
@@ -27,7 +26,6 @@ interface AcceptInvitationPageProps {
 }
 
 export default function AcceptInvitationPage({ params }: AcceptInvitationPageProps) {
-	const router = useRouter()
 	const [token, setToken] = useState<string | null>(null)
 	const [invitation, setInvitation] = useState<InvitationData | null>(null)
 	const [isValidating, setIsValidating] = useState(true)
@@ -77,8 +75,8 @@ export default function AcceptInvitationPage({ params }: AcceptInvitationPagePro
 			if (!result.success) {
 				setError(result.error ?? "Account creation failed")
 			} else {
-				router.push("/")
-				router.refresh()
+				// Full load: router.push + router.refresh loops forever when "/" redirects (board → /library).
+				window.location.assign("/")
 			}
 		} catch {
 			setError("An unexpected error occurred")
